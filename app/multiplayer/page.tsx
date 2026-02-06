@@ -9,14 +9,31 @@ export default function Multiplayer() {
   const [name, setName] = useState("");
   const [room, setRoom] = useState("");
 
+  function makeRoomCode() {
+    const code = Math.floor(1000 + Math.random() * 9000).toString();
+    return `#${code}`;
+  }
+
+  function normalizeRoomCode(input: string) {
+    const digits = input.replace(/[^0-9]/g, "");
+    if (digits.length === 4) {
+      return `#${digits}`;
+    }
+    return "";
+  }
+
   function createRoom() {
     if (!name.trim()) {
       alert("Enter your name");
       return;
     }
 
-    const newRoom = Math.random().toString(36).slice(2, 8);
-    router.push(`/room?roomId=${newRoom}&name=${encodeURIComponent(name)}`);
+    const newRoom = makeRoomCode();
+    router.push(
+      `/room?roomId=${encodeURIComponent(newRoom)}&name=${encodeURIComponent(
+        name
+      )}`
+    );
   }
 
   function joinRoom() {
@@ -25,7 +42,17 @@ export default function Multiplayer() {
       return;
     }
 
-    router.push(`/room?roomId=${room.trim()}&name=${encodeURIComponent(name)}`);
+    const normalized = normalizeRoomCode(room);
+    if (!normalized) {
+      alert("Room code must be 4 digits");
+      return;
+    }
+
+    router.push(
+      `/room?roomId=${encodeURIComponent(normalized)}&name=${encodeURIComponent(
+        name
+      )}`
+    );
   }
 
   return (
