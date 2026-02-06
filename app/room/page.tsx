@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { socket } from "@/lib/socket";
 import { cn } from "@/lib/utils";
+import ScorePage from "@/components/score/scorepage";
 
 type RoomUser = {
   id: string;
@@ -34,6 +35,10 @@ export default function RoomPage() {
   const [text, setText] = useState(defaultText);
   const [typed, setTyped] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+  const [testEnded, setTestEnded] = useState(false);
 
   const ready = roomId.trim().length > 0 && name.trim().length > 0;
 
@@ -59,11 +64,16 @@ export default function RoomPage() {
     };
 
     const handleTestStarted = (payload: { text?: string; users?: RoomUser[] }) => {
-      setText(payload.text && payload.text.length > 0 ? payload.text : defaultText);
+      setText(
+        payload.text && payload.text.length > 0 ? payload.text : defaultText
+      );
       setTyped("");
       if (Array.isArray(payload.users)) {
         setUsers(payload.users);
       }
+      setTimeLeft(60);
+      setIsRunning(true);
+      setTestEnded(false);
     };
 
     socket.on("room-users-update", handleUsersUpdate);
@@ -77,6 +87,34 @@ export default function RoomPage() {
       socket.disconnect();
     };
   }, [ready, roomId, name]);
+
+  useEffect(() => {
+    if (!isRunning) {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      return;
+    }
+
+    timerRef.current = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          setIsRunning(false);
+          setTestEnded(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [isRunning]);
 
   useEffect(() => {
     if (!ready) return;
@@ -97,6 +135,9 @@ export default function RoomPage() {
     if (!ready) return;
     socket.emit("start-test", { roomId, text: defaultText });
     inputRef.current?.focus();
+    setTimeLeft(60);
+    setIsRunning(true);
+    setTestEnded(false);
   }
 
   if (!ready) {
@@ -118,6 +159,19 @@ export default function RoomPage() {
     );
   }
 
+  if (testEnded) {
+    return (
+      <ScorePage
+        name={name}
+        roomId={roomId}
+        typed={typed}
+        text={text}
+        onRestart={startTest}
+        onExit={() => router.push("/multiplayer")}
+      />
+    );
+  }
+
   return (
     <main
       className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center px-6"
@@ -129,12 +183,20 @@ export default function RoomPage() {
             <h1 className="text-3xl font-bold">Room {roomId}</h1>
             <p className="text-zinc-400">Playing as {name}</p>
           </div>
-          <button
-            onClick={startTest}
-            className="px-4 py-2 rounded bg-emerald-500 text-emerald-950 font-semibold"
-          >
-            Start test
-          </button>
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-zinc-400">
+              Time:{" "}
+              <span className="text-zinc-100 font-semibold">
+                {timeLeft}s
+              </span>
+            </div>
+            <button
+              onClick={startTest}
+              className="px-4 py-2 rounded bg-emerald-500 text-emerald-950 font-semibold"
+            >
+              Start test
+            </button>
+          </div>
         </div>
 
         <div className="space-y-3">
