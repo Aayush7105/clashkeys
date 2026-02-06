@@ -15,29 +15,32 @@ export default function SoloPlay() {
 
   return (
     <main
-      className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center px-6 "
+      className="min-h-screen bg-[#1a1b1f] text-[#e2e2e2] flex items-center justify-center px-6"
       onClick={() => inputRef.current?.focus()}
     >
-      <div className="max-w-3xl w-full space-y-8">
+      <div className="max-w-4xl w-full space-y-10">
         {/* Title */}
-        <h1 className="text-center text-4xl font-bold">Solo Typing</h1>
+        <div className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a]">
+          <span>Solo Play</span>
+          <span className="text-[#e2b714]">clashkeys</span>
+        </div>
 
         {/* Text Output */}
-        <div className="w-7xl rounded-xl bg-zinc-900/50 border border-zinc-800 p-6 text-2xl font-mono leading-relaxed mx-auto tracking-wide select-none">
+        <div className="text-3xl sm:text-4xl font-mono leading-relaxed tracking-wide select-none">
           {text.split("").map((char, i) => {
             const typedChar = typed[i];
 
-            let color = "text-zinc-500";
-            if (typedChar === undefined) color = "text-zinc-500";
-            else if (typedChar === char) color = "text-emerald-400";
-            else color = "text-red-400";
+            let color = "text-[#4a4f5a]";
+            if (typedChar === undefined) color = "text-[#4a4f5a]";
+            else if (typedChar === char) color = "text-[#e2e2e2]";
+            else color = "text-[#e34f4f]";
 
             const showCaret = i === typed.length;
 
             return (
               <span key={i} className="relative">
                 {showCaret && (
-                  <span className="absolute -left-0.5 top-0 h-full w-[2px] bg-emerald-400 animate-pulse" />
+                  <span className="absolute -left-0.5 top-0 h-full w-[2px] bg-[#e2b714] animate-pulse" />
                 )}
                 <span className={cn(color)}>{char}</span>
               </span>
@@ -56,7 +59,7 @@ export default function SoloPlay() {
         />
 
         {/* Hint */}
-        <p className="text-center text-zinc-500">
+        <p className="text-center text-sm tracking-wide text-[#6b6f7a]">
           Click anywhere and start typing
         </p>
       </div>
