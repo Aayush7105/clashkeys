@@ -8,9 +8,8 @@ export default function Home() {
 
   return (
     <main>
-      {/* <button onClick={() => router.push("/multiplayer")}>Multiplayer</button>
-      <button onClick={() => router.push("/soloplay")}>Solo Play</button> */}
-      <Landing />
+      <button onClick={() => router.push("/multiplayer")}>Multiplayer</button>
+      <button onClick={() => router.push("/soloplay")}>Solo Play</button>
     </main>
   );
 }

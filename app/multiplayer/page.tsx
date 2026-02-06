@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -28,19 +28,9 @@ export default function Multiplayer() {
     router.push(`/room?roomId=${room.trim()}&name=${encodeURIComponent(name)}`);
   }
 
-  function playWithFriends() {
-    if (!name.trim()) {
-      alert("Enter your name");
-      return;
-    }
-
-    const newRoom = Math.random().toString(36).slice(2, 8);
-    router.push(`/room?roomId=${newRoom}&name=${encodeURIComponent(name)}`);
-  }
-
   return (
     <div style={{ padding: 40, fontFamily: "system-ui, sans-serif" }}>
-      <h2>Typing Rooms – Multiplayer</h2>
+      <h2>Typing Rooms - Multiplayer</h2>
 
       <div style={{ marginTop: 20 }}>
         <input
@@ -63,7 +53,7 @@ export default function Multiplayer() {
         <button onClick={joinRoom} style={{ marginLeft: 10 }}>
           Join room
         </button>
-        <button onClick={playWithFriends} style={{ marginLeft: 10 }}>
+        <button onClick={createRoom} style={{ marginLeft: 10 }}>
           Play with friends
         </button>
       </div>
