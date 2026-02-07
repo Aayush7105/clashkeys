@@ -41,6 +41,8 @@ export default function RoomPage() {
   const [isRunning, setIsRunning] = useState(false);
   const [testEnded, setTestEnded] = useState(false);
   const [socketId, setSocketId] = useState<string | null>(null);
+  const [keystrokes, setKeystrokes] = useState(0);
+  const [backspaces, setBackspaces] = useState(0);
 
   const ready = roomId.trim().length > 0 && name.trim().length > 0;
   const hostId = users[0]?.id ?? null;
@@ -84,6 +86,8 @@ export default function RoomPage() {
         payload.text && payload.text.length > 0 ? payload.text : defaultText,
       );
       setTyped("");
+      setKeystrokes(0);
+      setBackspaces(0);
       if (Array.isArray(payload.users)) {
         setUsers(payload.users);
       }
@@ -153,6 +157,8 @@ export default function RoomPage() {
     if (!isHost) return;
     socket.emit("start-test", { roomId, text: defaultText });
     inputRef.current?.focus();
+    setKeystrokes(0);
+    setBackspaces(0);
     setTimeLeft(60);
     setIsRunning(true);
     setTestEnded(false);
@@ -184,6 +190,9 @@ export default function RoomPage() {
         roomId={roomId}
         typed={typed}
         text={text}
+        durationSeconds={60}
+        keystrokes={keystrokes}
+        backspaces={backspaces}
         onRestart={startTest}
         onExit={() => router.push("/multiplayer")}
         isHost={isHost}
@@ -276,6 +285,25 @@ export default function RoomPage() {
           ref={inputRef}
           value={typed}
           onChange={(e) => setTyped(e.target.value.slice(0, text.length))}
+          onKeyDown={(e) => {
+            if (!isRunning) return;
+            if (e.key === "Backspace") {
+              setBackspaces((prev) => prev + 1);
+              setKeystrokes((prev) => prev + 1);
+              return;
+            }
+
+            if (e.key.length === 1 || e.key === "Enter" || e.key === "Tab") {
+              setKeystrokes((prev) => prev + 1);
+            }
+          }}
+          onPaste={(e) => {
+            if (!isRunning) return;
+            const pasted = e.clipboardData.getData("text");
+            if (pasted) {
+              setKeystrokes((prev) => prev + pasted.length);
+            }
+          }}
           className="absolute opacity-0 pointer-events-none"
           autoComplete="off"
           spellCheck={false}
