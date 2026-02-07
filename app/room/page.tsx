@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { socket } from "@/lib/socket";
 import { cn } from "@/lib/utils";
 import ScorePage from "@/components/score/scorepage";
+import WaitingRoomPage from "@/components/room/roompage";
 
 type RoomUser = {
   id: string;
@@ -39,14 +40,26 @@ export default function RoomPage() {
   const [timeLeft, setTimeLeft] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [testEnded, setTestEnded] = useState(false);
+  const [socketId, setSocketId] = useState<string | null>(null);
 
   const ready = roomId.trim().length > 0 && name.trim().length > 0;
+  const hostId = users[0]?.id ?? null;
+  const isHost = Boolean(hostId && socketId && hostId === socketId);
 
   useEffect(() => {
     if (!ready) return;
 
     if (!socket.connected) {
       socket.connect();
+    }
+
+    const handleConnect = () => {
+      setSocketId(socket.id);
+    };
+
+    socket.on("connect", handleConnect);
+    if (socket.connected) {
+      setSocketId(socket.id);
     }
 
     socket.emit("join-room", { roomId, name });
@@ -81,6 +94,7 @@ export default function RoomPage() {
     socket.on("test-started", handleTestStarted);
 
     return () => {
+      socket.off("connect", handleConnect);
       socket.off("room-users-update", handleUsersUpdate);
       socket.off("progress-update", handleProgressUpdate);
       socket.off("test-started", handleTestStarted);
@@ -133,6 +147,7 @@ export default function RoomPage() {
 
   function startTest() {
     if (!ready) return;
+    if (!isHost) return;
     socket.emit("start-test", { roomId, text: defaultText });
     inputRef.current?.focus();
     setTimeLeft(60);
@@ -168,6 +183,21 @@ export default function RoomPage() {
         text={text}
         onRestart={startTest}
         onExit={() => router.push("/multiplayer")}
+        isHost={isHost}
+      />
+    );
+  }
+
+  if (!isRunning) {
+    return (
+      <WaitingRoomPage
+        roomId={roomId}
+        name={name}
+        users={users}
+        hostId={hostId}
+        isHost={isHost}
+        onStart={startTest}
+        onExit={() => router.push("/multiplayer")}
       />
     );
   }
@@ -190,12 +220,6 @@ export default function RoomPage() {
                 {timeLeft}s
               </span>
             </div>
-            <button
-              onClick={startTest}
-              className="px-4 py-2 rounded bg-emerald-500 text-emerald-950 font-semibold"
-            >
-              Start test
-            </button>
           </div>
         </div>
 

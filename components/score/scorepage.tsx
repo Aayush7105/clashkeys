@@ -5,6 +5,7 @@ type ScorePageProps = {
   text: string;
   onRestart: () => void;
   onExit: () => void;
+  isHost?: boolean;
 };
 
 function calcStats(typed: string, text: string) {
@@ -26,6 +27,7 @@ export default function ScorePage({
   text,
   onRestart,
   onExit,
+  isHost = true,
 }: ScorePageProps) {
   const { correct, accuracy, wpm } = calcStats(typed, text);
 
@@ -65,12 +67,18 @@ export default function ScorePage({
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <button
-            onClick={onRestart}
-            className="px-4 py-2 rounded bg-emerald-500 text-emerald-950 font-semibold"
-          >
-            Play again
-          </button>
+          {isHost ? (
+            <button
+              onClick={onRestart}
+              className="px-4 py-2 rounded bg-emerald-500 text-emerald-950 font-semibold"
+            >
+              Play again
+            </button>
+          ) : (
+            <div className="px-4 py-2 rounded border border-zinc-700 text-zinc-400 font-semibold">
+              Waiting for host to restart
+            </div>
+          )}
           <button
             onClick={onExit}
             className="px-4 py-2 rounded border border-zinc-700 text-zinc-100 font-semibold"
