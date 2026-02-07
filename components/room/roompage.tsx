@@ -16,7 +16,7 @@ type RoomPageProps = {
   onExit: () => void;
 };
 
-export default function RoomPage({
+export default function WaitingRoomPage({
   roomId,
   name,
   users,

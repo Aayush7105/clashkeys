@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export default function SoloPlay() {
-  const text = "This is a simple solo typing test for the prototype.";
+  const text = "This is a simple solo typing test for the pro.";
   const [typed, setTyped] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -18,7 +18,7 @@ export default function SoloPlay() {
       className="min-h-screen bg-[#1a1b1f] text-[#e2e2e2] flex items-center justify-center px-6"
       onClick={() => inputRef.current?.focus()}
     >
-      <div className="max-w-4xl w-full space-y-10">
+      <div className="max-w-6xl w-full space-y-10">
         {/* Title */}
         <div className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a]">
           <span>Solo Play</span>
@@ -26,7 +26,7 @@ export default function SoloPlay() {
         </div>
 
         {/* Text Output */}
-        <div className="text-3xl sm:text-4xl font-mono leading-relaxed tracking-wide select-none">
+        <div className="w-full max-w-6xl text-3xl sm:text-4xl font-mono leading-relaxed tracking-wide select-none">
           {text.split("").map((char, i) => {
             const typedChar = typed[i];
 
@@ -57,11 +57,6 @@ export default function SoloPlay() {
           autoComplete="off"
           spellCheck={false}
         />
-
-        {/* Hint */}
-        <p className="text-center text-sm tracking-wide text-[#6b6f7a]">
-          Click anywhere and start typing
-        </p>
       </div>
     </main>
   );

@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { socket } from "@/lib/socket";
 import { cn } from "@/lib/utils";
 import ScorePage from "@/components/score/scorepage";
-import WaitingRoomPage from "@/components/room/roompage";
+import WaitingRoomPage from "./roompage";
 
 type RoomUser = {
   id: string;
@@ -54,12 +54,12 @@ export default function RoomPage() {
     }
 
     const handleConnect = () => {
-      setSocketId(socket.id);
+      setSocketId(socket.id ?? null);
     };
 
     socket.on("connect", handleConnect);
     if (socket.connected) {
-      setSocketId(socket.id);
+      handleConnect();
     }
 
     socket.emit("join-room", { roomId, name });
@@ -76,9 +76,12 @@ export default function RoomPage() {
       }
     };
 
-    const handleTestStarted = (payload: { text?: string; users?: RoomUser[] }) => {
+    const handleTestStarted = (payload: {
+      text?: string;
+      users?: RoomUser[];
+    }) => {
       setText(
-        payload.text && payload.text.length > 0 ? payload.text : defaultText
+        payload.text && payload.text.length > 0 ? payload.text : defaultText,
       );
       setTyped("");
       if (Array.isArray(payload.users)) {
@@ -216,9 +219,7 @@ export default function RoomPage() {
           <div className="flex items-center gap-4">
             <div className="text-sm text-zinc-400">
               Time:{" "}
-              <span className="text-zinc-100 font-semibold">
-                {timeLeft}s
-              </span>
+              <span className="text-zinc-100 font-semibold">{timeLeft}s</span>
             </div>
           </div>
         </div>
@@ -263,7 +264,7 @@ export default function RoomPage() {
             return (
               <span key={i} className="relative">
                 {showCaret && (
-                  <span className="absolute -left-0.5 top-0 h-full w-[2px] bg-emerald-400 animate-pulse" />
+                  <span className="absolute -left-0.5 top-0 h-full w-0.5 bg-emerald-400 animate-pulse" />
                 )}
                 <span className={cn(color)}>{char}</span>
               </span>
