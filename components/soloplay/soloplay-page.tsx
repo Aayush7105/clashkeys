@@ -3,12 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
-export default function SoloPlay() {
+export default function SoloPlayPage() {
   const text = "This is a simple solo typing test for the pro.";
   const [typed, setTyped] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-focus typing
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
@@ -19,13 +18,11 @@ export default function SoloPlay() {
       onClick={() => inputRef.current?.focus()}
     >
       <div className="max-w-6xl w-full space-y-10">
-        {/* Title */}
         <div className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a]">
           <span>Solo Play</span>
           <span className="text-[#e2b714]">clashkeys</span>
         </div>
 
-        {/* Text Output */}
         <div className="w-full max-w-6xl text-3xl sm:text-4xl font-mono leading-relaxed tracking-wide select-none">
           {text.split("").map((char, i) => {
             const typedChar = typed[i];
@@ -48,7 +45,6 @@ export default function SoloPlay() {
           })}
         </div>
 
-        {/* Hidden Input */}
         <input
           ref={inputRef}
           value={typed}

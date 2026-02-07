@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { socket } from "@/lib/socket";
 import { cn } from "@/lib/utils";
 import ScorePage from "@/components/score/scorepage";
-import WaitingRoomPage from "./roompage";
+import WaitingRoomPage from "./waitingroom";
 
 type RoomUser = {
   id: string;
