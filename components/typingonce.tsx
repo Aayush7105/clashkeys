@@ -11,7 +11,7 @@ type TypingOnceProps = {
 
 export default function TypingOnce({
   text,
-  speed = 80,
+  speed = 85,
   className,
 }: TypingOnceProps) {
   const [count, setCount] = useState(0);
