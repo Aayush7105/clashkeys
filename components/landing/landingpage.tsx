@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import TypingOnce from "../typingonce";
 
 const Landing = () => {
   return (
@@ -9,7 +10,7 @@ const Landing = () => {
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-16">
         <header className="flex items-center justify-between text-xs uppercase tracking-[0.35em] text-[#6b6f7a]">
-          <span>Typing Arena</span>
+          <span></span>
           <span className="text-[#e2b714]">ClashKeys</span>
         </header>
 
@@ -19,8 +20,8 @@ const Landing = () => {
               <p className="text-xs uppercase tracking-[0.3em] text-[#7a7f8a]">
                 Competitive typing duels
               </p>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-tight tracking-tight font-['Space_Grotesk']">
-                Race your friends. Sharpen your speed. Own the leaderboard.
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-tight tracking-tight font-mono">
+                <TypingOnce text={"ClashKeys"} />
               </h1>
               <p className="text-base sm:text-lg text-[#a8adb7] max-w-xl">
                 ClashKeys turns typing practice into a head-to-head arena.

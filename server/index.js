@@ -1,9 +1,13 @@
-const express = require("express");
-const http = require("http");
-const { Server } = require("socket.io");
+import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
 
 const app = express();
-const server = http.createServer(app);
+const server = createServer(app);
+
+app.get("/", (_req, res) => {
+  res.status(200).send("OK");
+});
 
 const io = new Server(server, {
   cors: {
@@ -27,7 +31,7 @@ io.on("connection", (socket) => {
 
     // Avoid duplicate entries if join-room fires twice (e.g., React strict mode)
     rooms[roomId].users = rooms[roomId].users.filter(
-      (u) => u.socketId !== socket.id
+      (u) => u.socketId !== socket.id,
     );
 
     rooms[roomId].users.push({
@@ -42,7 +46,7 @@ io.on("connection", (socket) => {
         id: u.socketId,
         name: u.name,
         progress: u.progress,
-      }))
+      })),
     );
   });
 
@@ -61,7 +65,7 @@ io.on("connection", (socket) => {
         id: u.socketId,
         name: u.name,
         progress: u.progress,
-      }))
+      })),
     );
   });
 
@@ -97,7 +101,7 @@ io.on("connection", (socket) => {
             id: u.socketId,
             name: u.name,
             progress: u.progress,
-          }))
+          })),
         );
       }
 
