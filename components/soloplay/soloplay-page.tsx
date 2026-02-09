@@ -18,7 +18,7 @@ export default function SoloPlayPage() {
       className="min-h-screen bg-[#1a1b1f] text-[#e2e2e2] flex items-center justify-center px-2 py-16 "
       onClick={() => inputRef.current?.focus()}
     >
-      <div className="max-w-7xl h-screen  py-16">
+      <div className="max-w-7xl h-screen  py-20">
         <Solonavbar />
         <div className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a] mt-10">
           <span>Solo Play</span>
