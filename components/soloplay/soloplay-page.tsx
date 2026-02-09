@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import Solonavbar from "./solonavbar";
 
 export default function SoloPlayPage() {
   const text = "This is a simple solo typing test for the pro.";
@@ -14,16 +15,17 @@ export default function SoloPlayPage() {
 
   return (
     <main
-      className="min-h-screen bg-[#1a1b1f] text-[#e2e2e2] flex items-center justify-center px-6"
+      className="min-h-screen bg-[#1a1b1f] text-[#e2e2e2] flex items-center justify-center px-2 py-16 "
       onClick={() => inputRef.current?.focus()}
     >
-      <div className="max-w-6xl w-full space-y-10">
-        <div className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a]">
+      <div className="max-w-7xl h-screen  py-16">
+        <Solonavbar />
+        <div className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a] mt-10">
           <span>Solo Play</span>
           <span className="text-[#e2b714]">clashkeys</span>
         </div>
 
-        <div className="w-full max-w-6xl text-3xl sm:text-4xl font-mono leading-relaxed tracking-wide select-none">
+        <div className="max-w-7xl text-3xl sm:text-4xl font-mono leading-relaxed tracking-wide select-none">
           {text.split("").map((char, i) => {
             const typedChar = typed[i];
 
