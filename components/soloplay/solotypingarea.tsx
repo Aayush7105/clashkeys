@@ -8,7 +8,6 @@ import React, {
   useMemo,
 } from "react";
 
-// 1. Text Pool
 const TEXT_POOL = [
   "The quick brown fox jumps over the lazy dog.",
   "Success is not final, failure is not fatal: it is the courage to continue that counts.",
@@ -25,10 +24,15 @@ interface SoloTypingAreaProps {
 }
 
 const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
-  // 2. State for the selected text
-  const [targetText, setTargetText] = useState(
-    () => TEXT_POOL[Math.floor(Math.random() * TEXT_POOL.length)],
-  );
+  // 1. Initialize state directly.
+  // We use a fallback for SSR and suppress the hydration warning below.
+  const [targetText] = useState(() => {
+    // If we're on the server, pick the first one.
+    // If on client, pick a random one.
+    if (typeof window === "undefined") return TEXT_POOL[0];
+    return TEXT_POOL[Math.floor(Math.random() * TEXT_POOL.length)];
+  });
+
   const [typed, setTyped] = useState("");
   const [isFocused, setIsFocused] = useState(true);
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -39,7 +43,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const caretRef = useRef<HTMLDivElement>(null);
 
-  // 3. Select random text on mount
+  // Auto-focus on mount
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
@@ -90,9 +94,6 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
     caret.style.transform = `translate(${el.offsetLeft}px, ${el.offsetTop}px)`;
   }, [typed]);
 
-  // Don't render until text is selected to avoid layout shift
-  if (!targetText) return null;
-
   return (
     <div className="relative w-full max-w-5xl mx-auto mt-10">
       <div className="mb-4 text-2xl font-mono text-yellow-500">{timeLeft}s</div>
@@ -101,12 +102,17 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
         className={`relative transition-all duration-500 ease-in-out
         ${!isFocused || endTime ? "blur-[6px] opacity-20 scale-[0.98]" : "blur-0 opacity-100 scale-100"}`}
       >
-        <div className="relative text-2xl md:text-3xl lg:text-4xl font-mono leading-[1.6] tracking-tight text-left select-none">
+        <div
+          className="relative text-2xl md:text-3xl lg:text-4xl font-mono leading-[1.6] tracking-tight text-left select-none"
+          // 2. THIS IS THE KEY: Suppress the mismatch warning for this specific text block
+          suppressHydrationWarning={true}
+        >
           <div
             ref={caretRef}
             className="absolute h-[1.2em] w-0.5 bg-yellow-400 rounded-full transition-all duration-100 ease-out z-10 shadow-[0_0_8px_rgba(250,204,21,0.6)]"
             style={{ marginTop: "0.2em" }}
           />
+
           <div className="inline">
             {targetText.split("").map((char, i) => {
               const typedChar = typed[i];
