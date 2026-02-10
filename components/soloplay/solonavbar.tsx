@@ -25,17 +25,15 @@ export default function SoloNavbar() {
       {/* Top Navigation */}
       <div className="flex items-center justify-between px-6 py-4  ">
         {/* Left Section - Logo and Brand */}
-
+        <div className="font-mono tracking-widest text-neutral-200">
+          CLASHKEYS
+        </div>
         {/* Center Navigation Icons */}
         <div className="flex items-center gap-4 text-slate-400"></div>
 
         {/* Right Section - User Controls */}
         <div className="flex items-center gap-4 text-slate-400">
           <FaKeyboard
-            size={20}
-            className="cursor-pointer hover:text-white transition"
-          />
-          <Bell
             size={20}
             className="cursor-pointer hover:text-white transition"
           />
