@@ -1,20 +1,6 @@
 "use client";
 
-import {
-  Bell,
-  User,
-  Keyboard,
-  Crown,
-  Info,
-  Settings,
-  AlertCircle,
-  Hash,
-  Clock,
-  MessageSquare,
-  Triangle,
-  Wrench,
-  X,
-} from "lucide-react";
+import { User, Hash, MessageSquare, Triangle, Wrench, X } from "lucide-react";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
 import { FaKeyboard } from "react-icons/fa";
 import { MdOutlineTimer } from "react-icons/md";
