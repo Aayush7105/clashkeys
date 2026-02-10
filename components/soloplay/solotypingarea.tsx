@@ -1,15 +1,58 @@
 "use client";
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useMemo,
+} from "react";
 
-const SoloTypingArea: React.FC = () => {
+interface SoloTypingAreaProps {
+  duration: number;
+}
+
+const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
   const text = "This is a simple solo typing test for the pro.";
   const [typed, setTyped] = useState("");
   const [isFocused, setIsFocused] = useState(true);
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [endTime, setEndTime] = useState<number | null>(null);
+  const [timeLeft, setTimeLeft] = useState(duration);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const caretRef = useRef<HTMLDivElement>(null);
+
+  const correctChars = useMemo(() => {
+    let count = 0;
+    for (let i = 0; i < typed.length; i++) {
+      if (typed[i] === text[i]) count++;
+    }
+    return count;
+  }, [typed, text]);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (startTime && !endTime && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            setEndTime(Date.now());
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [startTime, endTime, timeLeft]);
+
+  const timeElapsed = duration - timeLeft;
+  const timeMinutes = timeElapsed / 60;
+  const accuracy =
+    typed.length === 0 ? 100 : (correctChars / typed.length) * 100;
+  const wpm = timeMinutes > 0 ? correctChars / 5 / timeMinutes : 0;
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -28,30 +71,23 @@ const SoloTypingArea: React.FC = () => {
     const el = charRefs.current[typed.length];
     const caret = caretRef.current;
     if (!el || !caret) return;
-
-    // Use offsetLeft and offsetTop to handle multi-line wrapping correctly
     caret.style.transform = `translate(${el.offsetLeft}px, ${el.offsetTop}px)`;
   }, [typed]);
 
   return (
-    <div className="relative w-full max-w-5xl mx-auto">
+    <div className="relative w-full max-w-5xl mx-auto mt-10">
+      <div className="mb-4 text-2xl font-mono text-yellow-500">{timeLeft}s</div>
+
       <div
         className={`relative transition-all duration-500 ease-in-out
-        ${!isFocused ? "blur-[6px] opacity-20 scale-[0.98]" : "blur-0 opacity-100 scale-100"}`}
+        ${!isFocused || endTime ? "blur-[6px] opacity-20 scale-[0.98]" : "blur-0 opacity-100 scale-100"}`}
       >
-        {/* 
-            FIX: Added 'relative' to the wrapper and ensured the 
-            caret target is handled as part of the text flow.
-        */}
         <div className="relative text-2xl md:text-3xl lg:text-4xl font-mono leading-[1.6] tracking-tight text-left select-none">
-          {/* Caret */}
           <div
             ref={caretRef}
             className="absolute h-[1.2em] w-0.5 bg-yellow-400 rounded-full transition-all duration-100 ease-out z-10 shadow-[0_0_8px_rgba(250,204,21,0.6)]"
             style={{ marginTop: "0.2em" }}
           />
-
-          {/* Text Container */}
           <div className="inline">
             {text.split("").map((char, i) => {
               const typedChar = typed[i];
@@ -74,12 +110,6 @@ const SoloTypingArea: React.FC = () => {
                 </span>
               );
             })}
-
-            {/* 
-                FIX: This invisible span is the caret target for the end of the text.
-                We use 'whitespace-nowrap' on a small container to prevent the 
-                terminator from jumping to a new line by itself.
-            */}
             <span
               ref={(el) => {
                 charRefs.current[text.length] = el;
@@ -90,18 +120,42 @@ const SoloTypingArea: React.FC = () => {
         </div>
       </div>
 
-      {!isFocused && (
+      {endTime && (
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-neutral-900/80 rounded-xl border border-neutral-700 shadow-2xl">
+          <div className="flex gap-10 mb-6">
+            <div className="text-center">
+              <p className="text-xs uppercase text-neutral-500 font-mono">
+                wpm
+              </p>
+              <p className="text-5xl text-yellow-400 font-bold">
+                {wpm.toFixed(0)}
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs uppercase text-neutral-500 font-mono">
+                acc
+              </p>
+              <p className="text-5xl text-neutral-200 font-bold">
+                {accuracy.toFixed(0)}%
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-2 bg-neutral-800 text-neutral-200 rounded font-mono hover:bg-neutral-700 transition uppercase tracking-widest text-xs border border-neutral-600"
+          >
+            Restart
+          </button>
+        </div>
+      )}
+
+      {!isFocused && !endTime && (
         <div
           onClick={() => inputRef.current?.focus()}
           className="fixed inset-0 z-40 flex flex-col items-center justify-center bg-black/10 cursor-pointer"
         >
-          <div className="flex flex-col items-center gap-4">
-            <div className="flex items-center gap-3 px-6 py-3 rounded-xl bg-neutral-800/80 border border-neutral-700 shadow-2xl">
-              <span className="text-yellow-400 animate-pulse">▶</span>
-              <span className="text-neutral-200 font-mono text-lg tracking-widest uppercase">
-                Click to Resume
-              </span>
-            </div>
+          <div className="px-6 py-3 rounded-xl bg-neutral-800/80 border border-neutral-700 text-neutral-200 font-mono text-lg uppercase tracking-widest animate-pulse">
+            Click to Resume
           </div>
         </div>
       )}
@@ -111,7 +165,13 @@ const SoloTypingArea: React.FC = () => {
         type="text"
         autoFocus
         value={typed}
-        onChange={(e) => setTyped(e.target.value.slice(0, text.length))}
+        onChange={(e) => {
+          if (endTime) return;
+          const val = e.target.value.slice(0, text.length);
+          if (!startTime && val.length === 1) setStartTime(Date.now());
+          if (val.length === text.length) setEndTime(Date.now());
+          setTyped(val);
+        }}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         className="fixed opacity-0 pointer-events-none"
