@@ -6,6 +6,7 @@ import { socket } from "@/lib/socket";
 import { cn } from "@/lib/utils";
 import ScorePage from "@/components/score/scorepage";
 import WaitingRoomPage from "./waitingroom";
+export const dynamic = "force-dynamic";
 
 type RoomUser = {
   id: string;
