@@ -56,7 +56,7 @@ const SoloTypingArea: React.FC = () => {
     <div className="relative max-w-7xl mt-5">
       {/* typing area */}
       <div
-        className={`relative whitespace-pre text-3xl sm:text-4xl font-mono leading-relaxed tracking-wider select-none transition
+        className={`relative whitespace-pre text-3xl sm:text-4xl font-mono leading-relaxed tracking-wider select-none transition h-screen
         ${!isFocused ? "blur-[2px]" : ""}`}
       >
         {/* caret */}
@@ -93,7 +93,7 @@ const SoloTypingArea: React.FC = () => {
 
       {/* overlay + hint */}
       {!isFocused && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm sm:text-base text-[#6b6f7a]">
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-xl sm:text-base text-[#6b6f7a]">
           {typed.length === 0
             ? "Click anywhere to start typing"
             : "Click anywhere to continue"}
