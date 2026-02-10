@@ -8,12 +8,27 @@ import React, {
   useMemo,
 } from "react";
 
+// 1. Text Pool
+const TEXT_POOL = [
+  "The quick brown fox jumps over the lazy dog.",
+  "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+  "Programming is the art of telling another human what he wants the computer to do.",
+  "In the middle of every difficulty lies opportunity.",
+  "Move fast and break things. Unless you are breaking things, you are not moving fast enough.",
+  "The only way to do great work is to love what you do.",
+  "Focus is a matter of deciding what things you are not going to do.",
+  "Your time is limited, so don't waste it living someone else's life.",
+];
+
 interface SoloTypingAreaProps {
   duration: number;
 }
 
 const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
-  const text = "This is a simple solo typing test for the pro.";
+  // 2. State for the selected text
+  const [targetText, setTargetText] = useState(
+    () => TEXT_POOL[Math.floor(Math.random() * TEXT_POOL.length)],
+  );
   const [typed, setTyped] = useState("");
   const [isFocused, setIsFocused] = useState(true);
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -24,13 +39,18 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const caretRef = useRef<HTMLDivElement>(null);
 
+  // 3. Select random text on mount
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
   const correctChars = useMemo(() => {
     let count = 0;
     for (let i = 0; i < typed.length; i++) {
-      if (typed[i] === text[i]) count++;
+      if (typed[i] === targetText[i]) count++;
     }
     return count;
-  }, [typed, text]);
+  }, [typed, targetText]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -55,10 +75,6 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
   const wpm = timeMinutes > 0 ? correctChars / 5 / timeMinutes : 0;
 
   useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
-
-  useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden") setIsFocused(false);
     };
@@ -73,6 +89,9 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
     if (!el || !caret) return;
     caret.style.transform = `translate(${el.offsetLeft}px, ${el.offsetTop}px)`;
   }, [typed]);
+
+  // Don't render until text is selected to avoid layout shift
+  if (!targetText) return null;
 
   return (
     <div className="relative w-full max-w-5xl mx-auto mt-10">
@@ -89,7 +108,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
             style={{ marginTop: "0.2em" }}
           />
           <div className="inline">
-            {text.split("").map((char, i) => {
+            {targetText.split("").map((char, i) => {
               const typedChar = typed[i];
               let colorClass = "text-neutral-600";
               if (typedChar !== undefined) {
@@ -112,7 +131,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
             })}
             <span
               ref={(el) => {
-                charRefs.current[text.length] = el;
+                charRefs.current[targetText.length] = el;
               }}
               className="inline-block w-0 h-[1em]"
             />
@@ -122,8 +141,8 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
 
       {endTime && (
         <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-neutral-900/80 rounded-xl border border-neutral-700 shadow-2xl">
-          <div className="flex gap-10 mb-6">
-            <div className="text-center">
+          <div className="flex gap-10 mb-6 text-center">
+            <div>
               <p className="text-xs uppercase text-neutral-500 font-mono">
                 wpm
               </p>
@@ -131,7 +150,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
                 {wpm.toFixed(0)}
               </p>
             </div>
-            <div className="text-center">
+            <div>
               <p className="text-xs uppercase text-neutral-500 font-mono">
                 acc
               </p>
@@ -152,7 +171,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
       {!isFocused && !endTime && (
         <div
           onClick={() => inputRef.current?.focus()}
-          className="fixed inset-0 z-40 flex flex-col items-center justify-center bg-black/10 cursor-pointer"
+          className="fixed inset-0 z-40 flex items-center justify-center bg-black/10 cursor-pointer"
         >
           <div className="px-6 py-3 rounded-xl bg-neutral-800/80 border border-neutral-700 text-neutral-200 font-mono text-lg uppercase tracking-widest animate-pulse">
             Click to Resume
@@ -167,9 +186,9 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
         value={typed}
         onChange={(e) => {
           if (endTime) return;
-          const val = e.target.value.slice(0, text.length);
+          const val = e.target.value.slice(0, targetText.length);
           if (!startTime && val.length === 1) setStartTime(Date.now());
-          if (val.length === text.length) setEndTime(Date.now());
+          if (val.length === targetText.length) setEndTime(Date.now());
           setTyped(val);
         }}
         onFocus={() => setIsFocused(true)}
