@@ -41,14 +41,14 @@ const SoloScorePage: React.FC<Props> = ({
         </div>
         {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20 w-full max-w-4xl">
           <div className="text-center md:text-left">
-            <div className="text-neutral-500 font-mono text-xl mb-2">wpm</div>
-            <div className="text-8xl md:text-[10rem] font-bold text-yellow-500 font-mono leading-none tracking-tighter">
+            <div className="text-neutral-500 font-mono text-sm mb-2">wpm</div>
+            <div className="text-xl md:text-[10rem] font-bold text-yellow-500 font-mono leading-none tracking-tighter">
               {Math.round(wpm)}
             </div>
           </div>
           <div className="text-center md:text-left">
             <div className="text-neutral-500 font-mono text-xl mb-2">acc</div>
-            <div className="text-8xl md:text-[10rem] font-bold text-neutral-200 font-mono leading-none tracking-tighter">
+            <div className="text-xl md:text-[10rem] font-bold text-neutral-200 font-mono leading-none tracking-tighter">
               {Math.round(accuracy)}%
             </div>
           </div>
