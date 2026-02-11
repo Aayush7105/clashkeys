@@ -7,6 +7,7 @@ import React, {
   useState,
   useMemo,
 } from "react";
+import SoloScorePage from "./soloscorepage";
 
 const TEXT_POOL = [
   "The quick brown fox jumps over the lazy dog.",
@@ -24,11 +25,7 @@ interface SoloTypingAreaProps {
 }
 
 const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
-  // 1. Initialize state directly.
-  // We use a fallback for SSR and suppress the hydration warning below.
   const [targetText] = useState(() => {
-    // If we're on the server, pick the first one.
-    // If on client, pick a random one.
     if (typeof window === "undefined") return TEXT_POOL[0];
     return TEXT_POOL[Math.floor(Math.random() * TEXT_POOL.length)];
   });
@@ -39,11 +36,14 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
   const [endTime, setEndTime] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState(duration);
 
+  // ✅ real accuracy counters
+  const [totalKeystrokes, setTotalKeystrokes] = useState(0);
+  const [correctKeystrokes, setCorrectKeystrokes] = useState(0);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const caretRef = useRef<HTMLDivElement>(null);
 
-  // Auto-focus on mount
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
@@ -74,8 +74,11 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
 
   const timeElapsed = duration - timeLeft;
   const timeMinutes = timeElapsed / 60;
+
+  // ✅ real accuracy
   const accuracy =
-    typed.length === 0 ? 100 : (correctChars / typed.length) * 100;
+    totalKeystrokes === 0 ? 100 : (correctKeystrokes / totalKeystrokes) * 100;
+
   const wpm = timeMinutes > 0 ? correctChars / 5 / timeMinutes : 0;
 
   useEffect(() => {
@@ -94,17 +97,38 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
     caret.style.transform = `translate(${el.offsetLeft}px, ${el.offsetTop}px)`;
   }, [typed]);
 
+  if (endTime) {
+    function handleRestart(): void {
+      throw new Error("Function not implemented.");
+    }
+
+    return (
+      <SoloScorePage
+        wpm={wpm}
+        accuracy={accuracy}
+        correctChars={correctKeystrokes}
+        incorrectChars={totalKeystrokes - correctKeystrokes}
+        totalChars={totalKeystrokes}
+        timeElapsed={timeElapsed}
+        onRestart={handleRestart}
+      />
+    );
+  }
+
   return (
     <div className="relative w-full max-w-5xl mx-auto mt-10 ">
       <div className="mb-4 text-2xl font-mono text-yellow-500">{timeLeft}s</div>
 
       <div
         className={`relative transition-all duration-500 ease-in-out
-        ${!isFocused || endTime ? "blur-[6px] opacity-20 scale-[0.98]" : "blur-0 opacity-100 scale-100"}`}
+          ${
+            !isFocused || endTime
+              ? "blur-[6px] opacity-20 scale-[0.98]"
+              : "blur-0 opacity-100 scale-100"
+          }`}
       >
         <div
           className="relative text-2xl md:text-3xl lg:text-4xl font-mono leading-[1.6] tracking-tight text-left select-none"
-          // 2. THIS IS THE KEY: Suppress the mismatch warning for this specific text block
           suppressHydrationWarning={true}
         >
           <div
@@ -143,12 +167,6 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
             />
           </div>
         </div>
-        <button
-          onClick={() => window.location.reload()}
-          className="mx-96 mt-10 px-6 py-2  bg-neutral-800 text-neutral-200 rounded font-mono hover:bg-neutral-700 transition uppercase tracking-widest text-xs border border-neutral-600"
-        >
-          Restart
-        </button>
       </div>
 
       {endTime && (
@@ -204,9 +222,24 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
         value={typed}
         onChange={(e) => {
           if (endTime) return;
+
           const val = e.target.value.slice(0, targetText.length);
+
+          // ✅ count only real typed characters (ignore backspace)
+          if (val.length > typed.length) {
+            const newChar = val[val.length - 1];
+            const expectedChar = targetText[typed.length];
+
+            setTotalKeystrokes((p) => p + 1);
+
+            if (newChar === expectedChar) {
+              setCorrectKeystrokes((p) => p + 1);
+            }
+          }
+
           if (!startTime && val.length === 1) setStartTime(Date.now());
           if (val.length === targetText.length) setEndTime(Date.now());
+
           setTyped(val);
         }}
         onFocus={() => setIsFocused(true)}
