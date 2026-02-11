@@ -1,6 +1,6 @@
 "use client";
 
-import { User, Hash, MessageSquare, Triangle, Wrench, X } from "lucide-react";
+import { User, Hash, MessageSquare, Triangle } from "lucide-react";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
 import { FaKeyboard } from "react-icons/fa";
 import { MdOutlineTimer } from "react-icons/md";

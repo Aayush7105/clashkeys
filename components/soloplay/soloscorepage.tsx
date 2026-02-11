@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { RefreshCw, Trophy, Zap, Target, ArrowLeft } from "lucide-react";
+import { Trophy, Zap, Target } from "lucide-react";
 import { TbReload } from "react-icons/tb";
 
 interface Props {
@@ -19,7 +19,6 @@ const SoloScorePage: React.FC<Props> = ({
   incorrectChars,
   totalChars,
   timeElapsed,
-  onRestart,
 }) => {
   // Scroll to top on mount
   useEffect(() => {
@@ -27,12 +26,7 @@ const SoloScorePage: React.FC<Props> = ({
   }, []);
 
   return (
-    /* 
-       z-[100] ensures it covers the Navbar 
-       fixed inset-0 makes it a full-screen overlay
-       bg-neutral-900 (or your background color) hides content underneath
-    */
-    <div className="fixed inset-0 z-[100] bg-neutral-950 overflow-y-auto min-h-screen flex flex-col items-center justify-center p-6 animate-in fade-in duration-500">
+    <div className="fixed inset-0 z-100 bg-neutral-950 overflow-y-auto min-h-screen flex flex-col items-center justify-center p-6 animate-in fade-in duration-500">
       <div className="w-full max-w-5xl flex flex-col items-center">
         <div className="text-neutral-500 font-mono mb-8 uppercase tracking-widest flex items-center gap-2">
           <Trophy className="w-5 h-5 text-yellow-500" /> Test Completed
