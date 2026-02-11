@@ -95,7 +95,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
   }, [typed]);
 
   return (
-    <div className="relative w-full max-w-5xl mx-auto mt-10">
+    <div className="relative w-full max-w-5xl mx-auto mt-10 ">
       <div className="mb-4 text-2xl font-mono text-yellow-500">{timeLeft}s</div>
 
       <div
@@ -143,10 +143,16 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
             />
           </div>
         </div>
+        <button
+          onClick={() => window.location.reload()}
+          className="mx-96 mt-10 px-6 py-2  bg-neutral-800 text-neutral-200 rounded font-mono hover:bg-neutral-700 transition uppercase tracking-widest text-xs border border-neutral-600"
+        >
+          Restart
+        </button>
       </div>
 
       {endTime && (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-neutral-900/80 rounded-xl border border-neutral-700 shadow-2xl">
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-neutral-900/80 rounded-xl ">
           <div className="flex gap-10 mb-6 text-center">
             <div>
               <p className="text-xs uppercase text-neutral-500 font-mono">
@@ -177,11 +183,17 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
       {!isFocused && !endTime && (
         <div
           onClick={() => inputRef.current?.focus()}
-          className="fixed inset-0 z-40 flex items-center justify-center bg-black/10 cursor-pointer"
+          className="fixed inset-0 z-40 flex flex-col gap-10 items-center justify-center bg-black/10 cursor-pointer"
         >
-          <div className="px-6 py-3 rounded-xl bg-neutral-800/80 border border-neutral-700 text-neutral-200 font-mono text-lg uppercase tracking-widest animate-pulse">
+          <div className="px-6 py-3 rounded-xl bg-neutral-800/80 border border-neutral-700 text-neutral-200 font-mono text-lg uppercase tracking-widest">
             Click to Resume
           </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-2 mx-auto rounded-xl bg-neutral-800/80 border border-neutral-700 text-neutral-200 font-mono text-lg uppercase tracking-widest "
+          >
+            Restart
+          </button>
         </div>
       )}
 

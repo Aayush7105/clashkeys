@@ -17,8 +17,8 @@ export default function SoloNavbar({
   const durations = [15, 30, 60, 120];
 
   return (
-    <div className="w-ful p-2">
-      <div className="flex items-center justify-between px-6 py-4">
+    <div className="w-ful p-2 flex flex-col justify-center items-center gap-3">
+      <div className="flex  justify-between px-6 py-4 w-full">
         <div className="font-mono tracking-widest text-neutral-200">
           CLASHKEYS
         </div>
@@ -35,7 +35,7 @@ export default function SoloNavbar({
         </div>
       </div>
 
-      <div className="flex items-center gap-6 px-6 py-3 text-sm text-neutral-300 border border-neutral-600 rounded-2xl mt-5 bg-neutral-900">
+      <div className="flex items-center gap-6 px-6 py-3 text-sm text-neutral-300 border border-neutral-600 rounded-2xl mt-5 bg-neutral-900 w-fit">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition">
             <AiOutlineExclamationCircle size={16} />
@@ -61,13 +61,8 @@ export default function SoloNavbar({
             <Triangle size={16} />
             <span>zen</span>
           </div>
-          <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition">
-            <Wrench size={16} />
-            <span>custom</span>
-          </div>
+          <div className="h-full w-0.5 bg-white"> </div>
         </div>
-
-        <div className="w-px h-4 bg-slate-700"></div>
 
         {/* Duration Options - Logic added here */}
         <div className="flex items-center gap-4 text-slate-500">
@@ -84,13 +79,6 @@ export default function SoloNavbar({
               {d}
             </span>
           ))}
-        </div>
-
-        <div className="ml-auto">
-          <X
-            size={18}
-            className="text-slate-500 cursor-pointer hover:text-white transition"
-          />
         </div>
       </div>
     </div>
