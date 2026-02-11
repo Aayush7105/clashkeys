@@ -39,6 +39,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
   // ✅ real accuracy counters
   const [totalKeystrokes, setTotalKeystrokes] = useState(0);
   const [correctKeystrokes, setCorrectKeystrokes] = useState(0);
+  const [wpmHistory, setWpmHistory] = useState<number[]>([]);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -58,19 +59,29 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
+
     if (startTime && !endTime && timeLeft > 0) {
       interval = setInterval(() => {
         setTimeLeft((prev) => {
+          const elapsed = duration - prev + 1;
+          const minutes = elapsed / 60;
+
+          const currentWpm = minutes > 0 ? correctChars / 5 / minutes : 0;
+
+          setWpmHistory((h) => [...h, currentWpm]);
+
           if (prev <= 1) {
             setEndTime(Date.now());
             return 0;
           }
+
           return prev - 1;
         });
       }, 1000);
     }
+
     return () => clearInterval(interval);
-  }, [startTime, endTime, timeLeft]);
+  }, [startTime, endTime, timeLeft, correctChars, duration]);
 
   const timeElapsed = duration - timeLeft;
   const timeMinutes = timeElapsed / 60;
@@ -111,6 +122,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
         totalChars={totalKeystrokes}
         timeElapsed={timeElapsed}
         onRestart={handleRestart}
+        wpmHistory={wpmHistory}
       />
     );
   }

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Trophy, Zap, Target } from "lucide-react";
 import { TbReload } from "react-icons/tb";
+import WpmGraph from "./wpmgraph";
 
 interface Props {
   wpm: number;
@@ -10,6 +11,7 @@ interface Props {
   totalChars: number;
   timeElapsed: number;
   onRestart: () => void;
+  wpmHistory: number[];
 }
 
 const SoloScorePage: React.FC<Props> = ({
@@ -19,6 +21,7 @@ const SoloScorePage: React.FC<Props> = ({
   incorrectChars,
   totalChars,
   timeElapsed,
+  wpmHistory,
 }) => {
   // Scroll to top on mount
   useEffect(() => {
@@ -33,7 +36,10 @@ const SoloScorePage: React.FC<Props> = ({
         </div>
 
         {/* Huge Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20 w-full max-w-4xl">
+        <div className="mt-8 w-full max-w-xl">
+          <WpmGraph data={wpmHistory} />
+        </div>
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20 w-full max-w-4xl">
           <div className="text-center md:text-left">
             <div className="text-neutral-500 font-mono text-xl mb-2">wpm</div>
             <div className="text-8xl md:text-[10rem] font-bold text-yellow-500 font-mono leading-none tracking-tighter">
@@ -46,7 +52,7 @@ const SoloScorePage: React.FC<Props> = ({
               {Math.round(accuracy)}%
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Detailed Breakdown */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-neutral-800 pt-12 w-full max-w-4xl mb-16">
