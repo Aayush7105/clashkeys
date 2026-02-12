@@ -45,33 +45,28 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
   useEffect(() => {
     if (startTime === null || endTime !== null) return;
 
+    lastSampleSecondRef.current = -1;
     const id = setInterval(() => {
-      setNow(Date.now());
+      const current = Date.now();
+      setNow(current);
+
+      const elapsedMs = current - startTime;
+      if (elapsedMs >= duration * 1000) {
+        setEndTime(startTime + duration * 1000);
+        return;
+      }
+
+      const elapsedSec = Math.floor(elapsedMs / 1000);
+      if (elapsedSec > lastSampleSecondRef.current) {
+        lastSampleSecondRef.current = elapsedSec;
+        const minutes = elapsedMs / 60000;
+        const currentWpm = minutes > 0 ? correctKeystrokes / 5 / minutes : 0;
+        setWpmHistory((h) => [...h, currentWpm]);
+      }
     }, 100);
 
     return () => clearInterval(id);
-  }, [startTime, endTime]);
-
-  useEffect(() => {
-    if (startTime === null || endTime !== null) return;
-
-    const elapsedMs = now - startTime;
-    if (elapsedMs >= duration * 1000) {
-      setEndTime(startTime + duration * 1000);
-    }
-  }, [now, startTime, endTime, duration]);
-
-  useEffect(() => {
-    if (startTime === null || endTime !== null) return;
-
-    const elapsedSec = Math.floor((now - startTime) / 1000);
-    if (elapsedSec <= lastSampleSecondRef.current) return;
-
-    lastSampleSecondRef.current = elapsedSec;
-    const minutes = (now - startTime) / 60000;
-    const currentWpm = minutes > 0 ? correctKeystrokes / 5 / minutes : 0;
-    setWpmHistory((h) => [...h, currentWpm]);
-  }, [now, startTime, endTime, correctKeystrokes]);
+  }, [startTime, endTime, duration, correctKeystrokes]);
 
   const elapsedMs =
     startTime === null ? 0 : Math.max(0, (endTime ?? now) - startTime);

@@ -16,39 +16,57 @@ function fetchWithTimeout(url: string, ms = 2000) {
   }).finally(() => clearTimeout(id));
 }
 
-function limitWords(text: string, maxWords: number) {
-  return text.trim().split(/\s+/).slice(0, maxWords).join(" ");
+// keep only letters and spaces
+function cleanText(text: string) {
+  return text
+    .replace(/[^A-Za-z\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
-// same format as your previous code
+// limit words (optional but good for typing)
+function limitWords(text: string, maxWords: number) {
+  return text.split(/\s+/).slice(0, maxWords).join(" ");
+}
+
+// same structure you already use
 async function getSentence(): Promise<string> {
-  const bacon = fetchWithTimeout(
-    "https://baconipsum.com/api/?type=meat-and-filler&sentences=4",
-    2000,
-  ).then(async (r) => {
+  async function fetchWiki() {
+    const r = await fetchWithTimeout(
+      "https://en.wikipedia.org/api/rest_v1/page/random/summary",
+      2000,
+    );
+
     if (!r.ok) throw new Error();
 
-    const data = await r.json();
+    const d = await r.json();
+    const extract = d?.extract;
 
-    // API returns string[]
-    if (!Array.isArray(data) || typeof data[0] !== "string") {
-      throw new Error();
-    }
+    if (typeof extract !== "string") throw new Error();
 
-    const text = data.join(" ").replace(/\s+/g, " ").trim();
+    const cleaned = cleanText(extract);
 
-    // hard limit → max 40 words
-    return limitWords(text, 40);
-  });
+    if (!cleaned) throw new Error();
+
+    const limited = limitWords(cleaned, 40);
+
+    // avoid very tiny results
+    if (limited.split(/\s+/).length < 15) throw new Error();
+
+    return limited;
+  }
 
   try {
-    // keep the same Promise.any pattern
-    return await Promise.any([bacon]);
+    return await fetchWiki();
   } catch {
-    return "Typing short paragraphs helps you improve accuracy and reading flow at the same time.";
+    try {
+      // retry once
+      return await fetchWiki();
+    } catch {
+      return "Typing practice helps you build focus speed and accuracy through clear meaningful text";
+    }
   }
 }
-
 export default async function Page({
   searchParams,
 }: {
