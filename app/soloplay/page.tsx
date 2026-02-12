@@ -17,7 +17,6 @@ function fetchWithTimeout(url: string, ms = 2000) {
   }).finally(() => clearTimeout(id));
 }
 
-// keep only letters and spaces
 function cleanText(text: string) {
   return text
     .replace(/[^A-Za-z\s]/g, " ")
@@ -25,7 +24,6 @@ function cleanText(text: string) {
     .trim();
 }
 
-// limit words (optional but good for typing)
 function limitWords(text: string, maxWords: number) {
   return text.split(/\s+/).slice(0, maxWords).join(" ");
 }
@@ -60,7 +58,6 @@ async function getSentence(): Promise<string> {
 
     const limited = limitWords(cleaned, 40);
 
-    // avoid very tiny results
     if (limited.split(/\s+/).length < 15) throw new Error();
 
     return limited;
@@ -70,7 +67,6 @@ async function getSentence(): Promise<string> {
     return await fetchWiki();
   } catch {
     try {
-      // retry once
       return await fetchWiki();
     } catch {
       return getPoolFallback();
