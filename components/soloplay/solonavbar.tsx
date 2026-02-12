@@ -19,7 +19,7 @@ export default function SoloNavbar({
 
   return (
     <div className="w-ful p-2 flex flex-col justify-center items-center gap-3">
-      <div className="flex  justify-between px-6 py-4 w-full">
+      <div className="flex  justify-between px-6 py-4 w-full -mt-20">
         <div className="font-mono tracking-widest text-neutral-200">
           CLASHKEYS
         </div>
@@ -36,7 +36,7 @@ export default function SoloNavbar({
         </div>
       </div>
 
-      <div className="flex items-center gap-6 px-6 py-3 text-sm text-neutral-300 border border-neutral-600 rounded-2xl mt-5 bg-neutral-900 w-fit">
+      <div className="flex items-center gap-6 px-6 py-3 text-sm text-neutral-300 border border-neutral-600 rounded-2xl bg-neutral-900 w-fit">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition">
             <AiOutlineExclamationCircle size={16} />
