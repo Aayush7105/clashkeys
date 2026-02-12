@@ -34,7 +34,7 @@ async function getSentence(): Promise<string> {
   async function fetchWiki() {
     const r = await fetchWithTimeout(
       "https://en.wikipedia.org/api/rest_v1/page/random/summary",
-      2000,
+      6000,
     );
 
     if (!r.ok) throw new Error();
