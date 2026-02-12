@@ -5,6 +5,7 @@ import WpmGraph from "./wpmgraph";
 
 interface Props {
   wpm: number;
+  rawWpm: number;
   accuracy: number;
   correctChars: number;
   incorrectChars: number;
@@ -16,6 +17,7 @@ interface Props {
 
 const SoloScorePage: React.FC<Props> = ({
   wpm,
+  rawWpm,
   accuracy,
   correctChars,
   incorrectChars,
@@ -90,7 +92,7 @@ const SoloScorePage: React.FC<Props> = ({
               raw
             </span>
             <span className="text-3xl font-mono text-neutral-400">
-              {Math.round(totalChars / 5 / (timeElapsed / 60 || 1))}
+              {Math.round(rawWpm)}
             </span>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { User, Hash, MessageSquare, Triangle } from "lucide-react";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
 import { FaKeyboard } from "react-icons/fa";
 import { MdOutlineTimer } from "react-icons/md";
+import { SOLO_DURATIONS } from "./soloplay-constants";
 
 interface SoloNavbarProps {
   currentDuration: number;
@@ -14,7 +15,7 @@ export default function SoloNavbar({
   currentDuration,
   onDurationChange,
 }: SoloNavbarProps) {
-  const durations = [15, 30, 60, 120];
+  const durations = SOLO_DURATIONS;
 
   return (
     <div className="w-ful p-2 flex flex-col justify-center items-center gap-3">
@@ -70,7 +71,7 @@ export default function SoloNavbar({
             <span
               key={d}
               onClick={() => onDurationChange(d)}
-              className={`cursor-pointer transition ${
+              className={`cursor-pointer transition px-2 py-0.5 rounded-md  ${
                 currentDuration === d
                   ? "text-yellow-500 font-semibold hover:text-yellow-400"
                   : "hover:text-slate-300"

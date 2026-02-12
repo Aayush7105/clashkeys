@@ -1,12 +1,6 @@
 "use client";
 
-import React, {
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-  useMemo,
-} from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import SoloScorePage from "./soloscorepage";
 import { SOLO_TEXT_POOL } from "./text-pool";
 
@@ -26,6 +20,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState(duration);
+  const [now, setNow] = useState(() => Date.now());
 
   // ✅ real accuracy counters
   const [totalKeystrokes, setTotalKeystrokes] = useState(0);
@@ -40,13 +35,15 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
     inputRef.current?.focus();
   }, []);
 
-  const correctChars = useMemo(() => {
-    let count = 0;
-    for (let i = 0; i < typed.length; i++) {
-      if (typed[i] === targetText[i]) count++;
-    }
-    return count;
-  }, [typed, targetText]);
+  useEffect(() => {
+    if (startTime === null || endTime !== null) return;
+
+    const id = setInterval(() => {
+      setNow(Date.now());
+    }, 100);
+
+    return () => clearInterval(id);
+  }, [startTime, endTime]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -54,10 +51,9 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
     if (startTime && !endTime && timeLeft > 0) {
       interval = setInterval(() => {
         setTimeLeft((prev) => {
-          const elapsed = duration - prev + 1;
-          const minutes = elapsed / 60;
-
-          const currentWpm = minutes > 0 ? correctChars / 5 / minutes : 0;
+          const elapsedMs = Date.now() - startTime;
+          const minutes = elapsedMs / 60000;
+          const currentWpm = minutes > 0 ? correctKeystrokes / 5 / minutes : 0;
 
           setWpmHistory((h) => [...h, currentWpm]);
 
@@ -72,16 +68,19 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
     }
 
     return () => clearInterval(interval);
-  }, [startTime, endTime, timeLeft, correctChars, duration]);
+  }, [startTime, endTime, timeLeft, correctKeystrokes, duration]);
 
-  const timeElapsed = duration - timeLeft;
-  const timeMinutes = timeElapsed / 60;
+  const elapsedMs =
+    startTime === null ? 0 : Math.max(0, (endTime ?? now) - startTime);
+  const timeElapsed = Math.round(elapsedMs / 1000);
+  const timeMinutes = elapsedMs / 60000;
 
   // ✅ real accuracy
   const accuracy =
     totalKeystrokes === 0 ? 100 : (correctKeystrokes / totalKeystrokes) * 100;
 
-  const wpm = timeMinutes > 0 ? correctChars / 5 / timeMinutes : 0;
+  const wpm = timeMinutes > 0 ? correctKeystrokes / 5 / timeMinutes : 0;
+  const rawWpm = timeMinutes > 0 ? totalKeystrokes / 5 / timeMinutes : 0;
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -107,6 +106,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
     return (
       <SoloScorePage
         wpm={wpm}
+        rawWpm={rawWpm}
         accuracy={accuracy}
         correctChars={correctKeystrokes}
         incorrectChars={totalKeystrokes - correctKeystrokes}
