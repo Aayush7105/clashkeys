@@ -3,6 +3,7 @@ import {
   DEFAULT_SOLO_DURATION,
   SOLO_DURATIONS,
 } from "@/components/soloplay/soloplay-constants";
+import { SOLO_TEXT_POOL } from "@/components/soloplay/text-pool";
 
 export const dynamic = "force-dynamic";
 
@@ -29,12 +30,21 @@ function limitWords(text: string, maxWords: number) {
   return text.split(/\s+/).slice(0, maxWords).join(" ");
 }
 
+function getPoolFallback(): string {
+  if (!Array.isArray(SOLO_TEXT_POOL) || SOLO_TEXT_POOL.length === 0) {
+    return "";
+  }
+
+  const idx = Math.floor(Math.random() * SOLO_TEXT_POOL.length);
+  return SOLO_TEXT_POOL[idx] ?? SOLO_TEXT_POOL[0];
+}
+
 // same structure you already use
 async function getSentence(): Promise<string> {
   async function fetchWiki() {
     const r = await fetchWithTimeout(
       "https://en.wikipedia.org/api/rest_v1/page/random/summary",
-      6000,
+      5000,
     );
 
     if (!r.ok) throw new Error();
@@ -63,7 +73,7 @@ async function getSentence(): Promise<string> {
       // retry once
       return await fetchWiki();
     } catch {
-      return "Typing practice helps you build focus speed and accuracy through clear meaningful text";
+      return getPoolFallback();
     }
   }
 }
