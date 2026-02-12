@@ -4,7 +4,11 @@ import React, { useState } from "react";
 import Solonavbar from "./solonavbar";
 import SoloTypingArea from "./solotypingarea";
 
-const SoloPlayPage: React.FC = () => {
+interface SoloPlayPageProps {
+  initialText: string;
+}
+
+const SoloPlayPage: React.FC<SoloPlayPageProps> = ({ initialText }) => {
   const [duration, setDuration] = useState(30);
 
   return (
@@ -20,7 +24,11 @@ const SoloPlayPage: React.FC = () => {
           <span className="font-mono text-md">Solo Play</span>
         </div>
         {/* Reset component completely when duration changes */}
-        <SoloTypingArea key={duration} duration={duration} />
+        <SoloTypingArea
+          key={duration}
+          duration={duration}
+          initialText={initialText}
+        />
       </div>
     </main>
   );

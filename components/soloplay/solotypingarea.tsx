@@ -8,27 +8,18 @@ import React, {
   useMemo,
 } from "react";
 import SoloScorePage from "./soloscorepage";
-
-const TEXT_POOL = [
-  "The quick brown fox jumps over the lazy dog.",
-  "Success is not final, failure is not fatal: it is the courage to continue that counts.",
-  "Programming is the art of telling another human what he wants the computer to do.",
-  "In the middle of every difficulty lies opportunity.",
-  "Move fast and break things. Unless you are breaking things, you are not moving fast enough.",
-  "The only way to do great work is to love what you do.",
-  "Focus is a matter of deciding what things you are not going to do.",
-  "Your time is limited, so don't waste it living someone else's life.",
-];
+import { SOLO_TEXT_POOL } from "./text-pool";
 
 interface SoloTypingAreaProps {
   duration: number;
+  initialText: string;
 }
 
-const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({ duration }) => {
-  const [targetText] = useState(() => {
-    if (typeof window === "undefined") return TEXT_POOL[0];
-    return TEXT_POOL[Math.floor(Math.random() * TEXT_POOL.length)];
-  });
+const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
+  duration,
+  initialText,
+}) => {
+  const targetText = initialText || SOLO_TEXT_POOL[0];
 
   const [typed, setTyped] = useState("");
   const [isFocused, setIsFocused] = useState(true);
