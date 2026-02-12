@@ -13,13 +13,19 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
   duration,
   initialText,
 }) => {
-  const targetText = initialText || SOLO_TEXT_POOL[0];
+  const sanitizeText = (text: string) =>
+    text
+      .toLowerCase()
+      .replace(/[^a-z\s]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  const targetText = sanitizeText(initialText || SOLO_TEXT_POOL[0]);
 
   const [typed, setTyped] = useState("");
   const [isFocused, setIsFocused] = useState(true);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
-  const [timeLeft, setTimeLeft] = useState(duration);
   const [now, setNow] = useState(() => Date.now());
 
   // ✅ real accuracy counters
@@ -30,6 +36,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const caretRef = useRef<HTMLDivElement>(null);
+  const lastSampleSecondRef = useRef<number>(-1);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -46,34 +53,32 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
   }, [startTime, endTime]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    if (startTime === null || endTime !== null) return;
 
-    if (startTime && !endTime && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft((prev) => {
-          const elapsedMs = Date.now() - startTime;
-          const minutes = elapsedMs / 60000;
-          const currentWpm = minutes > 0 ? correctKeystrokes / 5 / minutes : 0;
-
-          setWpmHistory((h) => [...h, currentWpm]);
-
-          if (prev <= 1) {
-            setEndTime(Date.now());
-            return 0;
-          }
-
-          return prev - 1;
-        });
-      }, 1000);
+    const elapsedMs = now - startTime;
+    if (elapsedMs >= duration * 1000) {
+      setEndTime(startTime + duration * 1000);
     }
+  }, [now, startTime, endTime, duration]);
 
-    return () => clearInterval(interval);
-  }, [startTime, endTime, timeLeft, correctKeystrokes, duration]);
+  useEffect(() => {
+    if (startTime === null || endTime !== null) return;
+
+    const elapsedSec = Math.floor((now - startTime) / 1000);
+    if (elapsedSec <= lastSampleSecondRef.current) return;
+
+    lastSampleSecondRef.current = elapsedSec;
+    const minutes = (now - startTime) / 60000;
+    const currentWpm = minutes > 0 ? correctKeystrokes / 5 / minutes : 0;
+    setWpmHistory((h) => [...h, currentWpm]);
+  }, [now, startTime, endTime, correctKeystrokes]);
 
   const elapsedMs =
     startTime === null ? 0 : Math.max(0, (endTime ?? now) - startTime);
+  const elapsedSec = Math.floor(elapsedMs / 1000);
   const timeElapsed = Math.round(elapsedMs / 1000);
   const timeMinutes = elapsedMs / 60000;
+  const timeLeft = startTime === null ? duration : Math.max(0, duration - elapsedSec);
 
   // ✅ real accuracy
   const accuracy =
