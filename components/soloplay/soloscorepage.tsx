@@ -23,6 +23,7 @@ const SoloScorePage: React.FC<Props> = ({
   incorrectChars,
   totalChars,
   timeElapsed,
+  onRestart,
   wpmHistory,
 }) => {
   // Scroll to top on mount
@@ -30,80 +31,109 @@ const SoloScorePage: React.FC<Props> = ({
     window.scrollTo(0, 0);
   }, []);
 
+  const accuracyColor =
+    accuracy >= 95
+      ? "text-emerald-400"
+      : accuracy >= 90
+        ? "text-amber-400"
+        : "text-orange-400";
+
   return (
-    <div className="fixed inset-0 z-100 bg-neutral-950 overflow-y-auto min-h-screen flex flex-col items-center justify-center p-6 animate-in fade-in duration-500">
-      <div className="w-full max-w-5xl flex flex-col items-center">
-        <div className="text-neutral-500 font-mono mb-8 uppercase tracking-widest flex items-center gap-2">
-          <Trophy className="w-5 h-5 text-yellow-500" /> Test Completed
+    <div className="fixed inset-0 z-[100] bg-neutral-950 overflow-y-auto min-h-screen flex flex-col items-center justify-center p-6 animate-in fade-in duration-500">
+      <div className="w-full max-w-5xl flex flex-col items-center space-y-12">
+        {/* Header Indicator */}
+        <div className="flex items-center gap-2 text-neutral-500 font-mono text-xs uppercase tracking-[0.2em] animate-in slide-in-from-top duration-700">
+          <Trophy className="w-4 h-4 text-yellow-500" />
+          <span>Test Completed</span>
         </div>
 
-        {/* Huge Stats Section */}
-        <div className="mt-8 w-full max-w-xl">
-          <WpmGraph data={wpmHistory} />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20 w-full max-w-4xl">
-          <div className="text-center md:text-left">
-            <div className="text-neutral-500 font-mono text-sm mb-2">wpm</div>
-            <div className="text-md md:text-md font-bold text-yellow-500 font-mono leading-none tracking-tighter">
-              {Math.round(wpm)}
+        {/* Top Section: Main Stats and Graph */}
+        <div className="w-full grid grid-cols-1 lg:grid-cols-4 gap-8 items-center">
+          {/* Large Metrics */}
+          <div className="lg:col-span-1 space-y-8 flex flex-col items-center lg:items-start">
+            <div className="animate-in slide-in-from-left duration-700 delay-100">
+              <div className="text-neutral-500 font-mono text-xl mb-1">wpm</div>
+              <div className="text-7xl md:text-8xl font-bold text-yellow-500 font-mono leading-none tracking-tighter">
+                {Math.round(wpm)}
+              </div>
+            </div>
+            <div className="animate-in slide-in-from-left duration-700 delay-200">
+              <div className="text-neutral-500 font-mono text-xl mb-1">acc</div>
+              <div
+                className={`text-7xl md:text-8xl font-bold font-mono leading-none tracking-tighter ${accuracyColor}`}
+              >
+                {Math.round(accuracy)}%
+              </div>
             </div>
           </div>
-          <div className="text-center md:text-left">
-            <div className="text-neutral-500 font-mono text-xl mb-2">acc</div>
-            <div className="text-md md:text-md font-bold text-neutral-200 font-mono leading-none tracking-tighter">
-              {Math.round(accuracy)}%
+
+          {/* Graph Area */}
+          <div className="lg:col-span-3 w-full bg-neutral-900/20 rounded-xl p-4 animate-in fade-in zoom-in duration-1000 delay-300">
+            <div className="h-[250px] w-full">
+              <WpmGraph data={wpmHistory} />
             </div>
           </div>
         </div>
 
-        {/* Detailed Breakdown */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-neutral-800 pt-12 w-full max-w-4xl mb-16">
+        {/* Detailed Breakdown Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 border-t border-neutral-900 pt-12 w-full max-w-4xl animate-in slide-in-from-bottom duration-700 delay-500">
           <div className="flex flex-col items-center md:items-start">
-            <span className="text-xs uppercase text-neutral-500 font-mono mb-2 flex items-center gap-2">
-              <Zap className="w-3 h-3" /> characters
+            <span className="text-xs uppercase text-neutral-500 font-mono mb-2 flex items-center gap-2 tracking-widest">
+              <Zap className="w-3 h-3 text-blue-400" /> characters
             </span>
-            <span className="text-3xl font-mono text-neutral-200">
+            <span className="text-4xl font-mono text-neutral-200">
               {correctChars}
-              <span className="text-neutral-600">/</span>
-              <span className="text-red-500">{incorrectChars}</span>
+              <span className="text-neutral-700 mx-1">/</span>
+              <span className="text-red-500/80">{incorrectChars}</span>
             </span>
           </div>
 
           <div className="flex flex-col items-center md:items-start">
-            <span className="text-xs uppercase text-neutral-500 font-mono mb-2 flex items-center gap-2">
-              <Target className="w-3 h-3" /> keystrokes
+            <span className="text-xs uppercase text-neutral-500 font-mono mb-2 flex items-center gap-2 tracking-widest">
+              <Target className="w-3 h-3 text-purple-400" /> keystrokes
             </span>
-            <span className="text-3xl font-mono text-neutral-200">
+            <span className="text-4xl font-mono text-neutral-200">
               {totalChars}
             </span>
           </div>
 
           <div className="flex flex-col items-center md:items-start">
-            <span className="text-xs uppercase text-neutral-500 font-mono mb-2">
+            <span className="text-xs uppercase text-neutral-500 font-mono mb-2 tracking-widest">
               time
             </span>
-            <span className="text-3xl font-mono text-neutral-200">
+            <span className="text-4xl font-mono text-neutral-200">
               {timeElapsed}s
             </span>
           </div>
 
           <div className="flex flex-col items-center md:items-start">
-            <span className="text-xs uppercase text-neutral-500 font-mono mb-2">
-              raw
+            <span className="text-xs uppercase text-neutral-500 font-mono mb-2 tracking-widest">
+              raw wpm
             </span>
-            <span className="text-3xl font-mono text-neutral-400">
+            <span className="text-4xl font-mono text-neutral-500">
               {Math.round(rawWpm)}
             </span>
           </div>
         </div>
 
-        {/* Buttons */}
-        <div className="flex flex-col sm:flex-row gap-6 items-center">
+        {/* Actions */}
+        <div className="flex flex-col items-center gap-8 pt-4 animate-in fade-in duration-1000 delay-700">
           <button
             onClick={() => window.location.reload()}
-            className="text-neutral-500 hover:text-neutral-200 font-mono text-sm uppercase tracking-widest transition-colors"
+            className="group flex flex-col items-center gap-3 transition-all"
+            title="Restart Test"
           >
-            <TbReload className="size-8 cursor-pointer" />
+            <TbReload className="size-10 text-neutral-600 group-hover:text-yellow-500 transition-colors cursor-pointer" />
+            <span className="text-neutral-600 group-hover:text-neutral-400 font-mono text-xs uppercase tracking-widest">
+              Restart Test
+            </span>
+          </button>
+
+          <button
+            onClick={onRestart}
+            className="text-neutral-700 hover:text-neutral-400 font-mono text-xs uppercase tracking-[0.3em] transition-colors"
+          >
+            back to home
           </button>
         </div>
       </div>

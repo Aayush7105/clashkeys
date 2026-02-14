@@ -73,7 +73,8 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
   const elapsedSec = Math.floor(elapsedMs / 1000);
   const timeElapsed = Math.round(elapsedMs / 1000);
   const timeMinutes = elapsedMs / 60000;
-  const timeLeft = startTime === null ? duration : Math.max(0, duration - elapsedSec);
+  const timeLeft =
+    startTime === null ? duration : Math.max(0, duration - elapsedSec);
 
   // ✅ real accuracy
   const accuracy =
@@ -171,35 +172,6 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
           </div>
         </div>
       </div>
-
-      {endTime && (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-neutral-900/80 rounded-xl ">
-          <div className="flex gap-10 mb-6 text-center">
-            <div>
-              <p className="text-xs uppercase text-neutral-500 font-mono">
-                wpm
-              </p>
-              <p className="text-5xl text-yellow-400 font-bold">
-                {wpm.toFixed(0)}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs uppercase text-neutral-500 font-mono">
-                acc
-              </p>
-              <p className="text-5xl text-neutral-200 font-bold">
-                {accuracy.toFixed(0)}%
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-6 py-2 bg-neutral-800 text-neutral-200 rounded font-mono hover:bg-neutral-700 transition uppercase tracking-widest text-xs border border-neutral-600"
-          >
-            Restart
-          </button>
-        </div>
-      )}
 
       {!isFocused && !endTime && (
         <div
