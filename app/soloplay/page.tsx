@@ -42,7 +42,7 @@ async function getSentence(): Promise<string> {
   async function fetchWiki() {
     const r = await fetchWithTimeout(
       "https://en.wikipedia.org/api/rest_v1/page/random/summary",
-      5000,
+      2000,
     );
 
     if (!r.ok) throw new Error();
@@ -76,9 +76,10 @@ async function getSentence(): Promise<string> {
 export default async function Page({
   searchParams,
 }: {
-  searchParams?: { duration?: string };
+  searchParams?: Promise<{ duration?: string }>;
 }) {
-  const rawDuration = Number(searchParams?.duration);
+  const params = searchParams ? await searchParams : undefined;
+  const rawDuration = Number(params?.duration);
 
   const initialDuration = SOLO_DURATIONS.includes(
     rawDuration as (typeof SOLO_DURATIONS)[number],
