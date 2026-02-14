@@ -5,8 +5,8 @@ import TypingOnce from "../typingonce";
 const Landing = () => {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#15171c] text-[#e2e2e2]">
-      <div className="pointer-events-none absolute -top-32 right-0 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_center,rgba(226,183,20,0.35),rgba(21,23,28,0))]" />
-      <div className="pointer-events-none absolute -bottom-24 left-0 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle_at_center,rgba(49,64,90,0.6),rgba(21,23,28,0))]" />
+      <div className="pointer-events-none absolute -top-32 right-0 h-105 w-105 rounded-full bg-[radial-gradient(circle_at_center,rgba(226,183,20,0.35),rgba(21,23,28,0))]" />
+      <div className="pointer-events-none absolute -bottom-24 left-0 h-130 w-130 rounded-full bg-[radial-gradient(circle_at_center,rgba(49,64,90,0.6),rgba(21,23,28,0))]" />
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-16">
         <header className="flex items-center justify-between text-xs uppercase tracking-[0.35em] text-[#6b6f7a]">

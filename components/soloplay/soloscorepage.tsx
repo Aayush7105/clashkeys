@@ -39,7 +39,7 @@ const SoloScorePage: React.FC<Props> = ({
         : "text-orange-400";
 
   return (
-    <div className="fixed inset-0 z-[100] bg-neutral-950 overflow-y-auto min-h-screen flex flex-col items-center justify-center p-6 animate-in fade-in duration-500">
+    <div className="fixed inset-0 z-100 bg-neutral-950 overflow-y-auto min-h-screen flex flex-col items-center justify-center p-6 animate-in fade-in duration-500">
       <div className="w-full max-w-5xl flex flex-col items-center space-y-12">
         {/* Header Indicator */}
         <div className="flex items-center gap-2 text-neutral-500 font-mono text-xs uppercase tracking-[0.2em] animate-in slide-in-from-top duration-700">
@@ -69,7 +69,7 @@ const SoloScorePage: React.FC<Props> = ({
 
           {/* Graph Area */}
           <div className="lg:col-span-3 w-full bg-neutral-900/20 rounded-xl p-4 animate-in fade-in zoom-in duration-1000 delay-300">
-            <div className="h-[250px] w-full">
+            <div className="h-62.5 w-full">
               <WpmGraph data={wpmHistory} />
             </div>
           </div>
