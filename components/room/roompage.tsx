@@ -160,7 +160,7 @@ export default function RoomPage() {
     inputRef.current?.focus();
     setKeystrokes(0);
     setBackspaces(0);
-    setTimeLeft(60);
+    setTimeLeft(15);
     setIsRunning(true);
     setTestEnded(false);
   }
