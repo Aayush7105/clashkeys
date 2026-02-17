@@ -59,12 +59,16 @@ export default function MultiplayerPage() {
     <main className="min-h-screen bg-neutral-900 text-neutral-200 flex items-center justify-center px-6">
       <div className="max-w-3xl w-full space-y-10">
         <div className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-neutral-400">
-          <span className="font-mono text-lg tracking-tight">Multiplayer</span>
-          <span className="text-[#e2b714] text-lg font-mono ">clashkeys</span>
+          <span className="font-mono text-lg tracking-tight font-semibold">
+            Multiplayer
+          </span>
+          <span className="text-[#e2b714] text-lg font-mono tracking-tight font-semibold">
+            clashkeys
+          </span>
         </div>
 
-        <div className="rounded-2xl border border-neutral-600 bg-neutral-900 p-6 sm:p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] font-mono tracking-tight">
-          <h2 className="text-2xl sm:text-3xl font-semibold tracking-wide ">
+        <div className="rounded-2xl border border-neutral-700 bg-neutral-900 p-6 sm:p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.05)] font-mono tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-semibold tracking-wide ">
             Typing Rooms
           </h2>
           <p className="mt-2 text-sm text-neutral-400">
@@ -73,7 +77,7 @@ export default function MultiplayerPage() {
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="block text-xs uppercase tracking-[0.2em] text-[#6b6f7a]">
+              <label className="block text-sm uppercase tracking-[0.2em] text-neutral-200">
                 Your name
               </label>
               <input
@@ -85,7 +89,7 @@ export default function MultiplayerPage() {
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-xs uppercase tracking-[0.2em] text-[#6b6f7a]">
+              <label className="block text-sm uppercase tracking-[0.2em] text-neutral-200">
                 Room code
               </label>
               <input
