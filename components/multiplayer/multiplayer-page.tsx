@@ -104,13 +104,13 @@ export default function MultiplayerPage() {
           <div className="mt-6 flex flex-wrap gap-3">
             <button
               onClick={createRoom}
-              className="rounded-lg bg-[#e2b714] px-5 py-2.5 text-sm font-semibold text-[#1a1b1f] tracking-wide hover:brightness-110"
+              className="rounded-xl bg-[#e2b714] px-5 py-2.5 text-sm font-semibold text-[#1a1b1f] tracking-wide hover:brightness-110"
             >
               Create room
             </button>
             <button
               onClick={joinRoom}
-              className="rounded-lg border border-[#3a3f49] px-5 py-2.5 text-sm font-semibold tracking-wide text-[#e2e2e2] hover:border-[#e2b714]"
+              className="rounded-xl border border-[#3a3f49] px-5 py-2.5 text-sm font-semibold tracking-wide text-[#e2e2e2] hover:border-[#e2b714]"
             >
               Join room
             </button>

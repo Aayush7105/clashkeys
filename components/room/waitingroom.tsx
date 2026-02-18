@@ -26,40 +26,40 @@ export default function WaitingRoomPage({
   onExit,
 }: RoomPageProps) {
   return (
-    <main className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center px-6">
+    <main className="min-h-screen bg-neutral-900 text-zinc-100 flex items-center justify-center px-6">
       <div className="max-w-4xl w-full space-y-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Room {roomId}</h1>
-            <p className="text-zinc-400">Waiting room · {name}</p>
+            <h1 className="text-3xl font-bold font-mono ">Room {roomId}</h1>
+            <p className="text-neutral-200 font-mono">Waiting room · {name}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             {isHost ? (
               <button
                 onClick={onStart}
-                className="px-4 py-2 rounded bg-emerald-500 text-emerald-950 font-semibold"
+                className="px-4 py-2 rounded-xl bg-[#e2b714] text-neutral-800 font-mono font-bold cursor-pointer"
               >
                 Start test
               </button>
             ) : (
-              <div className="rounded-full border border-zinc-800 px-3 py-1 text-xs uppercase tracking-[0.2em] text-zinc-400">
+              <div className="rounded-full border border-[#3a3f49] px-3 py-1 text-xs uppercase tracking-[0.2em] text-zinc-400">
                 Waiting for host
               </div>
             )}
             <button
               onClick={onExit}
-              className="px-4 py-2 rounded border border-zinc-700 text-zinc-100 font-semibold"
+              className="px-4 py-2 rounded-xl border border-[#3a3f49] text-zinc-200 font-bold font-mono"
             >
               Back
             </button>
           </div>
         </div>
 
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-6">
+        <div className="rounded-xl border border-[#3a3f49] bg-neutral-900 p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-semibold">Players</h2>
-              <p className="text-sm text-zinc-500">
+              <p className="text-sm text-neutral-200">
                 {users.length === 0
                   ? "Waiting for players to join..."
                   : `${users.length} player${users.length === 1 ? "" : "s"} in room`}
@@ -70,7 +70,7 @@ export default function WaitingRoomPage({
 
           <div className="mt-4 space-y-3">
             {users.length === 0 ? (
-              <div className="rounded-lg border border-dashed border-zinc-800 p-6 text-center text-zinc-500">
+              <div className="rounded-xl border border-dashed border-zinc-800 p-6 text-center text-zinc-500">
                 No players yet.
               </div>
             ) : (
@@ -79,23 +79,23 @@ export default function WaitingRoomPage({
                 return (
                   <div
                     key={user.id}
-                    className="flex items-center justify-between gap-4 rounded-lg border border-zinc-800 bg-zinc-950/60 px-4 py-3"
+                    className="flex items-center justify-between gap-4 rounded-lg border border-zinc-800 bg-neutral-800 px-4 py-3"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-full bg-zinc-800 flex items-center justify-center text-sm font-semibold">
+                      <div className="h-9 w-9 rounded-full bg-neutral-900 flex items-center justify-center text-sm font-semibold border border-neutral-600">
                         {user.name.slice(0, 1).toUpperCase()}
                       </div>
                       <div>
-                        <div className="text-sm font-semibold text-zinc-100">
+                        <div className="text-sm font-semibold text-neutral-200">
                           {user.name}
                         </div>
-                        <div className="text-xs text-zinc-500">
-                          {isRoomHost ? "Host" : "Player"}
+                        <div className="text-sm text-neutral-500 ">
+                          {isRoomHost ? "" : "Player"}
                         </div>
                       </div>
                     </div>
                     {isRoomHost && (
-                      <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-300">
+                      <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-300 font-mono">
                         Host
                       </span>
                     )}
@@ -106,7 +106,7 @@ export default function WaitingRoomPage({
           </div>
         </div>
 
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 text-sm text-zinc-400">
+        <div className="rounded-xl  bg-neutral-900 p-6 text-sm text-zinc-400 font-mono">
           {isHost
             ? "You are the host. Start the test when everyone is ready."
             : "Only the host can start the test. You will be moved into the race automatically."}
