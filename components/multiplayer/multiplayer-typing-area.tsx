@@ -1,0 +1,160 @@
+"use client";
+
+import { cn } from "@/lib/utils";
+import React, { useLayoutEffect, useRef } from "react";
+import type { RoomUser } from "./multiplayer-types";
+
+type MultiplayerTypingAreaProps = {
+  roomId: string;
+  name: string;
+  text: string;
+  typed: string;
+  users: RoomUser[];
+  timeLeft: number;
+  isFocused: boolean;
+  inputRef: React.RefObject<HTMLInputElement | null>;
+  onTypedChange: (value: string) => void;
+  onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+  onPaste: (event: React.ClipboardEvent<HTMLInputElement>) => void;
+  onFocusChange: (focused: boolean) => void;
+};
+
+export default function MultiplayerTypingArea({
+  roomId,
+  name,
+  text,
+  typed,
+  users,
+  timeLeft,
+  isFocused,
+  inputRef,
+  onTypedChange,
+  onKeyDown,
+  onPaste,
+  onFocusChange,
+}: MultiplayerTypingAreaProps) {
+  const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const caretRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const target = charRefs.current[typed.length];
+    const caret = caretRef.current;
+
+    if (!target || !caret) return;
+
+    caret.style.transform = `translate(${target.offsetLeft}px, ${target.offsetTop}px)`;
+  }, [typed, text]);
+
+  return (
+    <div
+      className="relative w-full max-w-5xl mx-auto mt-10"
+      onClick={() => inputRef.current?.focus()}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-bold font-mono text-neutral-200">Room {roomId}</h1>
+          <p className="text-neutral-500 text-sm font-mono">Playing as {name}</p>
+        </div>
+        <div className="text-2xl font-mono text-yellow-500">{timeLeft}s</div>
+      </div>
+
+      <div className="space-y-2 mb-8">
+        {users.length === 0 ? (
+          <div className="text-sm text-neutral-500">Waiting for players...</div>
+        ) : (
+          users.map((user) => (
+            <div key={user.id} className="flex items-center gap-3">
+              <div className="w-28 truncate text-sm text-neutral-300 font-mono">
+                {user.name}
+              </div>
+              <div className="h-2 flex-1 bg-zinc-800 rounded">
+                <div
+                  className="h-2 bg-yellow-500 rounded"
+                  style={{ width: `${Math.min(100, Math.max(0, user.progress))}%` }}
+                />
+              </div>
+              <div className="w-12 text-right text-xs text-zinc-400 font-mono">
+                {user.progress}%
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      <div
+        className={`relative transition-all duration-500 ease-in-out ${
+          !isFocused ? "blur-[6px] opacity-20 scale-[0.98]" : "blur-0 opacity-100 scale-100"
+        }`}
+      >
+        <div
+          className="relative text-2xl md:text-3xl lg:text-4xl font-mono leading-[1.6] tracking-tight text-left select-none"
+          suppressHydrationWarning={true}
+        >
+          <div
+            ref={caretRef}
+            className="absolute h-[1.2em] w-0.5 bg-yellow-400 rounded-full transition-all duration-100 ease-out z-10 shadow-[0_0_8px_rgba(250,204,21,0.6)]"
+            style={{ marginTop: "0.2em" }}
+          />
+
+          <div className="inline">
+            {text.split("").map((char, i) => {
+              const typedChar = typed[i];
+              let colorClass = "text-neutral-600";
+
+              if (typedChar !== undefined) {
+                colorClass =
+                  typedChar === char
+                    ? "text-neutral-200"
+                    : "text-red-500 border-b-2 border-red-500/30";
+              }
+
+              return (
+                <span
+                  key={i}
+                  ref={(el) => {
+                    charRefs.current[i] = el;
+                  }}
+                  className={cn(colorClass, "transition-colors duration-150")}
+                >
+                  {char}
+                </span>
+              );
+            })}
+            <span
+              ref={(el) => {
+                charRefs.current[text.length] = el;
+              }}
+              className="inline-block w-0 h-[1em]"
+            />
+          </div>
+        </div>
+      </div>
+
+      {!isFocused && (
+        <div
+          onClick={() => inputRef.current?.focus()}
+          className="fixed inset-0 z-40 flex flex-col gap-10 items-center justify-center bg-black/10 cursor-pointer"
+        >
+          <div className="px-6 py-3 rounded-xl bg-neutral-800/80 border border-neutral-700 text-neutral-200 font-mono text-lg uppercase tracking-widest">
+            Click to Resume
+          </div>
+        </div>
+      )}
+
+      <input
+        ref={inputRef}
+        type="text"
+        autoFocus
+        value={typed}
+        onChange={(event) => onTypedChange(event.target.value)}
+        onKeyDown={onKeyDown}
+        onPaste={onPaste}
+        onFocus={() => onFocusChange(true)}
+        onBlur={() => onFocusChange(false)}
+        className="fixed opacity-0 pointer-events-none"
+        autoComplete="off"
+        spellCheck={false}
+      />
+    </div>
+  );
+}

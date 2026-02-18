@@ -16,6 +16,44 @@ const io = new Server(server, {
 });
 
 const rooms = {};
+const ALLOWED_DURATIONS = new Set([15, 30, 60, 120]);
+
+function normalizeDuration(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return 30;
+  return ALLOWED_DURATIONS.has(parsed) ? parsed : 30;
+}
+
+function normalizeProgress(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return 0;
+  return Math.min(100, Math.max(0, Math.round(parsed)));
+}
+
+function normalizeCount(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return 0;
+  return Math.max(0, Math.round(parsed));
+}
+
+function sanitizeText(value) {
+  if (typeof value !== "string") return "";
+  return value
+    .replace(/[^A-Za-z\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function serializeUsers(room) {
+  return room.users.map((u) => ({
+    id: u.socketId,
+    name: u.name,
+    progress: u.progress,
+    correctChars: u.correctChars,
+    totalKeystrokes: u.totalKeystrokes,
+  }));
+}
 
 io.on("connection", (socket) => {
   console.log("connected:", socket.id);
@@ -38,52 +76,45 @@ io.on("connection", (socket) => {
       socketId: socket.id,
       name,
       progress: 0,
+      correctChars: 0,
+      totalKeystrokes: 0,
     });
 
-    io.to(roomId).emit(
-      "room-users-update",
-      rooms[roomId].users.map((u) => ({
-        id: u.socketId,
-        name: u.name,
-        progress: u.progress,
-      })),
-    );
+    io.to(roomId).emit("room-users-update", serializeUsers(rooms[roomId]));
   });
 
-  socket.on("user-typing", ({ roomId, progress }) => {
+  socket.on("user-typing", ({ roomId, progress, correctChars, totalKeystrokes }) => {
     const room = rooms[roomId];
     if (!room) return;
 
     const user = room.users.find((u) => u.socketId === socket.id);
     if (!user) return;
 
-    user.progress = progress;
+    user.progress = normalizeProgress(progress);
+    user.correctChars = normalizeCount(correctChars);
+    user.totalKeystrokes = normalizeCount(totalKeystrokes);
 
-    io.to(roomId).emit(
-      "progress-update",
-      room.users.map((u) => ({
-        id: u.socketId,
-        name: u.name,
-        progress: u.progress,
-      })),
-    );
+    io.to(roomId).emit("progress-update", serializeUsers(room));
   });
 
-  socket.on("start-test", ({ roomId, text }) => {
+  socket.on("start-test", ({ roomId, text, duration }) => {
     const room = rooms[roomId];
     if (!room) return;
+    const nextDuration = normalizeDuration(duration);
+    const nextText = sanitizeText(text);
+    const startedAt = Date.now();
 
     room.users.forEach((u) => {
       u.progress = 0;
+      u.correctChars = 0;
+      u.totalKeystrokes = 0;
     });
 
     io.to(roomId).emit("test-started", {
-      text,
-      users: room.users.map((u) => ({
-        id: u.socketId,
-        name: u.name,
-        progress: u.progress,
-      })),
+      text: nextText,
+      duration: nextDuration,
+      startedAt,
+      users: serializeUsers(room),
     });
   });
 
@@ -95,14 +126,7 @@ io.on("connection", (socket) => {
       room.users = room.users.filter((u) => u.socketId !== socket.id);
 
       if (room.users.length !== before) {
-        io.to(roomId).emit(
-          "room-users-update",
-          room.users.map((u) => ({
-            id: u.socketId,
-            name: u.name,
-            progress: u.progress,
-          })),
-        );
+        io.to(roomId).emit("room-users-update", serializeUsers(room));
       }
 
       if (room.users.length === 0) {

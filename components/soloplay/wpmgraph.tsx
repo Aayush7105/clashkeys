@@ -1,174 +1,146 @@
-import React from "react";
+"use client";
+
+import {
+  CartesianGrid,
+  Customized,
+  Line,
+  LineChart,
+  ReferenceDot,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { useMemo } from "react";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { useDynamicDasharray } from "@/components/ui/partial-line";
 
 type WpmGraphProps = {
-  data: number[];
+  wpmData: number[];
+  rawWpmData: number[];
+  errorMarkers: (number | null)[];
 };
 
-const WpmGraph: React.FC<WpmGraphProps> = ({ data }) => {
-  if (data.length < 2) return null;
+const chartConfig = {
+  wpm: {
+    label: "WPM",
+    color: "hsl(48 96% 53%)",
+  },
+  rawWpm: {
+    label: "Raw WPM",
+    color: "hsl(0 0% 65%)",
+  },
+} satisfies ChartConfig;
 
-  const width = 500;
-  const height = 200;
+export default function WpmGraph({
+  wpmData,
+  rawWpmData,
+  errorMarkers,
+}: WpmGraphProps) {
+  const chartData = useMemo(
+    () => {
+      const points = Math.max(wpmData.length, rawWpmData.length, errorMarkers.length);
+      return Array.from({ length: points }, (_, index) => ({
+        second: `${index + 1}`,
+        wpm: Math.max(0, Math.round(wpmData[index] ?? 0)),
+        rawWpm: Math.max(0, Math.round(rawWpmData[index] ?? 0)),
+        errorMarker:
+          typeof errorMarkers[index] === "number" &&
+          Number.isFinite(errorMarkers[index])
+            ? Math.max(0, Math.round(errorMarkers[index] as number))
+            : null,
+      }));
+    },
+    [wpmData, rawWpmData, errorMarkers],
+  );
 
-  const paddingLeft = 42;
-  const paddingBottom = 26;
-  const paddingTop = 14;
-  const paddingRight = 10;
-
-  const chartWidth = width - paddingLeft - paddingRight;
-  const chartHeight = height - paddingTop - paddingBottom;
-
-  const max = Math.max(...data, 10);
-
-  const points = data.map((v, i) => {
-    const x = paddingLeft + (i / (data.length - 1)) * chartWidth;
-    const y = paddingTop + chartHeight - (v / max) * chartHeight;
-    return { x, y };
+  const splitIndex = Math.max(1, chartData.length - 10);
+  const [DasharrayCalculator, lineDasharrays] = useDynamicDasharray({
+    splitIndex,
+    lineConfigs: [
+      { name: "wpm", splitIndex },
+      { name: "rawWpm", splitIndex },
+    ],
   });
 
-  const linePoints = points.map((p) => `${p.x},${p.y}`).join(" ");
-
-  const areaPoints = [
-    `${points[0].x},${paddingTop + chartHeight}`,
-    ...points.map((p) => `${p.x},${p.y}`),
-    `${points[points.length - 1].x},${paddingTop + chartHeight}`,
-  ].join(" ");
-
-  const yTicks = 4;
+  if (chartData.length < 2) return null;
 
   return (
-    <svg
-      viewBox={`0 0 ${width} ${height}`}
-      className="w-full h-48"
-      preserveAspectRatio="none"
-    >
-      <defs>
-        {/* Line gradient */}
-        <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#facc15" />
-          <stop offset="100%" stopColor="#fb923c" />
-        </linearGradient>
-
-        {/* Area gradient */}
-        <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#facc15" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="#facc15" stopOpacity="0" />
-        </linearGradient>
-
-        {/* Glow */}
-        <filter id="glow">
-          <feGaussianBlur stdDeviation="3" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-
-      {/* Horizontal grid + Y labels */}
-      {Array.from({ length: yTicks + 1 }).map((_, i) => {
-        const y = paddingTop + chartHeight - (i / yTicks) * chartHeight;
-        const value = Math.round((max / yTicks) * i);
-
-        return (
-          <g key={i}>
-            <line
-              x1={paddingLeft}
-              y1={y}
-              x2={paddingLeft + chartWidth}
-              y2={y}
-              stroke="rgb(63 63 70)"
-              strokeDasharray="4 4"
-              strokeWidth="1"
-            />
-            <text
-              x={paddingLeft - 8}
-              y={y + 4}
-              textAnchor="end"
-              fontSize="10"
-              fill="rgb(161 161 170)"
-            >
-              {value}
-            </text>
-          </g>
-        );
-      })}
-
-      {/* X axis */}
-      <line
-        x1={paddingLeft}
-        y1={paddingTop + chartHeight}
-        x2={paddingLeft + chartWidth}
-        y2={paddingTop + chartHeight}
-        stroke="rgb(82 82 82)"
-      />
-
-      {/* Area */}
-      <polygon points={areaPoints} fill="url(#areaGradient)" />
-
-      {/* Glow line (behind) */}
-      <polyline
-        points={linePoints}
-        fill="none"
-        stroke="url(#lineGradient)"
-        strokeWidth="6"
-        opacity="0.35"
-        filter="url(#glow)"
-      />
-
-      {/* Main line */}
-      <polyline
-        points={linePoints}
-        fill="none"
-        stroke="url(#lineGradient)"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        pathLength={1}
+    <ChartContainer className="h-54 w-full" config={chartConfig}>
+      <LineChart
+        accessibilityLayer
+        data={chartData}
+        margin={{
+          left: 8,
+          right: 8,
+          top: 8,
+        }}
       >
-        <animate
-          attributeName="stroke-dasharray"
-          from="0 1"
-          to="1 0"
-          dur="0.8s"
-          fill="freeze"
+        <CartesianGrid vertical={false} />
+        <XAxis
+          dataKey="second"
+          tickLine={false}
+          axisLine={false}
+          tickMargin={8}
+          interval={0}
+          tickFormatter={(value: string, index: number) => {
+            const numeric = Number(value);
+            const isFirst = index === 0;
+            const isLast = index === chartData.length - 1;
+            const everyTen = numeric % 10 === 0;
+            return isFirst || isLast || everyTen ? `${numeric}s` : "";
+          }}
         />
-      </polyline>
-
-      {/* Points */}
-      {points.map((p, i) => (
-        <circle
-          key={i}
-          cx={p.x}
-          cy={p.y}
-          r="3.2"
-          fill="#facc15"
-          stroke="#0f172a"
-          strokeWidth="1.2"
+        <YAxis hide />
+        <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+        <Line
+          dataKey="wpm"
+          type="linear"
+          stroke={chartConfig.wpm.color}
+          strokeWidth={3}
+          dot={{
+            r: 2.5,
+            fill: chartConfig.wpm.color,
+          }}
+          strokeDasharray={
+            lineDasharrays.find((line) => line.name === "wpm")?.strokeDasharray ||
+            "0 0"
+          }
         />
-      ))}
-
-      {/* X labels (seconds) */}
-      {data.map((_, i) => {
-        if (i !== 0 && i !== data.length - 1 && i % 5 !== 0) return null;
-
-        const x = paddingLeft + (i / (data.length - 1)) * chartWidth;
-
-        return (
-          <text
-            key={i}
-            x={x}
-            y={paddingTop + chartHeight + 16}
-            textAnchor="middle"
-            fontSize="10"
-            fill="rgb(161 161 170)"
-          >
-            {i + 1}s
-          </text>
-        );
-      })}
-    </svg>
+        <Line
+          dataKey="rawWpm"
+          type="linear"
+          stroke={chartConfig.rawWpm.color}
+          strokeWidth={2.5}
+          dot={{
+            r: 2.5,
+            fill: chartConfig.rawWpm.color,
+          }}
+          strokeDasharray={
+            lineDasharrays.find((line) => line.name === "rawWpm")
+              ?.strokeDasharray || "0 0"
+          }
+        />
+        {chartData.map((point) => {
+          if (point.errorMarker === null) return null;
+          return (
+            <ReferenceDot
+              key={`error-${point.second}`}
+              x={point.second}
+              y={point.errorMarker}
+              r={4}
+              fill="hsl(0 84% 60%)"
+              stroke="hsl(0 0% 100%)"
+              strokeWidth={1}
+              ifOverflow="extendDomain"
+            />
+          );
+        })}
+        <Customized component={DasharrayCalculator} />
+      </LineChart>
+    </ChartContainer>
   );
-};
-
-export default WpmGraph;
+}

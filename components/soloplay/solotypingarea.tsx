@@ -32,11 +32,14 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
   const [totalKeystrokes, setTotalKeystrokes] = useState(0);
   const [correctKeystrokes, setCorrectKeystrokes] = useState(0);
   const [wpmHistory, setWpmHistory] = useState<number[]>([]);
+  const [rawWpmHistory, setRawWpmHistory] = useState<number[]>([]);
+  const [errorDotHistory, setErrorDotHistory] = useState<(number | null)[]>([]);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const caretRef = useRef<HTMLDivElement>(null);
   const lastSampleSecondRef = useRef<number>(-1);
+  const lastIncorrectCountRef = useRef<number>(0);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -46,6 +49,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
     if (startTime === null || endTime !== null) return;
 
     lastSampleSecondRef.current = -1;
+    lastIncorrectCountRef.current = 0;
     const id = setInterval(() => {
       const current = Date.now();
       setNow(current);
@@ -61,12 +65,18 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
         lastSampleSecondRef.current = elapsedSec;
         const minutes = elapsedMs / 60000;
         const currentWpm = minutes > 0 ? correctKeystrokes / 5 / minutes : 0;
+        const currentRawWpm = minutes > 0 ? totalKeystrokes / 5 / minutes : 0;
+        const incorrectChars = Math.max(0, totalKeystrokes - correctKeystrokes);
+        const hasNewErrors = incorrectChars > lastIncorrectCountRef.current;
+        lastIncorrectCountRef.current = incorrectChars;
         setWpmHistory((h) => [...h, currentWpm]);
+        setRawWpmHistory((h) => [...h, currentRawWpm]);
+        setErrorDotHistory((h) => [...h, hasNewErrors ? currentWpm : null]);
       }
     }, 100);
 
     return () => clearInterval(id);
-  }, [startTime, endTime, duration, correctKeystrokes]);
+  }, [startTime, endTime, duration, correctKeystrokes, totalKeystrokes]);
 
   const elapsedMs =
     startTime === null ? 0 : Math.max(0, (endTime ?? now) - startTime);
@@ -115,6 +125,8 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
         timeElapsed={timeElapsed}
         onRestart={handleRestart}
         wpmHistory={wpmHistory}
+        rawWpmHistory={rawWpmHistory}
+        errorDotHistory={errorDotHistory}
       />
     );
   }

@@ -1,21 +1,19 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { socket } from "@/lib/socket";
-import { cn } from "@/lib/utils";
-import ScorePage from "@/components/score/scorepage";
-import WaitingRoomPage from "../room/waitingroom";
+import MultiplayerNavbar from "./multiplayer-navbar";
+import MultiplayerScorePage from "./multiplayer-score-page";
+import MultiplayerTypingArea from "./multiplayer-typing-area";
+import MultiplayerWaitingRoom from "./multiplayer-waiting-room";
+import {
+  DEFAULT_MULTIPLAYER_DURATION,
+  getRandomMultiplayerText,
+  isValidMultiplayerDuration,
+} from "./multiplayer-constants";
+import type { RoomUser, TestStartedPayload } from "./multiplayer-types";
 export const dynamic = "force-dynamic";
-
-type RoomUser = {
-  id: string;
-  name: string;
-  progress: number;
-};
-
-const defaultText =
-  "This is a simple multiplayer typing test for the prototype.";
 
 function safeDecode(value: string) {
   try {
@@ -25,29 +23,85 @@ function safeDecode(value: string) {
   }
 }
 
-export default function RoomPage() {
+function normalizeUser(user: Partial<RoomUser>): RoomUser {
+  return {
+    id: user.id ?? "",
+    name: user.name ?? "Player",
+    progress:
+      typeof user.progress === "number" && Number.isFinite(user.progress)
+        ? user.progress
+        : 0,
+    correctChars:
+      typeof user.correctChars === "number" && Number.isFinite(user.correctChars)
+        ? user.correctChars
+        : 0,
+    totalKeystrokes:
+      typeof user.totalKeystrokes === "number" &&
+      Number.isFinite(user.totalKeystrokes)
+        ? user.totalKeystrokes
+        : 0,
+  };
+}
+
+export default function MultiplayerArea() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const pathname = usePathname();
 
   const roomId = searchParams.get("roomId") ?? "";
   const rawName = searchParams.get("name") ?? "";
   const name = useMemo(() => safeDecode(rawName), [rawName]);
+  const rawDuration = Number(searchParams.get("duration"));
+  const initialDuration = isValidMultiplayerDuration(rawDuration)
+    ? rawDuration
+    : DEFAULT_MULTIPLAYER_DURATION;
 
   const [users, setUsers] = useState<RoomUser[]>([]);
-  const [text, setText] = useState(defaultText);
+  const [text, setText] = useState(getRandomMultiplayerText());
   const [typed, setTyped] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const [timeLeft, setTimeLeft] = useState(0);
+  const [isFocused, setIsFocused] = useState(true);
+  const [selectedDuration, setSelectedDuration] = useState(initialDuration);
+  const selectedDurationRef = useRef(initialDuration);
+  const [roundDuration, setRoundDuration] = useState(initialDuration);
+  const [roundStartedAt, setRoundStartedAt] = useState<number | null>(null);
+  const [finishedAt, setFinishedAt] = useState<number | null>(null);
+  const [now, setNow] = useState(() => Date.now());
   const [isRunning, setIsRunning] = useState(false);
   const [testEnded, setTestEnded] = useState(false);
   const [socketId, setSocketId] = useState<string | null>(null);
-  const [keystrokes, setKeystrokes] = useState(0);
-  const [backspaces, setBackspaces] = useState(0);
+  const [totalKeystrokes, setTotalKeystrokes] = useState(0);
+  const [correctKeystrokes, setCorrectKeystrokes] = useState(0);
+  const [wpmHistory, setWpmHistory] = useState<number[]>([]);
+  const [rawWpmHistory, setRawWpmHistory] = useState<number[]>([]);
+  const [errorDotHistory, setErrorDotHistory] = useState<(number | null)[]>([]);
+  const lastSampleSecondRef = useRef(-1);
+  const lastIncorrectCountRef = useRef(0);
 
   const ready = roomId.trim().length > 0 && name.trim().length > 0;
   const hostId = users[0]?.id ?? null;
   const isHost = Boolean(hostId && socketId && hostId === socketId);
+
+  useEffect(() => {
+    selectedDurationRef.current = selectedDuration;
+  }, [selectedDuration]);
+
+  const elapsedMs =
+    roundStartedAt === null
+      ? 0
+      : Math.max(
+          0,
+          Math.min(
+            (finishedAt ?? now) - roundStartedAt,
+            Math.max(1, roundDuration) * 1000,
+          ),
+        );
+  const elapsedSeconds = Math.round(elapsedMs / 1000);
+  const elapsedFloor = Math.floor(elapsedMs / 1000);
+  const timeLeft =
+    roundStartedAt === null
+      ? roundDuration
+      : Math.max(0, roundDuration - elapsedFloor);
 
   useEffect(() => {
     if (!ready) return;
@@ -69,32 +123,51 @@ export default function RoomPage() {
 
     const handleUsersUpdate = (payload: RoomUser[]) => {
       if (Array.isArray(payload)) {
-        setUsers(payload);
+        setUsers(payload.map((user) => normalizeUser(user)));
       }
     };
 
     const handleProgressUpdate = (payload: RoomUser[]) => {
       if (Array.isArray(payload)) {
-        setUsers(payload);
+        setUsers(payload.map((user) => normalizeUser(user)));
       }
     };
 
-    const handleTestStarted = (payload: {
-      text?: string;
-      users?: RoomUser[];
-    }) => {
+    const handleTestStarted = (payload: TestStartedPayload) => {
+      const incomingDuration = Number(payload.duration);
+      const nextDuration = isValidMultiplayerDuration(incomingDuration)
+        ? incomingDuration
+        : selectedDurationRef.current;
+      const startedAt =
+        typeof payload.startedAt === "number" &&
+        Number.isFinite(payload.startedAt)
+          ? payload.startedAt
+          : Date.now();
+
       setText(
-        payload.text && payload.text.length > 0 ? payload.text : defaultText,
+        typeof payload.text === "string" && payload.text.trim().length > 0
+          ? payload.text
+          : getRandomMultiplayerText(),
       );
       setTyped("");
-      setKeystrokes(0);
-      setBackspaces(0);
+      setTotalKeystrokes(0);
+      setCorrectKeystrokes(0);
+      setWpmHistory([]);
+      setRawWpmHistory([]);
+      setErrorDotHistory([]);
+      lastSampleSecondRef.current = -1;
+      lastIncorrectCountRef.current = 0;
+      setRoundDuration(nextDuration);
+      setRoundStartedAt(startedAt);
+      setFinishedAt(null);
+      setNow(Date.now());
+      setIsFocused(true);
       if (Array.isArray(payload.users)) {
-        setUsers(payload.users);
+        setUsers(payload.users.map((user) => normalizeUser(user)));
       }
-      setTimeLeft(60);
       setIsRunning(true);
       setTestEnded(false);
+      setTimeout(() => inputRef.current?.focus(), 0);
     };
 
     socket.on("room-users-update", handleUsersUpdate);
@@ -111,32 +184,46 @@ export default function RoomPage() {
   }, [ready, roomId, name]);
 
   useEffect(() => {
-    if (!isRunning) {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-      return;
-    }
+    if (!isRunning || roundStartedAt === null) return;
 
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          setIsRunning(false);
-          setTestEnded(true);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    const timerId = setInterval(() => {
+      const current = Date.now();
+      setNow(current);
 
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
+      const elapsed = current - roundStartedAt;
+      if (elapsed >= roundDuration * 1000) {
+        setFinishedAt(roundStartedAt + roundDuration * 1000);
+        setIsRunning(false);
+        setTestEnded(true);
+        return;
       }
-    };
-  }, [isRunning]);
+
+      const elapsedSec = Math.floor(elapsed / 1000);
+      if (elapsedSec > lastSampleSecondRef.current) {
+        lastSampleSecondRef.current = elapsedSec;
+        const minutes = elapsed / 60000;
+        const liveWpm = minutes > 0 ? correctKeystrokes / 5 / minutes : 0;
+        const liveRawWpm = minutes > 0 ? totalKeystrokes / 5 / minutes : 0;
+        const incorrectChars = Math.max(0, totalKeystrokes - correctKeystrokes);
+        const hasNewErrors = incorrectChars > lastIncorrectCountRef.current;
+        lastIncorrectCountRef.current = incorrectChars;
+        setWpmHistory((history) => [...history, liveWpm]);
+        setRawWpmHistory((history) => [...history, liveRawWpm]);
+        setErrorDotHistory((history) => [
+          ...history,
+          hasNewErrors ? liveWpm : null,
+        ]);
+      }
+    }, 100);
+
+    return () => clearInterval(timerId);
+  }, [
+    isRunning,
+    roundStartedAt,
+    roundDuration,
+    correctKeystrokes,
+    totalKeystrokes,
+  ]);
 
   useEffect(() => {
     if (!ready) return;
@@ -145,37 +232,95 @@ export default function RoomPage() {
       ? Math.min(100, Math.round((typed.length / text.length) * 100))
       : 0;
 
-    socket.emit("user-typing", { roomId, progress });
-  }, [typed, text, roomId, ready]);
+    socket.emit("user-typing", {
+      roomId,
+      progress,
+      correctChars: correctKeystrokes,
+      totalKeystrokes,
+    });
+  }, [typed, text, roomId, ready, correctKeystrokes, totalKeystrokes]);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !isRunning) return;
     inputRef.current?.focus();
-  }, [ready]);
+  }, [ready, isRunning]);
+
+  function onDurationChange(nextDuration: number) {
+    if (!isHost || !isValidMultiplayerDuration(nextDuration)) return;
+    if (nextDuration === selectedDuration) return;
+
+    setSelectedDuration(nextDuration);
+    setRoundDuration(nextDuration);
+    selectedDurationRef.current = nextDuration;
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("duration", String(nextDuration));
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }
 
   function startTest() {
-    if (!ready) return;
-    if (!isHost) return;
-    socket.emit("start-test", { roomId, text: defaultText });
-    inputRef.current?.focus();
-    setKeystrokes(0);
-    setBackspaces(0);
-    setTimeLeft(15);
-    setIsRunning(true);
-    setTestEnded(false);
+    if (!ready || !isHost) return;
+
+    const nextText = getRandomMultiplayerText();
+    socket.emit("start-test", {
+      roomId,
+      text: nextText,
+      duration: selectedDuration,
+    });
+  }
+
+  function handleTypedChange(next: string) {
+    if (!isRunning || testEnded) return;
+
+    const value = next.slice(0, text.length);
+
+    if (value.length > typed.length) {
+      const added = value.slice(typed.length);
+      let correctAdded = 0;
+
+      added.split("").forEach((char, index) => {
+        if (char === text[typed.length + index]) {
+          correctAdded += 1;
+        }
+      });
+
+      setTotalKeystrokes((count) => count + added.length);
+      setCorrectKeystrokes((count) => count + correctAdded);
+    }
+
+    setTyped(value);
+
+    if (value.length === text.length) {
+      const finishedNow = Date.now();
+      setFinishedAt(finishedNow);
+      setNow(finishedNow);
+      setIsRunning(false);
+      setTestEnded(true);
+    }
+  }
+
+  function handleKeyDown() {
+    if (!isRunning || testEnded) return;
+  }
+
+  function handlePaste(event: React.ClipboardEvent<HTMLInputElement>) {
+    if (!isRunning || testEnded) {
+      event.preventDefault();
+    }
   }
 
   if (!ready) {
     return (
-      <main className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center px-6">
+      <main className="min-h-screen bg-neutral-900 text-neutral-100 flex items-center justify-center px-6">
         <div className="max-w-lg w-full space-y-4 text-center">
-          <h1 className="text-3xl font-bold">Missing room details</h1>
-          <p className="text-zinc-400">
+          <h1 className="text-3xl font-bold font-mono">Missing room details</h1>
+          <p className="text-neutral-400 font-mono">
             Open multiplayer from the lobby so your name and room code are set.
           </p>
           <button
             onClick={() => router.push("/multiplayer")}
-            className="px-4 py-2 rounded bg-emerald-500 text-emerald-950 font-semibold"
+            className="px-4 py-2 rounded-xl bg-[#e2b714] text-neutral-900 font-semibold font-mono cursor-pointer"
+            type="button"
           >
             Back to multiplayer
           </button>
@@ -186,133 +331,57 @@ export default function RoomPage() {
 
   if (testEnded) {
     return (
-      <ScorePage
-        name={name}
+      <MultiplayerScorePage
         roomId={roomId}
-        typed={typed}
-        text={text}
-        durationSeconds={60}
-        keystrokes={keystrokes}
-        backspaces={backspaces}
+        elapsedSeconds={elapsedSeconds}
+        totalKeystrokes={totalKeystrokes}
+        correctKeystrokes={correctKeystrokes}
+        wpmHistory={wpmHistory}
+        rawWpmHistory={rawWpmHistory}
+        errorDotHistory={errorDotHistory}
+        isHost={isHost}
         onRestart={startTest}
-        onExit={() => router.push("/multiplayer")}
-        isHost={isHost}
-      />
-    );
-  }
-
-  if (!isRunning) {
-    return (
-      <WaitingRoomPage
-        roomId={roomId}
-        name={name}
-        users={users}
-        hostId={hostId}
-        isHost={isHost}
-        onStart={startTest}
         onExit={() => router.push("/multiplayer")}
       />
     );
   }
 
   return (
-    <main
-      className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center px-6"
-      onClick={() => inputRef.current?.focus()}
-    >
-      <div className="max-w-4xl w-full space-y-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold">Room {roomId}</h1>
-            <p className="text-zinc-400">Playing as {name}</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-zinc-400">
-              Time:{" "}
-              <span className="text-zinc-100 font-semibold">{timeLeft}s</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          <h2 className="text-lg font-semibold">Players</h2>
-          {users.length === 0 ? (
-            <p className="text-zinc-500">Waiting for players...</p>
-          ) : (
-            <div className="space-y-2">
-              {users.map((user) => (
-                <div key={user.id} className="flex items-center gap-3">
-                  <div className="w-28 truncate text-sm text-zinc-300">
-                    {user.name}
-                  </div>
-                  <div className="h-2 flex-1 bg-zinc-800 rounded">
-                    <div
-                      className="h-2 bg-emerald-400 rounded"
-                      style={{ width: `${user.progress}%` }}
-                    />
-                  </div>
-                  <div className="w-10 text-right text-xs text-zinc-400">
-                    {user.progress}%
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="w-full rounded-xl bg-zinc-900/50 border border-zinc-800 p-6 text-2xl font-mono leading-relaxed mx-auto tracking-wide select-none">
-          {text.split("").map((char, i) => {
-            const typedChar = typed[i];
-
-            let color = "text-zinc-500";
-            if (typedChar === undefined) color = "text-zinc-500";
-            else if (typedChar === char) color = "text-emerald-400";
-            else color = "text-red-400";
-
-            const showCaret = i === typed.length;
-
-            return (
-              <span key={i} className="relative">
-                {showCaret && (
-                  <span className="absolute -left-0.5 top-0 h-full w-0.5 bg-emerald-400 animate-pulse" />
-                )}
-                <span className={cn(color)}>{char}</span>
-              </span>
-            );
-          })}
-        </div>
-
-        <input
-          ref={inputRef}
-          value={typed}
-          onChange={(e) => setTyped(e.target.value.slice(0, text.length))}
-          onKeyDown={(e) => {
-            if (!isRunning) return;
-            if (e.key === "Backspace") {
-              setBackspaces((prev) => prev + 1);
-              setKeystrokes((prev) => prev + 1);
-              return;
-            }
-
-            if (e.key.length === 1 || e.key === "Enter" || e.key === "Tab") {
-              setKeystrokes((prev) => prev + 1);
-            }
-          }}
-          onPaste={(e) => {
-            if (!isRunning) return;
-            const pasted = e.clipboardData.getData("text");
-            if (pasted) {
-              setKeystrokes((prev) => prev + pasted.length);
-            }
-          }}
-          className="absolute opacity-0 pointer-events-none"
-          autoComplete="off"
-          spellCheck={false}
+    <main className="min-h-screen bg-neutral-900 text-neutral-300 flex items-start justify-center px-2 py-16">
+      <div className="max-w-7xl w-full">
+        <MultiplayerNavbar
+          currentDuration={selectedDuration}
+          onDurationChange={onDurationChange}
+          isHost={isHost}
         />
 
-        <p className="text-center text-zinc-500">
-          Click anywhere and start typing
-        </p>
+        {!isRunning ? (
+          <MultiplayerWaitingRoom
+            roomId={roomId}
+            name={name}
+            users={users}
+            hostId={hostId}
+            isHost={isHost}
+            selectedDuration={selectedDuration}
+            onStart={startTest}
+            onExit={() => router.push("/multiplayer")}
+          />
+        ) : (
+          <MultiplayerTypingArea
+            roomId={roomId}
+            name={name}
+            text={text}
+            typed={typed}
+            users={users}
+            timeLeft={timeLeft}
+            isFocused={isFocused}
+            inputRef={inputRef}
+            onTypedChange={handleTypedChange}
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
+            onFocusChange={setIsFocused}
+          />
+        )}
       </div>
     </main>
   );

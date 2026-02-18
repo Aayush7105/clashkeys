@@ -1,39 +1,47 @@
+"use client";
+
 import React, { useEffect } from "react";
 import { Trophy, Zap, Target } from "lucide-react";
 import { TbReload } from "react-icons/tb";
-import WpmGraph from "./wpmgraph";
+import WpmGraph from "../soloplay/wpmgraph";
 
-interface Props {
-  wpm: number;
-  rawWpm: number;
-  accuracy: number;
-  correctChars: number;
-  incorrectChars: number;
-  totalChars: number;
-  timeElapsed: number;
-  onRestart: () => void;
+type MultiplayerScorePageProps = {
+  roomId: string;
+  elapsedSeconds: number;
+  totalKeystrokes: number;
+  correctKeystrokes: number;
   wpmHistory: number[];
   rawWpmHistory: number[];
   errorDotHistory: (number | null)[];
-}
+  isHost: boolean;
+  onRestart: () => void;
+  onExit: () => void;
+};
 
-const SoloScorePage: React.FC<Props> = ({
-  wpm,
-  rawWpm,
-  accuracy,
-  correctChars,
-  incorrectChars,
-  totalChars,
-  timeElapsed,
-  onRestart,
+export default function MultiplayerScorePage({
+  roomId,
+  elapsedSeconds,
+  totalKeystrokes,
+  correctKeystrokes,
   wpmHistory,
   rawWpmHistory,
   errorDotHistory,
-}) => {
-  // Scroll to top on mount
+  isHost,
+  onRestart,
+  onExit,
+}: MultiplayerScorePageProps) {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const safeSeconds = Math.max(1, elapsedSeconds);
+  const timeMinutes = safeSeconds / 60;
+
+  const accuracy =
+    totalKeystrokes === 0 ? 100 : (correctKeystrokes / totalKeystrokes) * 100;
+  const wpm = timeMinutes > 0 ? correctKeystrokes / 5 / timeMinutes : 0;
+  const rawWpm = timeMinutes > 0 ? totalKeystrokes / 5 / timeMinutes : 0;
+  const incorrectChars = Math.max(0, totalKeystrokes - correctKeystrokes);
 
   const accuracyColor =
     accuracy >= 95
@@ -44,16 +52,13 @@ const SoloScorePage: React.FC<Props> = ({
 
   return (
     <div className="fixed inset-0 z-100 bg-neutral-950 overflow-y-auto min-h-screen flex flex-col items-center justify-center p-6 animate-in fade-in duration-500">
-      <div className="w-full max-w-5xl flex flex-col items-center space-y-12">
-        {/* Header Indicator */}
+      <div className="w-full max-w-6xl flex flex-col items-center space-y-12">
         <div className="flex items-center gap-2 text-neutral-500 font-mono text-xs uppercase tracking-[0.2em] animate-in slide-in-from-top duration-700">
           <Trophy className="w-4 h-4 text-yellow-500" />
-          <span>Test Completed</span>
+          <span>Test Completed · Room {roomId}</span>
         </div>
 
-        {/* Top Section: Main Stats and Graph */}
         <div className="w-full grid grid-cols-1 lg:grid-cols-4 gap-8 items-center">
-          {/* Large Metrics */}
           <div className="lg:col-span-1 space-y-8 flex flex-col items-center lg:items-start">
             <div className="animate-in slide-in-from-left duration-700 delay-100">
               <div className="text-neutral-500 font-mono text-xl mb-1">wpm</div>
@@ -71,7 +76,6 @@ const SoloScorePage: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* Graph Area */}
           <div className="lg:col-span-3 w-full bg-neutral-900/20 rounded-xl p-4 animate-in fade-in zoom-in duration-1000 delay-300">
             <div className="h-62.5 w-full">
               <WpmGraph
@@ -83,14 +87,13 @@ const SoloScorePage: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* Detailed Breakdown Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12 border-t border-neutral-900 pt-12 w-full max-w-4xl animate-in slide-in-from-bottom duration-700 delay-500">
           <div className="flex flex-col items-center md:items-start">
             <span className="text-xs uppercase text-neutral-500 font-mono mb-2 flex items-center gap-2 tracking-widest">
               <Zap className="w-3 h-3 text-blue-400" /> characters
             </span>
             <span className="text-4xl font-mono text-neutral-200">
-              {correctChars}
+              {correctKeystrokes}
               <span className="text-neutral-700 mx-1">/</span>
               <span className="text-red-500/80">{incorrectChars}</span>
             </span>
@@ -101,7 +104,7 @@ const SoloScorePage: React.FC<Props> = ({
               <Target className="w-3 h-3 text-purple-400" /> keystrokes
             </span>
             <span className="text-4xl font-mono text-neutral-200">
-              {totalChars}
+              {totalKeystrokes}
             </span>
           </div>
 
@@ -110,7 +113,7 @@ const SoloScorePage: React.FC<Props> = ({
               time
             </span>
             <span className="text-4xl font-mono text-neutral-200">
-              {timeElapsed}s
+              {safeSeconds}s
             </span>
           </div>
 
@@ -124,29 +127,68 @@ const SoloScorePage: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* Actions */}
+        {/* <div className="w-full max-w-4xl rounded-xl border border-neutral-800 bg-neutral-900/30 p-5">
+          <div className="text-xs uppercase tracking-[0.2em] text-neutral-500 font-mono mb-4">
+            Leaderboard
+          </div>
+          <div className="space-y-2">
+            {leaderboard.map((entry, index) => {
+              const entryWpm =
+                timeMinutes > 0 ? Math.round((entry.correctChars / 5) / timeMinutes) : 0;
+              const entryAccuracy =
+                entry.totalKeystrokes > 0
+                  ? Math.round((entry.correctChars / entry.totalKeystrokes) * 100)
+                  : 0;
+              const isMe = Boolean(socketId && entry.id === socketId);
+
+              return (
+                <div
+                  key={entry.id}
+                  className={`grid grid-cols-[40px_1fr_80px_80px_80px] items-center gap-3 rounded-lg border px-3 py-2 text-sm font-mono ${
+                    isMe
+                      ? "border-yellow-500/60 bg-yellow-500/10 text-yellow-100"
+                      : "border-neutral-800 bg-neutral-950/50 text-neutral-300"
+                  }`}
+                >
+                  <div className="text-neutral-500">#{index + 1}</div>
+                  <div className="truncate">{entry.name}</div>
+                  <div className="text-right">{entry.progress}%</div>
+                  <div className="text-right">{entryWpm} wpm</div>
+                  <div className="text-right">{entryAccuracy}%</div>
+                </div>
+              );
+            })}
+          </div>
+        </div> */}
+
         <div className="flex flex-col items-center gap-8 pt-4 animate-in fade-in duration-1000 delay-700">
-          <button
-            onClick={() => window.location.reload()}
-            className="group flex flex-col items-center gap-3 transition-all"
-            title="Restart Test"
-          >
-            <TbReload className="size-10 text-neutral-600 group-hover:text-yellow-500 transition-colors cursor-pointer" />
-            <span className="text-neutral-600 group-hover:text-neutral-400 font-mono text-xs uppercase tracking-widest">
-              Restart Test
-            </span>
-          </button>
+          {isHost ? (
+            <button
+              onClick={onRestart}
+              className="group flex flex-col items-center gap-3 transition-all"
+              title="Restart Test"
+              type="button"
+            >
+              <TbReload className="size-5 text-neutral-600 group-hover:text-yellow-500 transition-colors cursor-pointer" />
+              <span className="text-neutral-600 group-hover:text-neutral-400 font-mono text-xs uppercase tracking-widest">
+                Restart Test
+              </span>
+            </button>
+          ) : (
+            <div className="text-neutral-500 font-mono text-xs uppercase tracking-[0.2em]">
+              Waiting for host to restart
+            </div>
+          )}
 
           <button
-            onClick={onRestart}
+            onClick={onExit}
             className="text-neutral-700 hover:text-neutral-400 font-mono text-xs uppercase tracking-[0.3em] transition-colors"
+            type="button"
           >
-            back to home
+            back to multiplayer
           </button>
         </div>
       </div>
     </div>
   );
-};
-
-export default SoloScorePage;
+}
