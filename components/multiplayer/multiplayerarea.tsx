@@ -334,6 +334,7 @@ export default function MultiplayerArea() {
       <MultiplayerScorePage
         roomId={roomId}
         elapsedSeconds={elapsedSeconds}
+        selectedDuration={roundDuration}
         totalKeystrokes={totalKeystrokes}
         correctKeystrokes={correctKeystrokes}
         wpmHistory={wpmHistory}

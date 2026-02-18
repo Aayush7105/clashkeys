@@ -124,6 +124,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
         totalChars={totalKeystrokes}
         timeElapsed={timeElapsed}
         onRestart={handleRestart}
+        selectedDuration={duration}
         wpmHistory={wpmHistory}
         rawWpmHistory={rawWpmHistory}
         errorDotHistory={errorDotHistory}
