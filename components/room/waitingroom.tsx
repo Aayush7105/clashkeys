@@ -42,13 +42,13 @@ export default function WaitingRoomPage({
                 Start test
               </button>
             ) : (
-              <div className="rounded-full border border-[#3a3f49] px-3 py-1 text-xs uppercase tracking-[0.2em] text-zinc-400">
-                Waiting for host
+              <div className=" px-4 py-4 text-sm uppercase  text-neutral-200 font-mono tracking-wide ">
+                Waiting for host..
               </div>
             )}
             <button
               onClick={onExit}
-              className="px-4 py-2 rounded-xl border border-[#3a3f49] text-zinc-200 font-bold font-mono"
+              className="px-4 py-2 rounded-xl border border-[#3a3f49] text-zinc-200 font-bold font-mono cursor-pointer"
             >
               Back
             </button>
@@ -65,7 +65,9 @@ export default function WaitingRoomPage({
                   : `${users.length} player${users.length === 1 ? "" : "s"} in room`}
               </p>
             </div>
-            <div className="text-sm text-zinc-500">Share code: {roomId}</div>
+            <div className="text-sm  text-neutral-200 font-mono ">
+              Share code: {roomId}
+            </div>
           </div>
 
           <div className="mt-4 space-y-3">
@@ -89,7 +91,7 @@ export default function WaitingRoomPage({
                         <div className="text-sm font-semibold text-neutral-200">
                           {user.name}
                         </div>
-                        <div className="text-sm text-neutral-500 ">
+                        <div className="text-xs text-neutral-500 font-mono">
                           {isRoomHost ? "" : "Player"}
                         </div>
                       </div>

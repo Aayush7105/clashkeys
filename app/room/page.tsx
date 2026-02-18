@@ -1,4 +1,4 @@
-import RoomPage from "@/components/room/roompage";
+import RoomPage from "@/components/multiplayer/multiplayerarea";
 export const dynamic = "force-dynamic";
 
 export default function Room() {

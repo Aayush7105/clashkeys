@@ -1,11 +1,11 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { socket } from "@/lib/socket";
 import { cn } from "@/lib/utils";
 import ScorePage from "@/components/score/scorepage";
-import WaitingRoomPage from "./waitingroom";
+import WaitingRoomPage from "../room/waitingroom";
 export const dynamic = "force-dynamic";
 
 type RoomUser = {
