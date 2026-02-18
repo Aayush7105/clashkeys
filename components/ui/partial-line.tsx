@@ -15,6 +15,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { TrendingUp } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const chartData = [
   { month: "January", desktop: 345, mobile: 210 },
@@ -34,11 +36,11 @@ const chartData = [
 const chartConfig = {
   desktop: {
     label: "Desktop",
-    color: "hsl(0 0% 100%)",
+    color: "var(--secondary-foreground)",
   },
   mobile: {
     label: "Mobile",
-    color: "hsl(0 0% 65%)",
+    color: "var(--chart-2)",
   },
 } satisfies ChartConfig;
 
@@ -50,7 +52,16 @@ export function PartialLineChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Partial Line Chart</CardTitle>
+        <CardTitle>
+          Partial Line Chart
+          <Badge
+            variant="outline"
+            className="text-green-500 bg-green-500/10 border-none ml-2"
+          >
+            <TrendingUp className="h-4 w-4" />
+            <span>5.2%</span>
+          </Badge>
+        </CardTitle>
         <CardDescription>January - June 2025</CardDescription>
       </CardHeader>
       <CardContent>
@@ -147,7 +158,7 @@ export function useDynamicDasharray({
   curveAdjustment = 1,
 }: UseDynamicDasharrayProps): [
   (props: CustomizedChartProps) => null,
-  LineDasharray
+  LineDasharray,
 ] {
   const [lineDasharrays, setLineDasharrays] = useState<LineDasharray>([]);
 
@@ -178,7 +189,7 @@ export function useDynamicDasharray({
 
         const lineName = line?.item?.props?.dataKey;
         const lineConfig = lineConfigs?.find(
-          (config) => config?.name === lineName
+          (config) => config?.name === lineName,
         );
         const lineSplitIndex = lineConfig?.splitIndex ?? splitIndex;
         const dashedSegment = points?.slice(lineSplitIndex);
@@ -197,11 +208,11 @@ export function useDynamicDasharray({
           (targetDashPattern?.[0] || 0) + (targetDashPattern?.[1] || 0) || 1;
         const repetitions = Math.ceil(dashedLength / patternSegmentLength);
         const dashedPatternSegments = Array.from({ length: repetitions }, () =>
-          targetDashPattern.join(" ")
+          targetDashPattern.join(" "),
         );
 
         const finalDasharray = `${solidDasharrayPart} ${dashedPatternSegments.join(
-          " "
+          " ",
         )}`;
         newLineDasharrays.push({
           name: lineName!,
@@ -217,7 +228,7 @@ export function useDynamicDasharray({
 
       return null;
     },
-    [splitIndex, curveAdjustment, lineConfigs, dashPattern, lineDasharrays]
+    [splitIndex, curveAdjustment, lineConfigs, dashPattern, lineDasharrays],
   );
 
   return [DasharrayCalculator, lineDasharrays];

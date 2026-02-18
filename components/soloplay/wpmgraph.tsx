@@ -44,7 +44,7 @@ export default function WpmGraph({
     () => {
       const points = Math.max(wpmData.length, rawWpmData.length, errorMarkers.length);
       return Array.from({ length: points }, (_, index) => ({
-        second: `${index + 1}`,
+        second: index + 1,
         wpm: Math.max(0, Math.round(wpmData[index] ?? 0)),
         rawWpm: Math.max(0, Math.round(rawWpmData[index] ?? 0)),
         errorMarker:
@@ -82,19 +82,24 @@ export default function WpmGraph({
         <CartesianGrid vertical={false} />
         <XAxis
           dataKey="second"
+          type="number"
+          domain={[1, Math.max(1, chartData.length)]}
+          ticks={chartData.map((point) => point.second)}
+          allowDecimals={false}
           tickLine={false}
           axisLine={false}
           tickMargin={8}
           interval={0}
-          tickFormatter={(value: string, index: number) => {
-            const numeric = Number(value);
-            const isFirst = index === 0;
-            const isLast = index === chartData.length - 1;
-            const everyTen = numeric % 10 === 0;
-            return isFirst || isLast || everyTen ? `${numeric}s` : "";
-          }}
+          tickFormatter={(value: number) => `${value}s`}
         />
-        <YAxis hide />
+        <YAxis
+          domain={[0, "auto"]}
+          allowDecimals={false}
+          tickLine={false}
+          axisLine={false}
+          tickMargin={8}
+          label={{ value: "WPM", angle: -90, position: "insideLeft" }}
+        />
         <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
         <Line
           dataKey="wpm"
