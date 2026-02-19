@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import WpmGraph from "./wpmgraph";
-import { RxReload } from "react-icons/rx";
 
 interface Props {
   wpm: number;
@@ -54,10 +53,10 @@ const SoloScorePage: React.FC<Props> = ({
         : "text-[#ca4754]";
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-neutral-900 text-[#d1d0c5]">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-[#323437] text-[#d1d0c5]">
       <div className="mx-auto flex h-screen w-full max-w-7xl flex-col justify-center gap-3 px-3 py-3 font-mono md:gap-5 md:px-4 md:py-4">
-        <p className="text-xs uppercase tracking-[0.2em] text-neutral-200">
-          Test completed
+        <p className="text-xs uppercase tracking-[0.2em] text-[#646669]">
+          test completed
         </p>
 
         <section className="flex w-full flex-col gap-2 md:gap-4 lg:flex-row lg:items-start">
@@ -107,35 +106,29 @@ const SoloScorePage: React.FC<Props> = ({
             <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
               keystrokes
             </div>
-            <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">
-              {totalChars}
-            </div>
+            <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">{totalChars}</div>
           </div>
           <div>
             <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
               time
             </div>
-            <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">
-              {timeElapsed}s
-            </div>
+            <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">{timeElapsed}s</div>
           </div>
           <div>
             <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
               raw
             </div>
-            <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">
-              {Math.round(rawWpm)}
-            </div>
+            <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">{Math.round(rawWpm)}</div>
           </div>
         </section>
 
-        <div className="mt-5 flex flex-col justify-center items-center gap-5 text-[11px] uppercase tracking-[0.2em] text-[#646669] md:gap-4 md:text-xs">
+        <div className="flex flex-wrap gap-3 text-[11px] uppercase tracking-[0.2em] text-[#646669] md:gap-4 md:text-xs">
           <button
             onClick={() => window.location.reload()}
             className="transition-colors hover:text-[#e2b714]"
             type="button"
           >
-            <RxReload className="size-8" />
+            restart test
           </button>
           <button
             onClick={onRestart}
