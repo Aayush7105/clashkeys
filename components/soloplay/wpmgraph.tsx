@@ -1,7 +1,14 @@
 "use client";
 
 import { useMemo } from "react";
-import { CartesianGrid, Line, LineChart, ReferenceDot, XAxis, YAxis } from "recharts";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ReferenceDot,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -52,7 +59,10 @@ export default function WpmGraph({
     Math.round(durationSeconds ?? Math.max(1, sampledPoints - 1)),
   );
 
-  const allXTicks = Array.from({ length: axisMaxSeconds + 1 }, (_, index) => index);
+  const allXTicks = Array.from(
+    { length: axisMaxSeconds + 1 },
+    (_, index) => index,
+  );
   const tickStep = axisMaxSeconds <= 20 ? 1 : axisMaxSeconds <= 60 ? 2 : 5;
   const xTicks = allXTicks.filter(
     (second) => second % tickStep === 0 || second === axisMaxSeconds,
@@ -85,30 +95,17 @@ export default function WpmGraph({
     .filter((value): value is number => typeof value === "number");
   const firstWpm = wpmPoints[0] ?? 0;
   const lastWpm = wpmPoints[wpmPoints.length - 1] ?? 0;
-  const trendPercent = firstWpm > 0 ? ((lastWpm - firstWpm) / firstWpm) * 100 : 0;
+  const trendPercent =
+    firstWpm > 0 ? ((lastWpm - firstWpm) / firstWpm) * 100 : 0;
   const trendPositive = trendPercent >= 0;
 
   return (
-    <Card className="w-full overflow-hidden gap-2 border-neutral-900 bg-neutral-950/50 py-2.5 shadow-none">
+    <Card className="w-full overflow-hidden gap-2 border-neutral-900 bg-neutral-900 py-2.5 shadow-none">
       <CardHeader className="px-3 pb-1 md:px-4">
-        <CardTitle className="flex items-center gap-2 text-neutral-200 font-mono">
-          typing speed
-          <Badge
-            variant="outline"
-            className={`border-none font-mono ${
-              trendPositive
-                ? "bg-emerald-500/10 text-emerald-400"
-                : "bg-red-500/10 text-red-400"
-            }`}
-          >
-            <TrendingUp className="h-3.5 w-3.5" />
-            <span>
-              {trendPositive ? "+" : ""}
-              {trendPercent.toFixed(1)}%
-            </span>
-          </Badge>
+        <CardTitle className="flex items-center gap-2 text-neutral-200 font-mono mx-5 mt-3">
+          Typing speeed
         </CardTitle>
-        <CardDescription className="font-mono text-neutral-500">
+        <CardDescription className="font-mono text-neutral-500 mx-5 mb-3 mt-2">
           0s to {axisMaxSeconds}s
         </CardDescription>
       </CardHeader>
