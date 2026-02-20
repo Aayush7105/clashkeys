@@ -56,7 +56,7 @@ const SoloScorePage: React.FC<Props> = ({
         : "text-[#ca4754]";
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-neutral-900 text-[#d1d0c5]">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-neutral-950 text-[#d1d0c5]">
       <div className="mx-auto flex h-screen w-full max-w-7xl flex-col justify-center gap-3 px-3 py-3 font-mono md:gap-5 md:px-4 md:py-4">
         <p className="text-xs uppercase tracking-[0.2em] text-neutral-200">
           Test completed

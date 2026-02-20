@@ -47,7 +47,7 @@ const chartConfig = {
   },
   burstWpm: {
     label: "Burst",
-    color: "hsl(168 72% 46%)",
+    color: "hsl(360 0% 35.7%)",
   },
 } satisfies ChartConfig;
 
@@ -58,9 +58,12 @@ export default function WpmGraph({
   errorPoints,
   durationSeconds,
 }: WpmGraphProps) {
+  const hasFixedDuration = typeof durationSeconds === "number";
   const maxErrorSecond = errorPoints.reduce(
     (maxSecond, point) =>
-      Number.isFinite(point.second) ? Math.max(maxSecond, point.second) : maxSecond,
+      Number.isFinite(point.second)
+        ? Math.max(maxSecond, point.second)
+        : maxSecond,
     0,
   );
   const sampledPoints = Math.max(
@@ -83,25 +86,26 @@ export default function WpmGraph({
     (second) => second % tickStep === 0 || second === axisMaxSeconds,
   );
 
-  const chartData = useMemo(
-    () =>
-      Array.from({ length: axisMaxSeconds + 1 }, (_, second) => ({
-        second,
-        wpm:
-          second < wpmData.length
-            ? Math.max(0, Math.round(wpmData[second] ?? 0))
-            : null,
-        rawWpm:
-          second < rawWpmData.length
-            ? Math.max(0, Math.round(rawWpmData[second] ?? 0))
-            : null,
-        burstWpm:
-          second < burstWpmData.length
-            ? Math.max(0, Math.round(burstWpmData[second] ?? 0))
-            : null,
-      })),
-    [axisMaxSeconds, burstWpmData, rawWpmData, wpmData],
-  );
+  const chartData = useMemo(() => {
+    const getSeriesValue = (series: number[], second: number) => {
+      if (second < series.length) {
+        return Math.max(0, Math.round(series[second] ?? 0));
+      }
+
+      if (hasFixedDuration && series.length > 0) {
+        return Math.max(0, Math.round(series[series.length - 1] ?? 0));
+      }
+
+      return null;
+    };
+
+    return Array.from({ length: axisMaxSeconds + 1 }, (_, second) => ({
+      second,
+      wpm: getSeriesValue(wpmData, second),
+      rawWpm: getSeriesValue(rawWpmData, second),
+      burstWpm: getSeriesValue(burstWpmData, second),
+    }));
+  }, [axisMaxSeconds, burstWpmData, rawWpmData, wpmData, hasFixedDuration]);
 
   return (
     <Card className="w-full overflow-hidden gap-2 border-neutral-900 bg-neutral-900 py-2.5 shadow-none">
@@ -180,7 +184,7 @@ export default function WpmGraph({
               allowDecimals={false}
               tickLine={false}
               axisLine={false}
-              tickMargin={8}
+              tickMargin={10}
             />
 
             <ChartTooltip
@@ -193,7 +197,7 @@ export default function WpmGraph({
               type="bump"
               stroke={chartConfig.wpm.color}
               dot={false}
-              strokeWidth={2.5}
+              strokeWidth={3}
             />
 
             <Line
@@ -201,7 +205,7 @@ export default function WpmGraph({
               type="bump"
               stroke={chartConfig.rawWpm.color}
               dot={false}
-              strokeWidth={2.5}
+              strokeWidth={2}
             />
 
             <Line
@@ -214,7 +218,10 @@ export default function WpmGraph({
             />
 
             {errorPoints.map((point, index) => {
-              if (!Number.isFinite(point.second) || !Number.isFinite(point.wpm)) {
+              if (
+                !Number.isFinite(point.second) ||
+                !Number.isFinite(point.wpm)
+              ) {
                 return null;
               }
 
