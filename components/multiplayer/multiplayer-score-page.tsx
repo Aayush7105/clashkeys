@@ -5,12 +5,13 @@ import WpmGraph from "../soloplay/wpmgraph";
 
 type MultiplayerScorePageProps = {
   roomId: string;
-  elapsedSeconds: number;
+  elapsedMs: number;
   selectedDuration: number;
   totalKeystrokes: number;
   correctKeystrokes: number;
   wpmHistory: number[];
   rawWpmHistory: number[];
+  burstWpmHistory: number[];
   errorPoints: Array<{ second: number; wpm: number }>;
   isHost: boolean;
   onRestart: () => void;
@@ -19,12 +20,13 @@ type MultiplayerScorePageProps = {
 
 export default function MultiplayerScorePage({
   roomId,
-  elapsedSeconds,
+  elapsedMs,
   selectedDuration,
   totalKeystrokes,
   correctKeystrokes,
   wpmHistory,
   rawWpmHistory,
+  burstWpmHistory,
   errorPoints,
   isHost,
   onRestart,
@@ -44,13 +46,14 @@ export default function MultiplayerScorePage({
     };
   }, []);
 
-  const safeSeconds = Math.max(1, elapsedSeconds);
-  const timeMinutes = safeSeconds / 60;
+  const safeElapsedMs = Math.max(1000, elapsedMs);
+  const safeSeconds = Math.round(safeElapsedMs / 1000);
+  const timeMinutes = safeElapsedMs / 60000;
 
   const accuracy =
     totalKeystrokes === 0 ? 100 : (correctKeystrokes / totalKeystrokes) * 100;
-  const wpm = timeMinutes > 0 ? correctKeystrokes / 5 / timeMinutes : 0;
   const rawWpm = timeMinutes > 0 ? totalKeystrokes / 5 / timeMinutes : 0;
+  const wpm = timeMinutes > 0 ? correctKeystrokes / 5 / timeMinutes : 0;
   const incorrectChars = Math.max(0, totalKeystrokes - correctKeystrokes);
 
   const accuracyColor =
@@ -93,6 +96,7 @@ export default function MultiplayerScorePage({
             <WpmGraph
               wpmData={wpmHistory}
               rawWpmData={rawWpmHistory}
+              burstWpmData={burstWpmHistory}
               errorPoints={errorPoints}
               durationSeconds={selectedDuration}
             />

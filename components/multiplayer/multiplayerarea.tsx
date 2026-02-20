@@ -26,6 +26,16 @@ type ErrorPoint = {
   wpm: number;
 };
 
+function countCorrectChars(typedText: string, sourceText: string) {
+  let count = 0;
+  for (let i = 0; i < typedText.length; i += 1) {
+    if (typedText[i] === sourceText[i]) {
+      count += 1;
+    }
+  }
+  return count;
+}
+
 function safeDecode(value: string) {
   try {
     return decodeURIComponent(value);
@@ -91,8 +101,10 @@ export default function MultiplayerArea({
   const [correctKeystrokes, setCorrectKeystrokes] = useState(0);
   const [wpmHistory, setWpmHistory] = useState<number[]>([]);
   const [rawWpmHistory, setRawWpmHistory] = useState<number[]>([]);
+  const [burstWpmHistory, setBurstWpmHistory] = useState<number[]>([]);
   const [errorPoints, setErrorPoints] = useState<ErrorPoint[]>([]);
   const lastSampleSecondRef = useRef(-1);
+  const keystrokeTimesRef = useRef<number[]>([]);
 
   const ready = roomId.trim().length > 0 && name.trim().length > 0;
   const hostId = users[0]?.id ?? null;
@@ -112,7 +124,6 @@ export default function MultiplayerArea({
             Math.max(1, roundDuration) * 1000,
           ),
         );
-  const elapsedSeconds = Math.round(elapsedMs / 1000);
   const elapsedFloor = Math.floor(elapsedMs / 1000);
   const timeLeft =
     roundStartedAt === null
@@ -170,8 +181,10 @@ export default function MultiplayerArea({
       setCorrectKeystrokes(0);
       setWpmHistory([]);
       setRawWpmHistory([]);
+      setBurstWpmHistory([]);
       setErrorPoints([]);
       lastSampleSecondRef.current = -1;
+      keystrokeTimesRef.current = [];
       setRoundDuration(nextDuration);
       setRoundStartedAt(startedAt);
       setFinishedAt(null);
@@ -217,10 +230,16 @@ export default function MultiplayerArea({
       if (elapsedSec > lastSampleSecondRef.current) {
         lastSampleSecondRef.current = elapsedSec;
         const minutes = elapsed / 60000;
-        const liveWpm = minutes > 0 ? correctKeystrokes / 5 / minutes : 0;
         const liveRawWpm = minutes > 0 ? totalKeystrokes / 5 / minutes : 0;
+        const liveWpm = minutes > 0 ? correctKeystrokes / 5 / minutes : 0;
+        const burstWindowStart = current - 1000;
+        keystrokeTimesRef.current = keystrokeTimesRef.current.filter(
+          (timestamp) => timestamp > burstWindowStart,
+        );
+        const burstWpm = keystrokeTimesRef.current.length * 12;
         setWpmHistory((history) => [...history, liveWpm]);
         setRawWpmHistory((history) => [...history, liveRawWpm]);
+        setBurstWpmHistory((history) => [...history, burstWpm]);
       }
     }, 100);
 
@@ -281,6 +300,7 @@ export default function MultiplayerArea({
     if (!isRunning || testEnded) return;
 
     const value = next.slice(0, text.length);
+    const nextCorrectChars = countCorrectChars(value, text);
 
     if (value.length > typed.length) {
       const added = value.slice(typed.length);
@@ -290,13 +310,11 @@ export default function MultiplayerArea({
           : Math.max(0, Math.min(Date.now() - roundStartedAt, roundDuration * 1000));
       const pointSecond = elapsedForPointMs / 1000;
       const minutes = elapsedForPointMs / 60000;
-      let correctAdded = 0;
-      let projectedCorrect = correctKeystrokes;
+      let projectedCorrect = countCorrectChars(typed, text);
       const newErrorPoints: ErrorPoint[] = [];
 
       added.split("").forEach((char, index) => {
         if (char === text[typed.length + index]) {
-          correctAdded += 1;
           projectedCorrect += 1;
         } else {
           const pointWpm = minutes > 0 ? projectedCorrect / 5 / minutes : 0;
@@ -304,13 +322,12 @@ export default function MultiplayerArea({
         }
       });
 
-      setTotalKeystrokes((count) => count + added.length);
-      setCorrectKeystrokes((count) => count + correctAdded);
       if (newErrorPoints.length > 0) {
         setErrorPoints((points) => [...points, ...newErrorPoints]);
       }
     }
 
+    setCorrectKeystrokes(nextCorrectChars);
     setTyped(value);
 
     if (value.length === text.length) {
@@ -322,8 +339,19 @@ export default function MultiplayerArea({
     }
   }
 
-  function handleKeyDown() {
+  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (!isRunning || testEnded) return;
+
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+    const isCharacterKey = event.key.length === 1;
+    const hasTypedChars = (inputRef.current?.value.length ?? 0) > 0;
+    const isBackspaceKey = event.key === "Backspace" && hasTypedChars;
+
+    if (!isCharacterKey && !isBackspaceKey) return;
+
+    setTotalKeystrokes((count) => count + 1);
+    keystrokeTimesRef.current.push(Date.now());
   }
 
   function handlePaste(event: React.ClipboardEvent<HTMLInputElement>) {
@@ -356,12 +384,13 @@ export default function MultiplayerArea({
     return (
       <MultiplayerScorePage
         roomId={roomId}
-        elapsedSeconds={elapsedSeconds}
+        elapsedMs={elapsedMs}
         selectedDuration={roundDuration}
         totalKeystrokes={totalKeystrokes}
         correctKeystrokes={correctKeystrokes}
         wpmHistory={wpmHistory}
         rawWpmHistory={rawWpmHistory}
+        burstWpmHistory={burstWpmHistory}
         errorPoints={errorPoints}
         isHost={isHost}
         onRestart={startTest}

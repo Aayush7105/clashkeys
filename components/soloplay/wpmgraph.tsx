@@ -31,6 +31,7 @@ type ErrorPoint = {
 type WpmGraphProps = {
   wpmData: number[];
   rawWpmData: number[];
+  burstWpmData: number[];
   errorPoints: ErrorPoint[];
   durationSeconds?: number;
 };
@@ -44,11 +45,16 @@ const chartConfig = {
     label: "Raw WPM",
     color: "hsl(220 10% 70%)",
   },
+  burstWpm: {
+    label: "Burst",
+    color: "hsl(168 72% 46%)",
+  },
 } satisfies ChartConfig;
 
 export default function WpmGraph({
   wpmData,
   rawWpmData,
+  burstWpmData,
   errorPoints,
   durationSeconds,
 }: WpmGraphProps) {
@@ -60,6 +66,7 @@ export default function WpmGraph({
   const sampledPoints = Math.max(
     wpmData.length,
     rawWpmData.length,
+    burstWpmData.length,
     Math.ceil(maxErrorSecond) + 1,
   );
   const axisMaxSeconds = Math.max(
@@ -82,25 +89,56 @@ export default function WpmGraph({
         second,
         wpm:
           second < wpmData.length
-            ? Math.max(0, wpmData[second] ?? 0)
+            ? Math.max(0, Math.round(wpmData[second] ?? 0))
             : null,
         rawWpm:
           second < rawWpmData.length
-            ? Math.max(0, rawWpmData[second] ?? 0)
+            ? Math.max(0, Math.round(rawWpmData[second] ?? 0))
+            : null,
+        burstWpm:
+          second < burstWpmData.length
+            ? Math.max(0, Math.round(burstWpmData[second] ?? 0))
             : null,
       })),
-    [axisMaxSeconds, rawWpmData, wpmData],
+    [axisMaxSeconds, burstWpmData, rawWpmData, wpmData],
   );
 
   return (
     <Card className="w-full overflow-hidden gap-2 border-neutral-900 bg-neutral-900 py-2.5 shadow-none">
       <CardHeader className="px-3 pb-1 md:px-4">
         <CardTitle className="flex items-center gap-2 text-neutral-200 font-mono mx-5 mt-3">
-          Typing speeed
+          Typing speed
         </CardTitle>
         <CardDescription className="font-mono text-neutral-500 mx-5 mb-3 mt-2">
           0s to {axisMaxSeconds}s
         </CardDescription>
+        <div className="mx-5 flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.18em] text-neutral-500 font-mono">
+          <span className="flex items-center gap-1.5">
+            <span
+              className="h-2 w-2 rounded-full"
+              style={{ backgroundColor: chartConfig.wpm.color }}
+            />
+            wpm
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span
+              className="h-2 w-2 rounded-full"
+              style={{ backgroundColor: chartConfig.rawWpm.color }}
+            />
+            raw
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span
+              className="h-2 w-2 rounded-full"
+              style={{ backgroundColor: chartConfig.burstWpm.color }}
+            />
+            burst
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-red-500" />
+            errors
+          </span>
+        </div>
       </CardHeader>
 
       <CardContent className="px-2 pt-1 md:px-3">
@@ -166,13 +204,25 @@ export default function WpmGraph({
               strokeWidth={2.5}
             />
 
+            <Line
+              dataKey="burstWpm"
+              type="bump"
+              stroke={chartConfig.burstWpm.color}
+              strokeDasharray="6 4"
+              dot={false}
+              strokeWidth={2.2}
+            />
+
             {errorPoints.map((point, index) => {
               if (!Number.isFinite(point.second) || !Number.isFinite(point.wpm)) {
                 return null;
               }
 
-              const x = Math.max(0, Math.min(axisMaxSeconds, point.second));
-              const y = Math.max(0, point.wpm);
+              const x = Math.max(
+                0,
+                Math.min(axisMaxSeconds, Math.round(point.second)),
+              );
+              const y = Math.max(0, Math.round(point.wpm));
 
               return (
                 <ReferenceDot
