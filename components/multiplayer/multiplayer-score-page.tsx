@@ -61,16 +61,16 @@ export default function MultiplayerScorePage({
         : "text-[#ca4754]";
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-[#323437] text-[#d1d0c5]">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-neutral-950 text-[#d1d0c5]">
       <div className="mx-auto flex h-screen w-full max-w-7xl flex-col justify-center gap-3 px-3 py-3 font-mono md:gap-5 md:px-4 md:py-4">
-        <p className="text-xs uppercase tracking-[0.2em] text-[#646669]">
-          test completed - room {roomId}
+        <p className="text-sm uppercase tracking-[0.2em] text-neutral-400 font-semibold ">
+          Test completed - room {roomId}
         </p>
 
         <section className="flex w-full flex-col gap-2 md:gap-4 lg:flex-row lg:items-start">
           <div className="flex gap-4 md:gap-6 lg:w-[15%] lg:flex-col">
             <div>
-              <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
+              <div className="text-xs uppercase tracking-[0.2em] text-neutral-500">
                 wpm
               </div>
               <div className="text-4xl font-semibold leading-none text-[#e2b714] md:text-6xl">
@@ -78,7 +78,7 @@ export default function MultiplayerScorePage({
               </div>
             </div>
             <div>
-              <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
+              <div className="text-xs uppercase tracking-[0.2em] text-neutral-500">
                 acc
               </div>
               <div
@@ -114,19 +114,25 @@ export default function MultiplayerScorePage({
             <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
               keystrokes
             </div>
-            <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">{totalKeystrokes}</div>
+            <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">
+              {totalKeystrokes}
+            </div>
           </div>
           <div>
             <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
               time
             </div>
-            <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">{safeSeconds}s</div>
+            <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">
+              {safeSeconds}s
+            </div>
           </div>
           <div>
             <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
               raw
             </div>
-            <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">{Math.round(rawWpm)}</div>
+            <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">
+              {Math.round(rawWpm)}
+            </div>
           </div>
         </section>
 

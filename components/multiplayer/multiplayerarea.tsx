@@ -15,6 +15,12 @@ import {
 import type { RoomUser, TestStartedPayload } from "./multiplayer-types";
 export const dynamic = "force-dynamic";
 
+type MultiplayerAreaProps = {
+  initialRoomId?: string;
+  initialName?: string;
+  initialDuration?: string;
+};
+
 function safeDecode(value: string) {
   try {
     return decodeURIComponent(value);
@@ -43,15 +49,21 @@ function normalizeUser(user: Partial<RoomUser>): RoomUser {
   };
 }
 
-export default function MultiplayerArea() {
+export default function MultiplayerArea({
+  initialRoomId = "",
+  initialName = "",
+  initialDuration: initialDurationParam = "",
+}: MultiplayerAreaProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
-  const roomId = searchParams.get("roomId") ?? "";
-  const rawName = searchParams.get("name") ?? "";
+  const roomId = searchParams.get("roomId") ?? initialRoomId;
+  const rawName = searchParams.get("name") ?? initialName;
   const name = useMemo(() => safeDecode(rawName), [rawName]);
-  const rawDuration = Number(searchParams.get("duration"));
+  const rawDuration = Number(
+    searchParams.get("duration") ?? initialDurationParam,
+  );
   const initialDuration = isValidMultiplayerDuration(rawDuration)
     ? rawDuration
     : DEFAULT_MULTIPLAYER_DURATION;
@@ -75,8 +87,10 @@ export default function MultiplayerArea() {
   const [wpmHistory, setWpmHistory] = useState<number[]>([]);
   const [rawWpmHistory, setRawWpmHistory] = useState<number[]>([]);
   const [errorDotHistory, setErrorDotHistory] = useState<(number | null)[]>([]);
+  const [errorEvents, setErrorEvents] = useState(0);
   const lastSampleSecondRef = useRef(-1);
-  const lastIncorrectCountRef = useRef(0);
+  const lastErrorEventCountRef = useRef(0);
+  const isInErrorStreakRef = useRef(false);
 
   const ready = roomId.trim().length > 0 && name.trim().length > 0;
   const hostId = users[0]?.id ?? null;
@@ -155,8 +169,10 @@ export default function MultiplayerArea() {
       setWpmHistory([]);
       setRawWpmHistory([]);
       setErrorDotHistory([]);
+      setErrorEvents(0);
       lastSampleSecondRef.current = -1;
-      lastIncorrectCountRef.current = 0;
+      lastErrorEventCountRef.current = 0;
+      isInErrorStreakRef.current = false;
       setRoundDuration(nextDuration);
       setRoundStartedAt(startedAt);
       setFinishedAt(null);
@@ -204,9 +220,8 @@ export default function MultiplayerArea() {
         const minutes = elapsed / 60000;
         const liveWpm = minutes > 0 ? correctKeystrokes / 5 / minutes : 0;
         const liveRawWpm = minutes > 0 ? totalKeystrokes / 5 / minutes : 0;
-        const incorrectChars = Math.max(0, totalKeystrokes - correctKeystrokes);
-        const hasNewErrors = incorrectChars > lastIncorrectCountRef.current;
-        lastIncorrectCountRef.current = incorrectChars;
+        const hasNewErrors = errorEvents > lastErrorEventCountRef.current;
+        lastErrorEventCountRef.current = errorEvents;
         setWpmHistory((history) => [...history, liveWpm]);
         setRawWpmHistory((history) => [...history, liveRawWpm]);
         setErrorDotHistory((history) => [
@@ -223,6 +238,7 @@ export default function MultiplayerArea() {
     roundDuration,
     correctKeystrokes,
     totalKeystrokes,
+    errorEvents,
   ]);
 
   useEffect(() => {
@@ -273,6 +289,17 @@ export default function MultiplayerArea() {
     if (!isRunning || testEnded) return;
 
     const value = next.slice(0, text.length);
+    const isInErrorStreak = value !== text.slice(0, value.length);
+
+    if (
+      value.length > typed.length &&
+      isInErrorStreak &&
+      !isInErrorStreakRef.current
+    ) {
+      setErrorEvents((count) => count + 1);
+    }
+
+    isInErrorStreakRef.current = isInErrorStreak;
 
     if (value.length > typed.length) {
       const added = value.slice(typed.length);
