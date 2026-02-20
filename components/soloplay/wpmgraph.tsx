@@ -9,6 +9,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { TrendingUp } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -87,6 +89,15 @@ export default function WpmGraph({
       })),
     [axisMaxSeconds, errorMarkers, rawWpmData, wpmData],
   );
+
+  const wpmPoints = chartData
+    .map((point) => point.wpm)
+    .filter((value): value is number => typeof value === "number");
+  const firstWpm = wpmPoints[0] ?? 0;
+  const lastWpm = wpmPoints[wpmPoints.length - 1] ?? 0;
+  const trendPercent =
+    firstWpm > 0 ? ((lastWpm - firstWpm) / firstWpm) * 100 : 0;
+  const trendPositive = trendPercent >= 0;
 
   return (
     <Card className="w-full overflow-hidden gap-2 border-neutral-900 bg-neutral-900 py-2.5 shadow-none">
@@ -169,8 +180,8 @@ export default function WpmGraph({
                   key={`error-${point.second}`}
                   x={point.second}
                   y={point.errorMarker}
-                  r={5}
-                  fill="hsl(0, 100%, 50%)"
+                  r={3}
+                  fill="hsl(0 84% 60%)"
                   stroke="none"
                   ifOverflow="extendDomain"
                 />
