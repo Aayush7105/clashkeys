@@ -21,6 +21,11 @@ type MultiplayerAreaProps = {
   initialDuration?: string;
 };
 
+type ErrorPoint = {
+  second: number;
+  wpm: number;
+};
+
 function safeDecode(value: string) {
   try {
     return decodeURIComponent(value);
@@ -86,11 +91,8 @@ export default function MultiplayerArea({
   const [correctKeystrokes, setCorrectKeystrokes] = useState(0);
   const [wpmHistory, setWpmHistory] = useState<number[]>([]);
   const [rawWpmHistory, setRawWpmHistory] = useState<number[]>([]);
-  const [errorDotHistory, setErrorDotHistory] = useState<(number | null)[]>([]);
-  const [errorEvents, setErrorEvents] = useState(0);
+  const [errorPoints, setErrorPoints] = useState<ErrorPoint[]>([]);
   const lastSampleSecondRef = useRef(-1);
-  const lastErrorEventCountRef = useRef(0);
-  const isInErrorStreakRef = useRef(false);
 
   const ready = roomId.trim().length > 0 && name.trim().length > 0;
   const hostId = users[0]?.id ?? null;
@@ -168,11 +170,8 @@ export default function MultiplayerArea({
       setCorrectKeystrokes(0);
       setWpmHistory([]);
       setRawWpmHistory([]);
-      setErrorDotHistory([]);
-      setErrorEvents(0);
+      setErrorPoints([]);
       lastSampleSecondRef.current = -1;
-      lastErrorEventCountRef.current = 0;
-      isInErrorStreakRef.current = false;
       setRoundDuration(nextDuration);
       setRoundStartedAt(startedAt);
       setFinishedAt(null);
@@ -220,14 +219,8 @@ export default function MultiplayerArea({
         const minutes = elapsed / 60000;
         const liveWpm = minutes > 0 ? correctKeystrokes / 5 / minutes : 0;
         const liveRawWpm = minutes > 0 ? totalKeystrokes / 5 / minutes : 0;
-        const hasNewErrors = errorEvents > lastErrorEventCountRef.current;
-        lastErrorEventCountRef.current = errorEvents;
         setWpmHistory((history) => [...history, liveWpm]);
         setRawWpmHistory((history) => [...history, liveRawWpm]);
-        setErrorDotHistory((history) => [
-          ...history,
-          hasNewErrors ? liveWpm : null,
-        ]);
       }
     }, 100);
 
@@ -238,7 +231,6 @@ export default function MultiplayerArea({
     roundDuration,
     correctKeystrokes,
     totalKeystrokes,
-    errorEvents,
   ]);
 
   useEffect(() => {
@@ -289,30 +281,34 @@ export default function MultiplayerArea({
     if (!isRunning || testEnded) return;
 
     const value = next.slice(0, text.length);
-    const isInErrorStreak = value !== text.slice(0, value.length);
-
-    if (
-      value.length > typed.length &&
-      isInErrorStreak &&
-      !isInErrorStreakRef.current
-    ) {
-      setErrorEvents((count) => count + 1);
-    }
-
-    isInErrorStreakRef.current = isInErrorStreak;
 
     if (value.length > typed.length) {
       const added = value.slice(typed.length);
+      const elapsedForPointMs =
+        roundStartedAt === null
+          ? 0
+          : Math.max(0, Math.min(Date.now() - roundStartedAt, roundDuration * 1000));
+      const pointSecond = elapsedForPointMs / 1000;
+      const minutes = elapsedForPointMs / 60000;
       let correctAdded = 0;
+      let projectedCorrect = correctKeystrokes;
+      const newErrorPoints: ErrorPoint[] = [];
 
       added.split("").forEach((char, index) => {
         if (char === text[typed.length + index]) {
           correctAdded += 1;
+          projectedCorrect += 1;
+        } else {
+          const pointWpm = minutes > 0 ? projectedCorrect / 5 / minutes : 0;
+          newErrorPoints.push({ second: pointSecond, wpm: pointWpm });
         }
       });
 
       setTotalKeystrokes((count) => count + added.length);
       setCorrectKeystrokes((count) => count + correctAdded);
+      if (newErrorPoints.length > 0) {
+        setErrorPoints((points) => [...points, ...newErrorPoints]);
+      }
     }
 
     setTyped(value);
@@ -366,7 +362,7 @@ export default function MultiplayerArea({
         correctKeystrokes={correctKeystrokes}
         wpmHistory={wpmHistory}
         rawWpmHistory={rawWpmHistory}
-        errorDotHistory={errorDotHistory}
+        errorPoints={errorPoints}
         isHost={isHost}
         onRestart={startTest}
         onExit={() => router.push("/multiplayer")}

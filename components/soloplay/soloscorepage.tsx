@@ -14,7 +14,7 @@ interface Props {
   selectedDuration: number;
   wpmHistory: number[];
   rawWpmHistory: number[];
-  errorDotHistory: (number | null)[];
+  errorPoints: Array<{ second: number; wpm: number }>;
 }
 
 const SoloScorePage: React.FC<Props> = ({
@@ -29,7 +29,7 @@ const SoloScorePage: React.FC<Props> = ({
   selectedDuration,
   wpmHistory,
   rawWpmHistory,
-  errorDotHistory,
+  errorPoints,
 }) => {
   // Scroll to top on mount
   useEffect(() => {
@@ -86,7 +86,7 @@ const SoloScorePage: React.FC<Props> = ({
             <WpmGraph
               wpmData={wpmHistory}
               rawWpmData={rawWpmHistory}
-              errorMarkers={errorDotHistory}
+              errorPoints={errorPoints}
               durationSeconds={selectedDuration}
             />
           </div>

@@ -9,8 +9,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { TrendingUp } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -25,10 +23,15 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
+type ErrorPoint = {
+  second: number;
+  wpm: number;
+};
+
 type WpmGraphProps = {
   wpmData: number[];
   rawWpmData: number[];
-  errorMarkers: (number | null)[];
+  errorPoints: ErrorPoint[];
   durationSeconds?: number;
 };
 
@@ -46,13 +49,18 @@ const chartConfig = {
 export default function WpmGraph({
   wpmData,
   rawWpmData,
-  errorMarkers,
+  errorPoints,
   durationSeconds,
 }: WpmGraphProps) {
+  const maxErrorSecond = errorPoints.reduce(
+    (maxSecond, point) =>
+      Number.isFinite(point.second) ? Math.max(maxSecond, point.second) : maxSecond,
+    0,
+  );
   const sampledPoints = Math.max(
     wpmData.length,
     rawWpmData.length,
-    errorMarkers.length,
+    Math.ceil(maxErrorSecond) + 1,
   );
   const axisMaxSeconds = Math.max(
     1,
@@ -74,30 +82,15 @@ export default function WpmGraph({
         second,
         wpm:
           second < wpmData.length
-            ? Math.max(0, Math.round(wpmData[second] ?? 0))
+            ? Math.max(0, wpmData[second] ?? 0)
             : null,
         rawWpm:
           second < rawWpmData.length
-            ? Math.max(0, Math.round(rawWpmData[second] ?? 0))
-            : null,
-        errorMarker:
-          second < errorMarkers.length &&
-          typeof errorMarkers[second] === "number" &&
-          Number.isFinite(errorMarkers[second])
-            ? Math.max(0, Math.round(errorMarkers[second] as number))
+            ? Math.max(0, rawWpmData[second] ?? 0)
             : null,
       })),
-    [axisMaxSeconds, errorMarkers, rawWpmData, wpmData],
+    [axisMaxSeconds, rawWpmData, wpmData],
   );
-
-  const wpmPoints = chartData
-    .map((point) => point.wpm)
-    .filter((value): value is number => typeof value === "number");
-  const firstWpm = wpmPoints[0] ?? 0;
-  const lastWpm = wpmPoints[wpmPoints.length - 1] ?? 0;
-  const trendPercent =
-    firstWpm > 0 ? ((lastWpm - firstWpm) / firstWpm) * 100 : 0;
-  const trendPositive = trendPercent >= 0;
 
   return (
     <Card className="w-full overflow-hidden gap-2 border-neutral-900 bg-neutral-900 py-2.5 shadow-none">
@@ -173,14 +166,20 @@ export default function WpmGraph({
               strokeWidth={2.5}
             />
 
-            {chartData.map((point) => {
-              if (point.errorMarker === null) return null;
+            {errorPoints.map((point, index) => {
+              if (!Number.isFinite(point.second) || !Number.isFinite(point.wpm)) {
+                return null;
+              }
+
+              const x = Math.max(0, Math.min(axisMaxSeconds, point.second));
+              const y = Math.max(0, point.wpm);
+
               return (
                 <ReferenceDot
-                  key={`error-${point.second}`}
-                  x={point.second}
-                  y={point.errorMarker}
-                  r={3}
+                  key={`error-${index}-${x.toFixed(3)}`}
+                  x={x}
+                  y={y}
+                  r={4}
                   fill="hsl(0 84% 60%)"
                   stroke="none"
                   ifOverflow="extendDomain"

@@ -9,6 +9,11 @@ interface SoloTypingAreaProps {
   initialText: string;
 }
 
+type ErrorPoint = {
+  second: number;
+  wpm: number;
+};
+
 const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
   duration,
   initialText,
@@ -28,20 +33,16 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
   const [endTime, setEndTime] = useState<number | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
-  // ✅ real accuracy counters
   const [totalKeystrokes, setTotalKeystrokes] = useState(0);
   const [correctKeystrokes, setCorrectKeystrokes] = useState(0);
   const [wpmHistory, setWpmHistory] = useState<number[]>([]);
   const [rawWpmHistory, setRawWpmHistory] = useState<number[]>([]);
-  const [errorDotHistory, setErrorDotHistory] = useState<(number | null)[]>([]);
-  const [errorEvents, setErrorEvents] = useState(0);
+  const [errorPoints, setErrorPoints] = useState<ErrorPoint[]>([]);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const caretRef = useRef<HTMLDivElement>(null);
   const lastSampleSecondRef = useRef<number>(-1);
-  const lastErrorEventCountRef = useRef<number>(0);
-  const isInErrorStreakRef = useRef(false);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -51,7 +52,6 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
     if (startTime === null || endTime !== null) return;
 
     lastSampleSecondRef.current = -1;
-    lastErrorEventCountRef.current = 0;
     const id = setInterval(() => {
       const current = Date.now();
       setNow(current);
@@ -68,23 +68,13 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
         const minutes = elapsedMs / 60000;
         const currentWpm = minutes > 0 ? correctKeystrokes / 5 / minutes : 0;
         const currentRawWpm = minutes > 0 ? totalKeystrokes / 5 / minutes : 0;
-        const hasNewErrors = errorEvents > lastErrorEventCountRef.current;
-        lastErrorEventCountRef.current = errorEvents;
-        setWpmHistory((h) => [...h, currentWpm]);
-        setRawWpmHistory((h) => [...h, currentRawWpm]);
-        setErrorDotHistory((h) => [...h, hasNewErrors ? currentWpm : null]);
+        setWpmHistory((history) => [...history, currentWpm]);
+        setRawWpmHistory((history) => [...history, currentRawWpm]);
       }
     }, 100);
 
     return () => clearInterval(id);
-  }, [
-    startTime,
-    endTime,
-    duration,
-    correctKeystrokes,
-    totalKeystrokes,
-    errorEvents,
-  ]);
+  }, [startTime, endTime, duration, correctKeystrokes, totalKeystrokes]);
 
   const elapsedMs =
     startTime === null ? 0 : Math.max(0, (endTime ?? now) - startTime);
@@ -94,7 +84,6 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
   const timeLeft =
     startTime === null ? duration : Math.max(0, duration - elapsedSec);
 
-  // ✅ real accuracy
   const accuracy =
     totalKeystrokes === 0 ? 100 : (correctKeystrokes / totalKeystrokes) * 100;
 
@@ -135,7 +124,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
         selectedDuration={duration}
         wpmHistory={wpmHistory}
         rawWpmHistory={rawWpmHistory}
-        errorDotHistory={errorDotHistory}
+        errorPoints={errorPoints}
       />
     );
   }
@@ -219,24 +208,41 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
         onChange={(e) => {
           if (endTime) return;
 
-          const val = e.target.value.slice(0, targetText.length);
+          const value = e.target.value.slice(0, targetText.length);
 
-          // ✅ count only real typed characters (ignore backspace)
-          if (val.length > typed.length) {
-            const newChar = val[val.length - 1];
-            const expectedChar = targetText[typed.length];
+          if (value.length > typed.length) {
+            const added = value.slice(typed.length);
+            const elapsedForPointMs =
+              startTime === null
+                ? 0
+                : Math.max(0, Math.min(Date.now() - startTime, duration * 1000));
+            const pointSecond = elapsedForPointMs / 1000;
+            const minutes = elapsedForPointMs / 60000;
+            let correctAdded = 0;
+            let projectedCorrect = correctKeystrokes;
+            const newErrorPoints: ErrorPoint[] = [];
 
-            setTotalKeystrokes((p) => p + 1);
+            added.split("").forEach((char, index) => {
+              if (char === targetText[typed.length + index]) {
+                correctAdded += 1;
+                projectedCorrect += 1;
+              } else {
+                const pointWpm = minutes > 0 ? projectedCorrect / 5 / minutes : 0;
+                newErrorPoints.push({ second: pointSecond, wpm: pointWpm });
+              }
+            });
 
-            if (newChar === expectedChar) {
-              setCorrectKeystrokes((p) => p + 1);
+            setTotalKeystrokes((count) => count + added.length);
+            setCorrectKeystrokes((count) => count + correctAdded);
+            if (newErrorPoints.length > 0) {
+              setErrorPoints((points) => [...points, ...newErrorPoints]);
             }
           }
 
-          if (!startTime && val.length === 1) setStartTime(Date.now());
-          if (val.length === targetText.length) setEndTime(Date.now());
+          if (!startTime && value.length === 1) setStartTime(Date.now());
+          if (value.length === targetText.length) setEndTime(Date.now());
 
-          setTyped(val);
+          setTyped(value);
         }}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}

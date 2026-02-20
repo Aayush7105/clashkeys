@@ -11,7 +11,7 @@ type MultiplayerScorePageProps = {
   correctKeystrokes: number;
   wpmHistory: number[];
   rawWpmHistory: number[];
-  errorDotHistory: (number | null)[];
+  errorPoints: Array<{ second: number; wpm: number }>;
   isHost: boolean;
   onRestart: () => void;
   onExit: () => void;
@@ -25,7 +25,7 @@ export default function MultiplayerScorePage({
   correctKeystrokes,
   wpmHistory,
   rawWpmHistory,
-  errorDotHistory,
+  errorPoints,
   isHost,
   onRestart,
   onExit,
@@ -93,7 +93,7 @@ export default function MultiplayerScorePage({
             <WpmGraph
               wpmData={wpmHistory}
               rawWpmData={rawWpmHistory}
-              errorMarkers={errorDotHistory}
+              errorPoints={errorPoints}
               durationSeconds={selectedDuration}
             />
           </div>
