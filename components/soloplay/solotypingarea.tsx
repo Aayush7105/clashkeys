@@ -55,6 +55,8 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
   const caretRef = useRef<HTMLDivElement>(null);
   const lastSampleSecondRef = useRef<number>(-1);
   const keystrokeTimesRef = useRef<number[]>([]);
+  const totalKeystrokesRef = useRef(0);
+  const correctKeystrokesRef = useRef(0);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -63,8 +65,6 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
   useEffect(() => {
     if (startTime === null || endTime !== null) return;
 
-    lastSampleSecondRef.current = -1;
-    keystrokeTimesRef.current = [];
     const id = setInterval(() => {
       const current = Date.now();
       setNow(current);
@@ -79,8 +79,10 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
       if (elapsedSec > lastSampleSecondRef.current) {
         lastSampleSecondRef.current = elapsedSec;
         const minutes = elapsedMs / 60000;
-        const currentRawWpm = minutes > 0 ? totalKeystrokes / 5 / minutes : 0;
-        const currentWpm = minutes > 0 ? correctKeystrokes / 5 / minutes : 0;
+        const currentRawWpm =
+          minutes > 0 ? totalKeystrokesRef.current / 5 / minutes : 0;
+        const currentWpm =
+          minutes > 0 ? correctKeystrokesRef.current / 5 / minutes : 0;
         const burstWindowStart = current - 1000;
         keystrokeTimesRef.current = keystrokeTimesRef.current.filter(
           (timestamp) => timestamp > burstWindowStart,
@@ -93,7 +95,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
     }, 100);
 
     return () => clearInterval(id);
-  }, [startTime, endTime, duration, correctKeystrokes, totalKeystrokes]);
+  }, [startTime, endTime, duration]);
 
   const elapsedMs =
     startTime === null ? 0 : Math.max(0, (endTime ?? now) - startTime);
@@ -228,14 +230,27 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
           if (endTime) return;
 
           const value = e.target.value.slice(0, targetText.length);
+          const eventTime = Date.now();
+          const keystrokeDelta = Math.abs(value.length - typed.length);
           const nextCorrectChars = countCorrectChars(value, targetText);
+
+          if (keystrokeDelta > 0) {
+            setTotalKeystrokes((count) => {
+              const nextCount = count + keystrokeDelta;
+              totalKeystrokesRef.current = nextCount;
+              return nextCount;
+            });
+            for (let i = 0; i < keystrokeDelta; i += 1) {
+              keystrokeTimesRef.current.push(eventTime);
+            }
+          }
 
           if (value.length > typed.length) {
             const added = value.slice(typed.length);
             const elapsedForPointMs =
               startTime === null
                 ? 0
-                : Math.max(0, Math.min(Date.now() - startTime, duration * 1000));
+                : Math.max(0, Math.min(eventTime - startTime, duration * 1000));
             const pointSecond = elapsedForPointMs / 1000;
             const minutes = elapsedForPointMs / 60000;
             let projectedCorrect = countCorrectChars(typed, targetText);
@@ -255,24 +270,22 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
             }
           }
 
-          setCorrectKeystrokes(nextCorrectChars);
+          setCorrectKeystrokes(() => {
+            correctKeystrokesRef.current = nextCorrectChars;
+            return nextCorrectChars;
+          });
 
-          if (!startTime && value.length === 1) setStartTime(Date.now());
-          if (value.length === targetText.length) setEndTime(Date.now());
+          if (startTime === null && value.length === 1) {
+            lastSampleSecondRef.current = -1;
+            setStartTime(eventTime);
+          }
+          if (value.length === targetText.length) setEndTime(eventTime);
 
           setTyped(value);
         }}
         onKeyDown={(event) => {
           if (endTime) return;
-          if (event.ctrlKey || event.metaKey || event.altKey) return;
-
-          const isCharacterKey = event.key.length === 1;
-          const hasTypedChars = (inputRef.current?.value.length ?? 0) > 0;
-          const isBackspaceKey = event.key === "Backspace" && hasTypedChars;
-          if (!isCharacterKey && !isBackspaceKey) return;
-
-          setTotalKeystrokes((count) => count + 1);
-          keystrokeTimesRef.current.push(Date.now());
+          void event;
         }}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}

@@ -105,6 +105,8 @@ export default function MultiplayerArea({
   const [errorPoints, setErrorPoints] = useState<ErrorPoint[]>([]);
   const lastSampleSecondRef = useRef(-1);
   const keystrokeTimesRef = useRef<number[]>([]);
+  const totalKeystrokesRef = useRef(0);
+  const correctKeystrokesRef = useRef(0);
 
   const ready = roomId.trim().length > 0 && name.trim().length > 0;
   const hostId = users[0]?.id ?? null;
@@ -179,6 +181,8 @@ export default function MultiplayerArea({
       setTyped("");
       setTotalKeystrokes(0);
       setCorrectKeystrokes(0);
+      totalKeystrokesRef.current = 0;
+      correctKeystrokesRef.current = 0;
       setWpmHistory([]);
       setRawWpmHistory([]);
       setBurstWpmHistory([]);
@@ -230,8 +234,10 @@ export default function MultiplayerArea({
       if (elapsedSec > lastSampleSecondRef.current) {
         lastSampleSecondRef.current = elapsedSec;
         const minutes = elapsed / 60000;
-        const liveRawWpm = minutes > 0 ? totalKeystrokes / 5 / minutes : 0;
-        const liveWpm = minutes > 0 ? correctKeystrokes / 5 / minutes : 0;
+        const liveRawWpm =
+          minutes > 0 ? totalKeystrokesRef.current / 5 / minutes : 0;
+        const liveWpm =
+          minutes > 0 ? correctKeystrokesRef.current / 5 / minutes : 0;
         const burstWindowStart = current - 1000;
         keystrokeTimesRef.current = keystrokeTimesRef.current.filter(
           (timestamp) => timestamp > burstWindowStart,
@@ -248,8 +254,6 @@ export default function MultiplayerArea({
     isRunning,
     roundStartedAt,
     roundDuration,
-    correctKeystrokes,
-    totalKeystrokes,
   ]);
 
   useEffect(() => {
@@ -300,14 +304,27 @@ export default function MultiplayerArea({
     if (!isRunning || testEnded) return;
 
     const value = next.slice(0, text.length);
+    const eventTime = Date.now();
+    const keystrokeDelta = Math.abs(value.length - typed.length);
     const nextCorrectChars = countCorrectChars(value, text);
+
+    if (keystrokeDelta > 0) {
+      setTotalKeystrokes((count) => {
+        const nextCount = count + keystrokeDelta;
+        totalKeystrokesRef.current = nextCount;
+        return nextCount;
+      });
+      for (let i = 0; i < keystrokeDelta; i += 1) {
+        keystrokeTimesRef.current.push(eventTime);
+      }
+    }
 
     if (value.length > typed.length) {
       const added = value.slice(typed.length);
       const elapsedForPointMs =
         roundStartedAt === null
           ? 0
-          : Math.max(0, Math.min(Date.now() - roundStartedAt, roundDuration * 1000));
+          : Math.max(0, Math.min(eventTime - roundStartedAt, roundDuration * 1000));
       const pointSecond = elapsedForPointMs / 1000;
       const minutes = elapsedForPointMs / 60000;
       let projectedCorrect = countCorrectChars(typed, text);
@@ -327,11 +344,14 @@ export default function MultiplayerArea({
       }
     }
 
-    setCorrectKeystrokes(nextCorrectChars);
+    setCorrectKeystrokes(() => {
+      correctKeystrokesRef.current = nextCorrectChars;
+      return nextCorrectChars;
+    });
     setTyped(value);
 
     if (value.length === text.length) {
-      const finishedNow = Date.now();
+      const finishedNow = eventTime;
       setFinishedAt(finishedNow);
       setNow(finishedNow);
       setIsRunning(false);
@@ -341,17 +361,8 @@ export default function MultiplayerArea({
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (!isRunning || testEnded) return;
-
-    if (event.ctrlKey || event.metaKey || event.altKey) return;
-
-    const isCharacterKey = event.key.length === 1;
-    const hasTypedChars = (inputRef.current?.value.length ?? 0) > 0;
-    const isBackspaceKey = event.key === "Backspace" && hasTypedChars;
-
-    if (!isCharacterKey && !isBackspaceKey) return;
-
-    setTotalKeystrokes((count) => count + 1);
-    keystrokeTimesRef.current.push(Date.now());
+    // Keystrokes are counted from onChange deltas to avoid focus/key-event edge cases.
+    void event;
   }
 
   function handlePaste(event: React.ClipboardEvent<HTMLInputElement>) {
