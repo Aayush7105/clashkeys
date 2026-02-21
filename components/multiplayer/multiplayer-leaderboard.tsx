@@ -8,7 +8,7 @@ type MultiplayerLeaderboardProps = {
   currentUserId?: string | null;
 };
 
-type LeaderboardRow = {
+export type LeaderboardRow = {
   id: string;
   name: string;
   wpm: number;
@@ -17,7 +17,10 @@ type LeaderboardRow = {
   correctChars: number;
 };
 
-function toLeaderboardRows(users: RoomUser[], elapsedMs: number): LeaderboardRow[] {
+export function toLeaderboardRows(
+  users: RoomUser[],
+  elapsedMs: number,
+): LeaderboardRow[] {
   const safeElapsedMs = Math.max(1000, elapsedMs);
   const timeMinutes = safeElapsedMs / 60000;
 
@@ -95,4 +98,3 @@ export default function MultiplayerLeaderboard({
     </div>
   );
 }
-
