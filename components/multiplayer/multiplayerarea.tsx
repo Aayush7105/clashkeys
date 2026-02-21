@@ -501,7 +501,6 @@ export default function MultiplayerArea({
             name={name}
             text={text}
             typed={typed}
-            users={users}
             timeLeft={timeLeft}
             isFocused={isFocused}
             inputRef={inputRef}

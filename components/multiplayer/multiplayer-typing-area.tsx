@@ -2,14 +2,12 @@
 
 import { cn } from "@/lib/utils";
 import React, { useLayoutEffect, useRef } from "react";
-import type { RoomUser } from "./multiplayer-types";
 
 type MultiplayerTypingAreaProps = {
   roomId: string;
   name: string;
   text: string;
   typed: string;
-  users: RoomUser[];
   timeLeft: number;
   isFocused: boolean;
   inputRef: React.RefObject<HTMLInputElement | null>;
@@ -24,7 +22,6 @@ export default function MultiplayerTypingArea({
   name,
   text,
   typed,
-  users,
   timeLeft,
   isFocused,
   inputRef,
@@ -56,29 +53,6 @@ export default function MultiplayerTypingArea({
           <p className="text-neutral-500 text-sm font-mono">Playing as {name}</p>
         </div>
         <div className="text-2xl font-mono text-yellow-500">{timeLeft}s</div>
-      </div>
-
-      <div className="space-y-2 mb-8">
-        {users.length === 0 ? (
-          <div className="text-sm text-neutral-500">Waiting for players...</div>
-        ) : (
-          users.map((user) => (
-            <div key={user.id} className="flex items-center gap-3">
-              <div className="w-28 truncate text-sm text-neutral-300 font-mono">
-                {user.name}
-              </div>
-              <div className="h-2 flex-1 bg-zinc-800 rounded">
-                <div
-                  className="h-2 bg-yellow-500 rounded"
-                  style={{ width: `${Math.min(100, Math.max(0, user.progress))}%` }}
-                />
-              </div>
-              <div className="w-12 text-right text-xs text-zinc-400 font-mono">
-                {user.progress}%
-              </div>
-            </div>
-          ))
-        )}
       </div>
 
       <div
