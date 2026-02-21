@@ -2,6 +2,8 @@
 
 import React, { useEffect } from "react";
 import WpmGraph from "../soloplay/wpmgraph";
+import MultiplayerLeaderboard from "./multiplayer-leaderboard";
+import type { RoomUser } from "./multiplayer-types";
 
 type MultiplayerScorePageProps = {
   roomId: string;
@@ -13,6 +15,8 @@ type MultiplayerScorePageProps = {
   rawWpmHistory: number[];
   burstWpmHistory: number[];
   errorPoints: Array<{ second: number; wpm: number }>;
+  users: RoomUser[];
+  currentUserId?: string | null;
   isHost: boolean;
   onRestart: () => void;
   onExit: () => void;
@@ -28,6 +32,8 @@ export default function MultiplayerScorePage({
   rawWpmHistory,
   burstWpmHistory,
   errorPoints,
+  users,
+  currentUserId,
   isHost,
   onRestart,
   onExit,
@@ -64,8 +70,8 @@ export default function MultiplayerScorePage({
         : "text-[#ca4754]";
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-neutral-950 text-[#d1d0c5]">
-      <div className="mx-auto flex h-screen w-full max-w-7xl flex-col justify-center gap-3 px-3 py-3 font-mono md:gap-5 md:px-4 md:py-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-neutral-950 text-[#d1d0c5]">
+      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col justify-start gap-3 px-3 py-6 font-mono md:gap-5 md:px-4 md:py-8">
         <p className="text-sm uppercase tracking-[0.2em] text-neutral-400 font-semibold ">
           Test completed - room {roomId}
         </p>
@@ -138,6 +144,17 @@ export default function MultiplayerScorePage({
               {Math.round(rawWpm)}
             </div>
           </div>
+        </section>
+
+        <section className="w-full border-t border-[#44464a] pt-3 md:pt-4">
+          <div className="mb-2 text-xs uppercase tracking-[0.2em] text-[#646669]">
+            Room leaderboard
+          </div>
+          <MultiplayerLeaderboard
+            users={users}
+            elapsedMs={safeElapsedMs}
+            currentUserId={currentUserId}
+          />
         </section>
 
         <div className="flex flex-wrap gap-3 text-[11px] uppercase tracking-[0.2em] text-[#646669] md:gap-4 md:text-xs">

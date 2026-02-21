@@ -468,6 +468,8 @@ export default function MultiplayerArea({
         rawWpmHistory={rawWpmHistory}
         burstWpmHistory={burstWpmHistory}
         errorPoints={errorPoints}
+        users={users}
+        currentUserId={socketId}
         isHost={isHost}
         onRestart={startTest}
         onExit={() => router.push("/multiplayer")}
