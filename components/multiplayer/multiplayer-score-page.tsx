@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import WpmGraph from "../soloplay/wpmgraph";
 import MultiplayerLeaderboard from "./multiplayer-leaderboard";
 import type { RoomUser } from "./multiplayer-types";
+import { RiResetRightFill } from "react-icons/ri";
 
 type MultiplayerScorePageProps = {
   roomId: string;
@@ -157,27 +158,31 @@ export default function MultiplayerScorePage({
           />
         </section>
 
-        <div className="flex flex-wrap gap-3 text-[11px] uppercase tracking-[0.2em] text-[#646669] md:gap-4 md:text-xs">
-          {isHost ? (
+        <section className="w-full border-t mt-3 border-[#44464a] pt-3 md:pt-4">
+          <div className="flex flex-col justify-center items-center gap-2">
             <button
               onClick={onRestart}
-              className="transition-colors hover:text-[#e2b714]"
+              disabled={!isHost}
+              className={`rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] transition-colors md:text-sm ${
+                isHost
+                  ? " text-neutral-500 hover:text-[#e2b714]"
+                  : "cursor-not-allowed border border-[#3a3f49] text-neutral-500"
+              }`}
+              type="button"
+              aria-label={isHost ? "restart test" : "waiting for host"}
+            >
+              <RiResetRightFill className="size-7" />
+            </button>
+
+            <button
+              onClick={onExit}
+              className="rounded-xl text-center text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:border-[#e2b714] hover:text-[#e2b714] md:text-sm"
               type="button"
             >
-              restart test
+              go back
             </button>
-          ) : (
-            <div>waiting for host to restart</div>
-          )}
-
-          <button
-            onClick={onExit}
-            className="transition-colors hover:text-[#d1d0c5]"
-            type="button"
-          >
-            back to multiplayer
-          </button>
-        </div>
+          </div>
+        </section>
       </div>
     </div>
   );
