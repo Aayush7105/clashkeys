@@ -44,6 +44,69 @@ function safeDecode(value: string) {
   }
 }
 
+function fetchWithTimeout(url: string, ms = 2000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), ms);
+
+  return fetch(url, {
+    cache: "no-store",
+    signal: controller.signal,
+  }).finally(() => clearTimeout(id));
+}
+
+function cleanText(text: string) {
+  return text
+    .replace(/[^A-Za-z\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function limitWords(text: string, maxWords: number) {
+  return text.split(/\s+/).slice(0, maxWords).join(" ");
+}
+
+async function getMultiplayerSentence(): Promise<string> {
+  async function fetchWiki() {
+    const response = await fetchWithTimeout(
+      "https://en.wikipedia.org/api/rest_v1/page/random/summary",
+      2000,
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch multiplayer text");
+    }
+
+    const data = await response.json();
+    const extract = data?.extract;
+
+    if (typeof extract !== "string") {
+      throw new Error("Missing extract text");
+    }
+
+    const cleaned = cleanText(extract);
+    if (!cleaned) {
+      throw new Error("Extract cleaned to empty text");
+    }
+
+    const limited = limitWords(cleaned, 40);
+    if (limited.split(/\s+/).length < 15) {
+      throw new Error("Text too short");
+    }
+
+    return limited;
+  }
+
+  try {
+    return await fetchWiki();
+  } catch {
+    try {
+      return await fetchWiki();
+    } catch {
+      return getRandomMultiplayerText();
+    }
+  }
+}
+
 function normalizeUser(user: Partial<RoomUser>): RoomUser {
   return {
     id: user.id ?? "",
@@ -292,12 +355,14 @@ export default function MultiplayerArea({
   function startTest() {
     if (!ready || !isHost) return;
 
-    const nextText = getRandomMultiplayerText();
-    socket.emit("start-test", {
-      roomId,
-      text: nextText,
-      duration: selectedDuration,
-    });
+    void (async () => {
+      const nextText = await getMultiplayerSentence();
+      socket.emit("start-test", {
+        roomId,
+        text: nextText,
+        duration: selectedDuration,
+      });
+    })();
   }
 
   function handleTypedChange(next: string) {
