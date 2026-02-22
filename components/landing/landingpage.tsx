@@ -4,13 +4,14 @@ import TypingOnce from "../typingonce";
 import WpmGraph from "../soloplay/wpmgraph";
 
 const Landing = () => {
-  const staticWpmData = [37, 42, 48, 54, 57, 61, 59, 63, 67, 65, 69, 72];
-  const staticRawWpmData = [40, 45, 51, 57, 61, 65, 63, 68, 71, 69, 73, 76];
-  const staticBurstWpmData = [44, 50, 56, 62, 66, 72, 64, 75, 79, 74, 81, 84];
+  const staticWpmData = [37, 42, 48, 54, 57, 61, 59, 63, 67, 65, 69, 72, 74, 73, 76, 78];
+  const staticRawWpmData = [40, 45, 51, 57, 61, 65, 63, 68, 71, 69, 73, 76, 77, 76, 79, 82];
+  const staticBurstWpmData = [44, 50, 56, 62, 66, 72, 64, 75, 79, 74, 81, 84, 83, 82, 86, 89];
   const staticErrorPoints = [
     { second: 2, wpm: 48 },
     { second: 6, wpm: 59 },
     { second: 9, wpm: 65 },
+    { second: 13, wpm: 73 },
   ];
 
   return (
@@ -24,7 +25,7 @@ const Landing = () => {
           <span className="text-[#e2b714]">ClashKeys</span>
         </header>
 
-        <div className="mt-16 grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        <div className="mt-16 grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
           <div className="space-y-8">
             <div className="space-y-4">
               <p className="text-xs uppercase tracking-[0.3em] text-[#7a7f8a]">
@@ -86,7 +87,7 @@ const Landing = () => {
               rawWpmData={staticRawWpmData}
               burstWpmData={staticBurstWpmData}
               errorPoints={staticErrorPoints}
-              durationSeconds={12}
+              durationSeconds={15}
             />
             <div className="rounded-xl border border-dashed border-[#2a2d34] p-4 text-center text-xs uppercase tracking-[0.2em] text-[#6b6f7a]">
               Static sample data
