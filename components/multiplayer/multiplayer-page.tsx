@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
 export default function MultiplayerPage() {
   const router = useRouter();
@@ -56,12 +57,24 @@ export default function MultiplayerPage() {
   }
 
   return (
-    <main className="min-h-screen bg-neutral-900 text-neutral-200 flex items-center justify-center px-6">
-      <div className="max-w-3xl w-full space-y-10">
+    <main className="relative min-h-screen overflow-hidden bg-neutral-950 text-neutral-200 flex items-center justify-center px-6">
+      <div className="pointer-events-none absolute -top-32 right-0 h-105 w-105 rounded-full bg-[radial-gradient(circle_at_center,rgba(226,183,20,0.3),rgba(10,10,10,0))]" />
+      <div className="pointer-events-none absolute -bottom-24 left-0 h-130 w-130 rounded-full bg-[radial-gradient(circle_at_center,rgba(64,64,64,0.45),rgba(10,10,10,0))]" />
+
+      <div className="relative max-w-3xl w-full space-y-10">
         <div className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-neutral-400">
-          <span className="font-mono text-lg tracking-tight font-semibold">
-            Multiplayer
-          </span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.push("/")}
+              aria-label="Back to home"
+              className="inline-flex  items-center justify-center rounded-full text-neutral-300 transition-colors hover:border-[#e2b714] hover:text-[#e2b714] cursor-pointer"
+            >
+              <IoMdArrowRoundBack className="size-5" />
+            </button>
+            <span className="font-mono text-lg tracking-tight font-semibold">
+              Multiplayer
+            </span>
+          </div>
           <span className="text-[#e2b714] text-lg font-mono tracking-tight font-semibold">
             clashkeys
           </span>
