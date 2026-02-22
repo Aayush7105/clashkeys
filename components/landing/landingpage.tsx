@@ -1,26 +1,17 @@
 import React from "react";
 import Link from "next/link";
 import TypingOnce from "../typingonce";
+import WpmGraph from "../soloplay/wpmgraph";
 
 const Landing = () => {
   const staticWpmData = [37, 42, 48, 54, 57, 61, 59, 63, 67, 65, 69, 72];
-  const minWpm = Math.min(...staticWpmData);
-  const maxWpm = Math.max(...staticWpmData);
-  const wpmRange = maxWpm - minWpm;
-  const maxIndex = Math.max(1, staticWpmData.length - 1);
-
-  const wpmPoints = staticWpmData.map((value, index) => {
-    const x = (index / maxIndex) * 100;
-    const y =
-      wpmRange === 0 ? 50 : 100 - ((value - minWpm) / wpmRange) * 100;
-    return { x, y, value };
-  });
-
-  const linePoints = wpmPoints.map((point) => `${point.x},${point.y}`).join(" ");
-  const areaPoints = `0,100 ${linePoints} 100,100`;
-  const averageWpm = Math.round(
-    staticWpmData.reduce((sum, value) => sum + value, 0) / staticWpmData.length,
-  );
+  const staticRawWpmData = [40, 45, 51, 57, 61, 65, 63, 68, 71, 69, 73, 76];
+  const staticBurstWpmData = [44, 50, 56, 62, 66, 72, 64, 75, 79, 74, 81, 84];
+  const staticErrorPoints = [
+    { second: 2, wpm: 48 },
+    { second: 6, wpm: 59 },
+    { second: 9, wpm: 65 },
+  ];
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#15171c] text-[#e2e2e2]">
@@ -85,76 +76,19 @@ const Landing = () => {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-[#2a2d34] bg-[#1a1d23] p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
-            <div className="flex items-center justify-between text-xs uppercase tracking-[0.25em] text-[#6b6f7a]">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between px-1 text-xs uppercase tracking-[0.25em] text-[#6b6f7a]">
               <span>WPM Preview</span>
-              <span className="text-[#e2b714]">#4821</span>
+              <span className="text-[#e2b714]">Static Data</span>
             </div>
-            <div className="mt-6 rounded-xl border border-[#2a2d34] bg-[#14161b] p-4">
-              <div className="flex items-end justify-between">
-                <div className="text-xs uppercase tracking-[0.2em] text-[#6b6f7a]">
-                  Live speed
-                </div>
-                <div className="text-2xl font-semibold text-[#e2b714]">
-                  {staticWpmData[staticWpmData.length - 1]} wpm
-                </div>
-              </div>
-
-              <div className="mt-4 h-44 w-full">
-                <svg
-                  viewBox="0 0 100 100"
-                  preserveAspectRatio="none"
-                  className="h-full w-full"
-                >
-                  {[20, 40, 60, 80].map((y) => (
-                    <line
-                      key={y}
-                      x1="0"
-                      y1={y}
-                      x2="100"
-                      y2={y}
-                      stroke="#2a2d34"
-                      strokeWidth="0.6"
-                    />
-                  ))}
-                  <polygon
-                    points={areaPoints}
-                    fill="#e2b714"
-                    fillOpacity="0.08"
-                  />
-                  <polyline
-                    points={linePoints}
-                    fill="none"
-                    stroke="#e2b714"
-                    strokeWidth="1.7"
-                  />
-                  {wpmPoints.map((point, index) => (
-                    <circle
-                      key={`${point.value}-${index}`}
-                      cx={point.x}
-                      cy={point.y}
-                      r="1.5"
-                      fill="#e2b714"
-                    />
-                  ))}
-                </svg>
-              </div>
-
-              <div className="mt-2 flex items-center justify-between text-[10px] uppercase tracking-[0.18em] text-[#6b6f7a]">
-                <span>0s</span>
-                <span>6s</span>
-                <span>12s</span>
-              </div>
-              <div className="mt-4 grid grid-cols-2 gap-3 text-xs uppercase tracking-[0.14em] text-[#6b6f7a]">
-                <div className="rounded-lg border border-[#2a2d34] bg-[#181b21] px-3 py-2">
-                  avg: <span className="text-[#e2e2e2]">{averageWpm}</span>
-                </div>
-                <div className="rounded-lg border border-[#2a2d34] bg-[#181b21] px-3 py-2">
-                  peak: <span className="text-[#e2e2e2]">{maxWpm}</span>
-                </div>
-              </div>
-            </div>
-            <div className="mt-6 rounded-xl border border-dashed border-[#2a2d34] p-4 text-center text-xs text-[#6b6f7a] uppercase tracking-[0.2em]">
+            <WpmGraph
+              wpmData={staticWpmData}
+              rawWpmData={staticRawWpmData}
+              burstWpmData={staticBurstWpmData}
+              errorPoints={staticErrorPoints}
+              durationSeconds={12}
+            />
+            <div className="rounded-xl border border-dashed border-[#2a2d34] p-4 text-center text-xs uppercase tracking-[0.2em] text-[#6b6f7a]">
               Static sample data
             </div>
           </div>
