@@ -116,7 +116,8 @@ function normalizeUser(user: Partial<RoomUser>): RoomUser {
         ? user.progress
         : 0,
     correctChars:
-      typeof user.correctChars === "number" && Number.isFinite(user.correctChars)
+      typeof user.correctChars === "number" &&
+      Number.isFinite(user.correctChars)
         ? user.correctChars
         : 0,
     totalKeystrokes:
@@ -313,11 +314,7 @@ export default function MultiplayerArea({
     }, 100);
 
     return () => clearInterval(timerId);
-  }, [
-    isRunning,
-    roundStartedAt,
-    roundDuration,
-  ]);
+  }, [isRunning, roundStartedAt, roundDuration]);
 
   useEffect(() => {
     if (!ready) return;
@@ -389,7 +386,10 @@ export default function MultiplayerArea({
       const elapsedForPointMs =
         roundStartedAt === null
           ? 0
-          : Math.max(0, Math.min(eventTime - roundStartedAt, roundDuration * 1000));
+          : Math.max(
+              0,
+              Math.min(eventTime - roundStartedAt, roundDuration * 1000),
+            );
       const pointSecond = elapsedForPointMs / 1000;
       const minutes = elapsedForPointMs / 60000;
       let projectedCorrect = countCorrectChars(typed, text);
@@ -478,7 +478,7 @@ export default function MultiplayerArea({
   }
 
   return (
-    <main className="min-h-screen bg-neutral-900 text-neutral-300 flex items-start justify-center px-2 py-16">
+    <main className="min-h-screen bg-neutral-950 text-neutral-300 flex items-start justify-center px-2 py-16">
       <div className="max-w-7xl w-full">
         <MultiplayerNavbar
           currentDuration={selectedDuration}

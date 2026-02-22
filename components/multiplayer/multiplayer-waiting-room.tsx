@@ -30,9 +30,13 @@ export default function MultiplayerWaitingRoom({
           <h1 className="text-3xl font-bold font-mono text-neutral-200">
             Room {roomId}
           </h1>
-          <p className="text-neutral-400 font-mono mt-1">Waiting room · {name}</p>
+          <p className="text-neutral-400 font-mono mt-1">
+            Waiting room · {name}
+          </p>
           <p className="text-xs uppercase tracking-[0.2em] text-neutral-500 mt-2">
-            Duration {selectedDuration}s
+            {" "}
+            Duration {selectedDuration}
+            <span className="text-[10px]">s</span>
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -69,7 +73,9 @@ export default function MultiplayerWaitingRoom({
                 : `${users.length} player${users.length === 1 ? "" : "s"} in room`}
             </p>
           </div>
-          <div className="text-sm text-neutral-300 font-mono">Share code: {roomId}</div>
+          <div className="text-sm text-neutral-300 font-mono">
+            Share code: {roomId}
+          </div>
         </div>
 
         <div className="mt-4 space-y-3">
