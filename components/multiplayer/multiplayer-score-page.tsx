@@ -72,7 +72,9 @@ export default function MultiplayerScorePage({
   );
   const currentRank = useMemo(() => {
     if (!currentUserId) return null;
-    const rankIndex = leaderboardRows.findIndex((row) => row.id === currentUserId);
+    const rankIndex = leaderboardRows.findIndex(
+      (row) => row.id === currentUserId,
+    );
     return rankIndex >= 0 ? rankIndex + 1 : null;
   }, [leaderboardRows, currentUserId]);
 
@@ -85,9 +87,9 @@ export default function MultiplayerScorePage({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-neutral-950 text-[#d1d0c5]">
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col justify-start gap-3 px-3 py-6 font-mono md:gap-5 md:px-4 md:py-8">
+      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col justify-center gap-3 px-3 py-6 font-mono md:gap-5 md:px-4 md:py-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm uppercase tracking-[0.2em] text-neutral-400 font-semibold ">
+          <p className="text-sm uppercase tracking-[0.2em] text-neutral-400 font-semibold mt-">
             Test completed - room {roomId}
           </p>
           <button
@@ -142,7 +144,7 @@ export default function MultiplayerScorePage({
               </div>
             </section>
 
-            <section className="grid w-full grid-cols-2 gap-3 border-t border-[#44464a] pt-3 md:grid-cols-4 md:gap-4 md:pt-4">
+            <section className="grid w-full grid-cols-2 gap-3 border-t border-[#44464a] pt-3 md:grid-cols-5 md:gap-4 md:pt-4">
               <div>
                 <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
                   characters
@@ -177,11 +179,19 @@ export default function MultiplayerScorePage({
                   {Math.round(rawWpm)}
                 </div>
               </div>
+              <div>
+                <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
+                  errors
+                </div>
+                <div className="mt-1 text-xl text-[#ca4754] md:mt-1.5 md:text-3xl">
+                  {incorrectChars}
+                </div>
+              </div>
             </section>
           </>
         ) : (
           <section className="w-full border-t border-[#44464a] pt-3 md:pt-4">
-            <div className="mb-2 text-xs uppercase tracking-[0.2em] text-[#646669]">
+            <div className="mb-2 text-lg uppercase tracking-[0.2em] text-neutral-300 font-semibold">
               Room leaderboard
             </div>
             <MultiplayerLeaderboard
@@ -194,19 +204,20 @@ export default function MultiplayerScorePage({
 
         <section className="w-full border-t mt-3 border-[#44464a] pt-3 md:pt-4">
           <div className="flex flex-col justify-center items-center gap-2">
-            <button
-              onClick={onRestart}
-              disabled={!isHost}
-              className={`rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] transition-colors md:text-sm ${
-                isHost
-                  ? " text-neutral-500 hover:text-[#e2b714]"
-                  : "cursor-not-allowed border border-[#3a3f49] text-neutral-500"
-              }`}
-              type="button"
-              aria-label={isHost ? "restart test" : "waiting for host"}
-            >
-              <RiResetRightFill className="size-7" />
-            </button>
+            {isHost ? (
+              <button
+                onClick={onRestart}
+                className="rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-[#e2b714] md:text-sm"
+                type="button"
+                aria-label="restart test"
+              >
+                <RiResetRightFill className="size-7" />
+              </button>
+            ) : (
+              <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-500 md:text-xs">
+                only host can restart
+              </p>
+            )}
 
             <button
               onClick={onExit}

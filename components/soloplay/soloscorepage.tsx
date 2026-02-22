@@ -95,7 +95,7 @@ const SoloScorePage: React.FC<Props> = ({
           </div>
         </section>
 
-        <section className="grid w-full grid-cols-2 gap-3 border-t border-[#44464a] pt-3 md:grid-cols-4 md:gap-4 md:pt-4">
+        <section className="grid w-full grid-cols-2 gap-3 border-t border-[#44464a] pt-3 md:grid-cols-5 md:gap-4 md:pt-4">
           <div>
             <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
               characters
@@ -128,6 +128,14 @@ const SoloScorePage: React.FC<Props> = ({
             </div>
             <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">
               {Math.round(rawWpm)}
+            </div>
+          </div>
+          <div>
+            <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
+              errors
+            </div>
+            <div className="mt-1 text-xl text-[#ca4754] md:mt-1.5 md:text-3xl">
+              {incorrectChars}
             </div>
           </div>
         </section>
