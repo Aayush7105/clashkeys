@@ -34,6 +34,7 @@ type WpmGraphProps = {
   burstWpmData: number[];
   errorPoints: ErrorPoint[];
   durationSeconds?: number;
+  forceOneSecondXTicks?: boolean;
 };
 
 const chartConfig = {
@@ -57,6 +58,7 @@ export default function WpmGraph({
   burstWpmData,
   errorPoints,
   durationSeconds,
+  forceOneSecondXTicks = false,
 }: WpmGraphProps) {
   const hasFixedDuration = typeof durationSeconds === "number";
   const maxErrorSecond = errorPoints.reduce(
@@ -81,7 +83,13 @@ export default function WpmGraph({
     { length: axisMaxSeconds + 1 },
     (_, index) => index,
   );
-  const tickStep = axisMaxSeconds <= 20 ? 1 : axisMaxSeconds <= 60 ? 2 : 5;
+  const tickStep = forceOneSecondXTicks
+    ? 1
+    : axisMaxSeconds <= 20
+      ? 1
+      : axisMaxSeconds <= 60
+        ? 2
+        : 5;
   const xTicks = allXTicks.filter(
     (second) => second % tickStep === 0 || second === axisMaxSeconds,
   );
@@ -171,7 +179,7 @@ export default function WpmGraph({
               domain={[0, axisMaxSeconds]}
               ticks={xTicks}
               allowDecimals={false}
-              interval="preserveStartEnd"
+              interval={forceOneSecondXTicks ? 0 : "preserveStartEnd"}
               minTickGap={24}
               tickLine={false}
               axisLine={false}

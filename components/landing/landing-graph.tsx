@@ -18,7 +18,7 @@ const staticErrorPoints = [
 
 export default function LandingGraph() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 lg:w-[calc(100%+4rem)] lg:-ml-16">
       <div className="flex items-center justify-between px-1 text-xs uppercase tracking-[0.25em] text-neutral-500">
         <span>WPM Preview</span>
         <span className="text-[#e2b714]">Static Data</span>
@@ -29,6 +29,7 @@ export default function LandingGraph() {
         burstWpmData={staticBurstWpmData}
         errorPoints={staticErrorPoints}
         durationSeconds={15}
+        forceOneSecondXTicks
       />
     </div>
   );
