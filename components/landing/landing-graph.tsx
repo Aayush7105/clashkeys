@@ -1,28 +1,33 @@
 import WpmGraph from "../soloplay/wpmgraph";
 
 const staticWpmData = [
-  37, 42, 48, 54, 57, 61, 59, 63, 67, 65, 69, 72, 74, 73, 76, 78,
-];
-const staticRawWpmData = [
-  40, 45, 51, 57, 61, 65, 63, 68, 71, 69, 73, 76, 77, 76, 79, 82,
-];
-const staticBurstWpmData = [
-  44, 50, 56, 62, 66, 72, 64, 75, 79, 74, 81, 84, 83, 82, 86, 89,
-];
-const staticErrorPoints = [
-  { second: 2, wpm: 48 },
-  { second: 6, wpm: 59 },
-  { second: 9, wpm: 65 },
-  { second: 13, wpm: 73 },
+  52, 61, 48, 73, 66, 58, 81, 69, 74, 55, 88, 62, 79, 71, 93, 64, 84, 59, 97,
+  68, 76, 53, 90, 72, 85, 60, 99, 70,
 ];
 
+const staticRawWpmData = [
+  58, 68, 54, 80, 72, 65, 89, 75, 82, 61, 96, 69, 87, 77, 101, 71, 92, 66, 105,
+  75, 84, 60, 98, 79, 94, 67, 108, 78,
+];
+
+const staticBurstWpmData = [
+  85, 110, 95, 130, 118, 102, 145, 120, 138, 100, 160, 108, 150, 125, 175, 112,
+  155, 98, 190, 120, 142, 92, 170, 128, 158, 105, 200, 118,
+];
+
+const staticErrorPoints = [
+  { second: 2, wpm: 48 },
+  { second: 5, wpm: 58 },
+  { second: 9, wpm: 55 },
+  { second: 11, wpm: 62 },
+  { second: 15, wpm: 64 },
+  { second: 17, wpm: 59 },
+  { second: 21, wpm: 53 },
+  { second: 24, wpm: 60 },
+];
 export default function LandingGraph() {
   return (
-    <div className="space-y-4 lg:w-[calc(100%+4rem)] lg:-ml-16">
-      <div className="flex items-center justify-between px-1 text-xs uppercase tracking-[0.25em] text-neutral-500">
-        <span>WPM Preview</span>
-        <span className="text-[#e2b714]">Static Data</span>
-      </div>
+    <div className="space-y-4 lg:w-[calc(100%+2rem)] lg:-ml-8">
       <WpmGraph
         wpmData={staticWpmData}
         rawWpmData={staticRawWpmData}

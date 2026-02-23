@@ -180,7 +180,7 @@ export default function WpmGraph({
               ticks={xTicks}
               allowDecimals={false}
               interval={forceOneSecondXTicks ? 0 : "preserveStartEnd"}
-              minTickGap={24}
+              minTickGap={forceOneSecondXTicks ? 0 : 24}
               tickLine={false}
               axisLine={false}
               tickMargin={8}
