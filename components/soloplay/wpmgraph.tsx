@@ -5,7 +5,6 @@ import {
   CartesianGrid,
   Line,
   LineChart,
-  ReferenceDot,
   XAxis,
   YAxis,
 } from "recharts";
@@ -49,6 +48,10 @@ const chartConfig = {
   burstWpm: {
     label: "Burst",
     color: "hsl(360 0% 35.7%)",
+  },
+  error: {
+    label: "Error",
+    color: "hsl(0 84% 60%)",
   },
 } satisfies ChartConfig;
 
@@ -94,6 +97,30 @@ export default function WpmGraph({
     (second) => second % tickStep === 0 || second === axisMaxSeconds,
   );
 
+  const errorSeries = useMemo(() => {
+    const pointsBySecond = new Map<number, number>();
+
+    errorPoints.forEach((point) => {
+      if (!Number.isFinite(point.second) || !Number.isFinite(point.wpm)) {
+        return;
+      }
+
+      const second = Math.max(
+        0,
+        Math.min(axisMaxSeconds, Math.round(point.second)),
+      );
+      const wpm = Math.max(0, Math.round(point.wpm));
+      const previous = pointsBySecond.get(second);
+
+      pointsBySecond.set(
+        second,
+        typeof previous === "number" ? Math.max(previous, wpm) : wpm,
+      );
+    });
+
+    return pointsBySecond;
+  }, [axisMaxSeconds, errorPoints]);
+
   const chartData = useMemo(() => {
     const getSeriesValue = (series: number[], second: number) => {
       if (second < series.length) {
@@ -112,8 +139,16 @@ export default function WpmGraph({
       wpm: getSeriesValue(wpmData, second),
       rawWpm: getSeriesValue(rawWpmData, second),
       burstWpm: getSeriesValue(burstWpmData, second),
+      error: errorSeries.get(second) ?? null,
     }));
-  }, [axisMaxSeconds, burstWpmData, rawWpmData, wpmData, hasFixedDuration]);
+  }, [
+    axisMaxSeconds,
+    burstWpmData,
+    errorSeries,
+    rawWpmData,
+    wpmData,
+    hasFixedDuration,
+  ]);
 
   return (
     <Card className="w-full overflow-hidden gap-2 border-neutral-900 bg-neutral-900 py-2.5 shadow-none">
@@ -147,8 +182,11 @@ export default function WpmGraph({
             burst
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-red-500" />
-            errors
+            <span
+              className="h-2 w-2 rounded-full"
+              style={{ backgroundColor: chartConfig.error.color }}
+            />
+            error
           </span>
         </div>
       </CardHeader>
@@ -224,33 +262,24 @@ export default function WpmGraph({
               dot={false}
               strokeWidth={2.2}
             />
-
-            {errorPoints.map((point, index) => {
-              if (
-                !Number.isFinite(point.second) ||
-                !Number.isFinite(point.wpm)
-              ) {
-                return null;
-              }
-
-              const x = Math.max(
-                0,
-                Math.min(axisMaxSeconds, Math.round(point.second)),
-              );
-              const y = Math.max(0, Math.round(point.wpm));
-
-              return (
-                <ReferenceDot
-                  key={`error-${index}-${x.toFixed(3)}`}
-                  x={x}
-                  y={y}
-                  r={4}
-                  fill="hsl(0 84% 60%)"
-                  stroke="none"
-                  ifOverflow="extendDomain"
-                />
-              );
-            })}
+            <Line
+              dataKey="error"
+              type="linear"
+              stroke={chartConfig.error.color}
+              strokeDasharray="2 5"
+              strokeWidth={2}
+              connectNulls={false}
+              dot={{
+                r: 4,
+                fill: chartConfig.error.color,
+                stroke: "none",
+              }}
+              activeDot={{
+                r: 5,
+                fill: chartConfig.error.color,
+                stroke: "none",
+              }}
+            />
           </LineChart>
         </ChartContainer>
       </CardContent>
