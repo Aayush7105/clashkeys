@@ -20,7 +20,7 @@ const SoloPlayPage: React.FC<SoloPlayPageProps> = ({
   const pathname = usePathname();
   const rawDuration = Number(searchParams.get("duration"));
   const duration = SOLO_DURATIONS.includes(
-    rawDuration as (typeof SOLO_DURATIONS)[number]
+    rawDuration as (typeof SOLO_DURATIONS)[number],
   )
     ? rawDuration
     : initialDuration || DEFAULT_SOLO_DURATION;
@@ -34,15 +34,15 @@ const SoloPlayPage: React.FC<SoloPlayPageProps> = ({
 
   return (
     <main className="min-h-screen bg-neutral-900 text-neutral-300 flex items-center justify-center px-2 py-16">
-      <div className="max-w-7xl h-screen py-20">
+      <div className="w-full max-w-7xl h-screen py-20">
         <div className="relative z-50">
           <Solonavbar
             currentDuration={duration}
             onDurationChange={handleDurationChange}
           />
         </div>
-        <div className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a] mt-10">
-          <span className="font-mono text-md">Solo Play</span>
+        <div className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a] mt-10 md:px-16lg:px-32">
+          <span className="font-mono text-md ">Solo Play</span>
         </div>
         {/* Reset component completely when duration changes */}
         <SoloTypingArea

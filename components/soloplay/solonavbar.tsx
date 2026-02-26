@@ -1,6 +1,7 @@
 "use client";
 
-import { User, Hash, MessageSquare, Triangle } from "lucide-react";
+import React, { useState } from "react";
+import { User, Hash, MessageSquare, Triangle, Menu, X } from "lucide-react";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
 import { FaKeyboard } from "react-icons/fa";
 import { MdOutlineTimer } from "react-icons/md";
@@ -16,15 +17,59 @@ export default function SoloNavbar({
   onDurationChange,
 }: SoloNavbarProps) {
   const durations = SOLO_DURATIONS;
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleDurationChange = (duration: number) => {
+    onDurationChange(duration);
+    setIsMobileMenuOpen(false);
+  };
+
+  const modeItems = (
+    <>
+      <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition">
+        <AiOutlineExclamationCircle size={16} />
+        <span>punctuation</span>
+      </div>
+      <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition">
+        <Hash size={16} />
+        <span>numbers</span>
+      </div>
+      <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition text-yellow-500">
+        <MdOutlineTimer size={16} />
+        <span>time</span>
+      </div>
+      <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition">
+        <span>A</span>
+        <span>words</span>
+      </div>
+      <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition">
+        <MessageSquare size={16} />
+        <span>quote</span>
+      </div>
+      <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition">
+        <Triangle size={16} />
+        <span>zen</span>
+      </div>
+    </>
+  );
 
   return (
-    <div className="w-ful p-2 flex flex-col justify-center items-center gap-3">
-      <div className="flex  justify-between px-6 py-4 w-full -mt-20">
+    <div className="w-full p-2 flex flex-col justify-center items-center gap-3">
+      <div className="flex  justify-between lg:px-32 md:px-12 py-4 w-full -mt-20">
         <div className="font-mono tracking-widest text-neutral-200">
           CLASHKEYS
         </div>
         <div className="flex items-center gap-4 text-slate-400"></div>
         <div className="flex items-center gap-4 text-slate-400">
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen((open) => !open)}
+            className="md:hidden cursor-pointer hover:text-white transition"
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMobileMenuOpen}
+          >
+            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
           <FaKeyboard
             size={20}
             className="cursor-pointer hover:text-white transition"
@@ -36,32 +81,9 @@ export default function SoloNavbar({
         </div>
       </div>
 
-      <div className="flex items-center gap-6 px-6 py-3 text-sm text-neutral-300 border border-neutral-600 rounded-2xl bg-neutral-900 w-fit">
+      <div className="hidden md:flex items-center gap-6 px-6 py-3 text-sm text-neutral-300 border border-neutral-600 rounded-2xl bg-neutral-900 w-fit">
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition">
-            <AiOutlineExclamationCircle size={16} />
-            <span>punctuation</span>
-          </div>
-          <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition">
-            <Hash size={16} />
-            <span>numbers</span>
-          </div>
-          <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition text-yellow-500">
-            <MdOutlineTimer size={16} />
-            <span>time</span>
-          </div>
-          <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition">
-            <span>A</span>
-            <span>words</span>
-          </div>
-          <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition">
-            <MessageSquare size={16} />
-            <span>quote</span>
-          </div>
-          <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition">
-            <Triangle size={16} />
-            <span>zen</span>
-          </div>
+          {modeItems}
           <div className="h-full w-0.5 bg-white"> </div>
         </div>
 
@@ -70,7 +92,7 @@ export default function SoloNavbar({
           {durations.map((d) => (
             <span
               key={d}
-              onClick={() => onDurationChange(d)}
+              onClick={() => handleDurationChange(d)}
               className={`cursor-pointer transition px-2 py-0.5 rounded-md  ${
                 currentDuration === d
                   ? "text-yellow-500 font-semibold hover:text-yellow-400"
@@ -82,6 +104,30 @@ export default function SoloNavbar({
           ))}
         </div>
       </div>
+
+      {isMobileMenuOpen && (
+        <div className="w-full px-6 md:hidden">
+          <div className="flex flex-col gap-4 px-4 py-3 text-sm text-neutral-300 border border-neutral-600 rounded-2xl bg-neutral-900">
+            <div className="grid grid-cols-2 gap-3">{modeItems}</div>
+            <div className="h-0.5 w-full bg-neutral-700" />
+            <div className="flex flex-wrap items-center gap-4 text-slate-500">
+              {durations.map((d) => (
+                <span
+                  key={d}
+                  onClick={() => handleDurationChange(d)}
+                  className={`cursor-pointer transition px-2 py-0.5 rounded-md  ${
+                    currentDuration === d
+                      ? "text-yellow-500 font-semibold hover:text-yellow-400"
+                      : "hover:text-slate-300"
+                  }`}
+                >
+                  {d}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
