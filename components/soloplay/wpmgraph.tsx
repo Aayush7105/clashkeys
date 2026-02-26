@@ -370,11 +370,11 @@ export default function WpmGraph({
               stroke={chartConfig.error.color}
               strokeWidth={0}
               strokeOpacity={0}
-              dot={(props: ErrorDotProps) => (
-                <ErrorPulseDot {...props} radius={4} />
+              dot={(props: unknown) => (
+                <ErrorPulseDot {...(props as ErrorDotProps)} radius={4} />
               )}
-              activeDot={(props: ErrorDotProps) => (
-                <ErrorPulseDot {...props} radius={5} />
+              activeDot={(props: unknown) => (
+                <ErrorPulseDot {...(props as ErrorDotProps)} radius={5} />
               )}
             />
           </LineChart>
