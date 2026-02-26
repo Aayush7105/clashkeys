@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import {
   CartesianGrid,
   Line,
@@ -53,6 +53,10 @@ const chartConfig = {
     label: "Error",
     color: "hsl(0 84% 60%)",
   },
+  errorCount: {
+    label: "Errors",
+    color: "hsl(0 84% 60%)",
+  },
 } satisfies ChartConfig;
 
 export default function WpmGraph({
@@ -81,6 +85,10 @@ export default function WpmGraph({
     1,
     Math.round(durationSeconds ?? Math.max(1, sampledPoints - 1)),
   );
+  const clampSecond = useCallback(
+    (second: number) => Math.max(0, Math.min(axisMaxSeconds, Math.round(second))),
+    [axisMaxSeconds],
+  );
 
   const allXTicks = Array.from(
     { length: axisMaxSeconds + 1 },
@@ -105,10 +113,7 @@ export default function WpmGraph({
         return;
       }
 
-      const second = Math.max(
-        0,
-        Math.min(axisMaxSeconds, Math.round(point.second)),
-      );
+      const second = clampSecond(point.second);
       const wpm = Math.max(0, Math.round(point.wpm));
       const previous = pointsBySecond.get(second);
 
@@ -119,7 +124,32 @@ export default function WpmGraph({
     });
 
     return pointsBySecond;
-  }, [axisMaxSeconds, errorPoints]);
+  }, [clampSecond, errorPoints]);
+
+  const cumulativeErrorsBySecond = useMemo(() => {
+    const errorCountsPerSecond = Array.from(
+      { length: axisMaxSeconds + 1 },
+      () => 0,
+    );
+
+    errorPoints.forEach((point) => {
+      if (!Number.isFinite(point.second)) {
+        return;
+      }
+
+      const second = clampSecond(point.second);
+      errorCountsPerSecond[second] += 1;
+    });
+
+    const cumulativeCounts: number[] = [];
+    let runningCount = 0;
+    for (let second = 0; second <= axisMaxSeconds; second += 1) {
+      runningCount += errorCountsPerSecond[second];
+      cumulativeCounts.push(runningCount);
+    }
+
+    return cumulativeCounts;
+  }, [axisMaxSeconds, clampSecond, errorPoints]);
 
   const chartData = useMemo(() => {
     const getSeriesValue = (series: number[], second: number) => {
@@ -140,10 +170,12 @@ export default function WpmGraph({
       rawWpm: getSeriesValue(rawWpmData, second),
       burstWpm: getSeriesValue(burstWpmData, second),
       error: errorSeries.get(second) ?? null,
+      errorCount: cumulativeErrorsBySecond[second] ?? 0,
     }));
   }, [
     axisMaxSeconds,
     burstWpmData,
+    cumulativeErrorsBySecond,
     errorSeries,
     rawWpmData,
     wpmData,
@@ -235,7 +267,21 @@ export default function WpmGraph({
 
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+              content={(props) => {
+                const filteredPayload = props.payload?.filter(
+                  (item) => item.dataKey !== "error",
+                );
+
+                return (
+                  <ChartTooltipContent
+                    active={props.active}
+                    payload={filteredPayload}
+                    label={props.label}
+                    hideLabel={false}
+                    labelFormatter={(value) => `${value}s`}
+                  />
+                );
+              }}
             />
 
             <Line
@@ -263,11 +309,21 @@ export default function WpmGraph({
               strokeWidth={2.2}
             />
             <Line
+              dataKey="errorCount"
+              name="errors"
+              type="linear"
+              stroke={chartConfig.errorCount.color}
+              strokeWidth={0}
+              strokeOpacity={0}
+              dot={false}
+              activeDot={false}
+            />
+            <Line
               dataKey="error"
               type="linear"
               stroke={chartConfig.error.color}
-              strokeDasharray="2 5"
-              strokeWidth={2}
+              strokeWidth={0}
+              strokeOpacity={0}
               connectNulls={false}
               dot={{
                 r: 4,
