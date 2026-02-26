@@ -27,6 +27,13 @@ type ErrorPoint = {
   wpm: number;
 };
 
+type ErrorDotProps = {
+  cx?: number;
+  cy?: number;
+  value?: number | string | null;
+  radius?: number;
+};
+
 type WpmGraphProps = {
   wpmData: number[];
   rawWpmData: number[];
@@ -58,6 +65,48 @@ const chartConfig = {
     color: "hsl(0 84% 60%)",
   },
 } satisfies ChartConfig;
+
+function ErrorPulseDot({ cx, cy, value, radius = 4 }: ErrorDotProps) {
+  if (
+    typeof cx !== "number" ||
+    typeof cy !== "number" ||
+    value === null ||
+    value === undefined
+  ) {
+    return null;
+  }
+
+  const ringStart = radius + 1;
+  const ringEnd = radius + 7;
+
+  return (
+    <g>
+      <circle
+        cx={cx}
+        cy={cy}
+        r={ringStart}
+        fill="none"
+        stroke={chartConfig.error.color}
+        strokeWidth={1.25}
+        opacity={0.75}
+      >
+        <animate
+          attributeName="r"
+          values={`${ringStart};${ringEnd};${ringStart}`}
+          dur="1.6s"
+          repeatCount="indefinite"
+        />
+        <animate
+          attributeName="opacity"
+          values="0.75;0;0.75"
+          dur="1.6s"
+          repeatCount="indefinite"
+        />
+      </circle>
+      <circle cx={cx} cy={cy} r={radius} fill={chartConfig.error.color} />
+    </g>
+  );
+}
 
 export default function WpmGraph({
   wpmData,
@@ -105,25 +154,18 @@ export default function WpmGraph({
     (second) => second % tickStep === 0 || second === axisMaxSeconds,
   );
 
-  const errorSeries = useMemo(() => {
-    const pointsBySecond = new Map<number, number>();
+  const errorSeconds = useMemo(() => {
+    const seconds = new Set<number>();
 
     errorPoints.forEach((point) => {
-      if (!Number.isFinite(point.second) || !Number.isFinite(point.wpm)) {
+      if (!Number.isFinite(point.second)) {
         return;
       }
 
-      const second = clampSecond(point.second);
-      const wpm = Math.max(0, Math.round(point.wpm));
-      const previous = pointsBySecond.get(second);
-
-      pointsBySecond.set(
-        second,
-        typeof previous === "number" ? Math.max(previous, wpm) : wpm,
-      );
+      seconds.add(clampSecond(point.second));
     });
 
-    return pointsBySecond;
+    return seconds;
   }, [clampSecond, errorPoints]);
 
   const cumulativeErrorsBySecond = useMemo(() => {
@@ -164,19 +206,23 @@ export default function WpmGraph({
       return null;
     };
 
-    return Array.from({ length: axisMaxSeconds + 1 }, (_, second) => ({
-      second,
-      wpm: getSeriesValue(wpmData, second),
-      rawWpm: getSeriesValue(rawWpmData, second),
-      burstWpm: getSeriesValue(burstWpmData, second),
-      error: errorSeries.get(second) ?? null,
-      errorCount: cumulativeErrorsBySecond[second] ?? 0,
-    }));
+    return Array.from({ length: axisMaxSeconds + 1 }, (_, second) => {
+      const wpmValue = getSeriesValue(wpmData, second);
+
+      return {
+        second,
+        wpm: wpmValue,
+        rawWpm: getSeriesValue(rawWpmData, second),
+        burstWpm: getSeriesValue(burstWpmData, second),
+        error: errorSeconds.has(second) ? wpmValue : null,
+        errorCount: cumulativeErrorsBySecond[second] ?? 0,
+      };
+    });
   }, [
     axisMaxSeconds,
     burstWpmData,
     cumulativeErrorsBySecond,
-    errorSeries,
+    errorSeconds,
     rawWpmData,
     wpmData,
     hasFixedDuration,
@@ -324,17 +370,12 @@ export default function WpmGraph({
               stroke={chartConfig.error.color}
               strokeWidth={0}
               strokeOpacity={0}
-              connectNulls={false}
-              dot={{
-                r: 4,
-                fill: chartConfig.error.color,
-                stroke: "none",
-              }}
-              activeDot={{
-                r: 5,
-                fill: chartConfig.error.color,
-                stroke: "none",
-              }}
+              dot={(props: ErrorDotProps) => (
+                <ErrorPulseDot {...props} radius={4} />
+              )}
+              activeDot={(props: ErrorDotProps) => (
+                <ErrorPulseDot {...props} radius={5} />
+              )}
             />
           </LineChart>
         </ChartContainer>
