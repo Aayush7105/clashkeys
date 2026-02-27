@@ -2,7 +2,7 @@
 
 import React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import Solonavbar from "./solonavbar";
+import GameNavbar from "@/components/game-navbar";
 import SoloTypingArea from "./solotypingarea";
 import { DEFAULT_SOLO_DURATION, SOLO_DURATIONS } from "./soloplay-constants";
 
@@ -33,11 +33,12 @@ const SoloPlayPage: React.FC<SoloPlayPageProps> = ({
   };
 
   return (
-    <main className="min-h-screen bg-neutral-900 text-neutral-300 flex items-start justify-center px-2 pt-2 md:items-center md:px-2 md:py-16">
+    <main className="min-h-screen bg-neutral-900 text-neutral-300 flex items-start justify-center px-3 pt-3 md:items-center md:px-2 md:py-16">
       <div className="w-full max-w-7xl min-h-screen py-0 md:h-screen md:py-20">
         <div className="sticky top-0 z-50 bg-neutral-900/95 backdrop-blur md:relative md:top-auto md:bg-transparent md:backdrop-blur-none">
-          <Solonavbar
+          <GameNavbar
             currentDuration={duration}
+            durations={SOLO_DURATIONS}
             onDurationChange={handleDurationChange}
           />
         </div>

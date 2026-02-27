@@ -5,23 +5,26 @@ import { useState } from "react";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
 import { FaKeyboard } from "react-icons/fa";
 import { MdOutlineTimer } from "react-icons/md";
-import { MULTIPLAYER_DURATIONS } from "./multiplayer-constants";
 
-type MultiplayerNavbarProps = {
+type GameNavbarProps = {
   currentDuration: number;
+  durations: readonly number[];
   onDurationChange: (duration: number) => void;
-  isHost: boolean;
+  canChangeDuration?: boolean;
+  disabledDurationTitle?: string;
 };
 
-export default function MultiplayerNavbar({
+export default function GameNavbar({
   currentDuration,
+  durations,
   onDurationChange,
-  isHost,
-}: MultiplayerNavbarProps) {
+  canChangeDuration = true,
+  disabledDurationTitle = "Duration is locked",
+}: GameNavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleDurationChange = (duration: number) => {
-    if (!isHost) return;
+    if (!canChangeDuration) return;
     onDurationChange(duration);
     setIsMobileMenuOpen(false);
   };
@@ -55,9 +58,26 @@ export default function MultiplayerNavbar({
     </>
   );
 
+  const durationButtons = durations.map((duration) => (
+    <button
+      key={duration}
+      onClick={() => handleDurationChange(duration)}
+      className={`transition px-2 py-0.5 rounded-md cursor-pointer ${
+        currentDuration === duration
+          ? "text-yellow-500 font-semibold hover:text-yellow-400"
+          : "hover:text-slate-300"
+      } ${!canChangeDuration ? "opacity-50 cursor-not-allowed hover:text-slate-500" : ""}`}
+      disabled={!canChangeDuration}
+      type="button"
+      title={canChangeDuration ? `Set duration to ${duration}s` : disabledDurationTitle}
+    >
+      {duration}
+    </button>
+  ));
+
   return (
-    <div className="w-full p-1 md:p-2 flex flex-col justify-center items-center gap-1 md:gap-3">
-      <div className="flex justify-between lg:px-32 md:px-12 py-1 md:py-4 w-full md:-mt-20">
+    <div className="w-full p-2 md:p-2 flex flex-col justify-center items-center gap-2 md:gap-3">
+      <div className="flex justify-between lg:px-32 md:px-12 py-2 md:py-4 w-full md:-mt-20">
         <div className="font-mono tracking-widest text-neutral-200">CLASHKEYS</div>
         <div className="flex items-center gap-4 text-slate-400">
           <button
@@ -69,10 +89,7 @@ export default function MultiplayerNavbar({
           >
             {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
-          <FaKeyboard
-            size={20}
-            className="cursor-default hover:text-white transition"
-          />
+          <FaKeyboard size={20} className="cursor-default hover:text-white transition" />
           <User size={20} className="cursor-default hover:text-white transition" />
         </div>
       </div>
@@ -83,24 +100,7 @@ export default function MultiplayerNavbar({
           <div className="h-full w-0.5 bg-white" />
         </div>
 
-        <div className="flex items-center gap-4 text-slate-500">
-          {MULTIPLAYER_DURATIONS.map((duration) => (
-            <button
-              key={duration}
-              onClick={() => handleDurationChange(duration)}
-              className={`transition px-2 py-0.5 rounded-md cursor-pointer ${
-                currentDuration === duration
-                  ? "text-yellow-500 font-semibold hover:text-yellow-400"
-                  : "hover:text-slate-300"
-              } ${!isHost ? "opacity-50 cursor-not-allowed hover:text-slate-500" : ""}`}
-              disabled={!isHost}
-              type="button"
-              title={isHost ? `Set duration to ${duration}s` : "Host controls duration"}
-            >
-              {duration}
-            </button>
-          ))}
-        </div>
+        <div className="flex items-center gap-4 text-slate-500">{durationButtons}</div>
       </div>
 
       {isMobileMenuOpen && (
@@ -109,26 +109,7 @@ export default function MultiplayerNavbar({
             <div className="grid grid-cols-2 gap-3">{modeItems}</div>
             <div className="h-0.5 w-full bg-neutral-700" />
             <div className="flex flex-wrap items-center gap-4 text-slate-500">
-              {MULTIPLAYER_DURATIONS.map((duration) => (
-                <button
-                  key={duration}
-                  onClick={() => handleDurationChange(duration)}
-                  className={`transition px-2 py-0.5 rounded-md cursor-pointer ${
-                    currentDuration === duration
-                      ? "text-yellow-500 font-semibold hover:text-yellow-400"
-                      : "hover:text-slate-300"
-                  } ${!isHost ? "opacity-50 cursor-not-allowed hover:text-slate-500" : ""}`}
-                  disabled={!isHost}
-                  type="button"
-                  title={
-                    isHost
-                      ? `Set duration to ${duration}s`
-                      : "Host controls duration"
-                  }
-                >
-                  {duration}
-                </button>
-              ))}
+              {durationButtons}
             </div>
           </div>
         </div>
