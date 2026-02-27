@@ -47,10 +47,12 @@ export default function MultiplayerTypingArea({
       className="relative w-full max-w-5xl mx-auto mt-10"
       onClick={() => inputRef.current?.focus()}
     >
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2 md:mb-8 md:gap-4">
         <div>
-          <h1 className="text-3xl font-bold font-mono text-neutral-200">Room {roomId}</h1>
-          <p className="text-neutral-500 text-sm font-mono">Playing as {name}</p>
+          <h1 className="text-xl font-bold font-mono text-neutral-200 md:text-3xl">
+            Room {roomId}
+          </h1>
+          <p className="text-xs text-neutral-500 font-mono md:text-sm">Playing as {name}</p>
         </div>
         <div className="text-2xl font-mono text-yellow-500">{timeLeft}s</div>
       </div>

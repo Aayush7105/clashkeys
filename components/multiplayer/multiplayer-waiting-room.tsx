@@ -24,38 +24,36 @@ export default function MultiplayerWaitingRoom({
   onExit,
 }: MultiplayerWaitingRoomProps) {
   return (
-    <div className="max-w-5xl mx-auto mt-10 space-y-8 px-2">
-      <div className="flex flex-wrap items-start justify-between gap-4">
+    <div className="mx-auto mt-10 w-full max-w-5xl space-y-6 px-2 md:space-y-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold font-mono text-neutral-200">
+          <h1 className="text-2xl font-bold font-mono text-neutral-200 md:text-3xl">
             Room {roomId}
           </h1>
-          <p className="text-neutral-400 font-mono mt-1">
-            Waiting room · {name}
-          </p>
-          <p className="text-xs uppercase tracking-[0.2em] text-neutral-500 mt-2">
-            {" "}
+          <p className="mt-1 text-neutral-400 font-mono">Waiting room - {name}</p>
+          <p className="mt-2 text-xs uppercase tracking-[0.2em] text-neutral-500">
             Duration {selectedDuration}
             <span className="text-[10px]">s</span>
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
+
+        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
           {isHost ? (
             <button
               onClick={onStart}
-              className="px-4 py-2 rounded-xl bg-[#e2b714] text-neutral-900 font-mono font-bold cursor-pointer hover:brightness-110"
+              className="w-full rounded-xl bg-[#e2b714] px-4 py-2 font-mono font-bold text-neutral-900 hover:brightness-110 cursor-pointer sm:w-auto"
               type="button"
             >
               Start test
             </button>
           ) : (
-            <div className="px-4 py-2 rounded-xl border border-neutral-700 text-sm uppercase text-neutral-400 font-mono tracking-wide">
+            <div className="w-full rounded-xl border border-neutral-700 px-4 py-2 text-center text-sm uppercase tracking-wide text-neutral-400 font-mono sm:w-auto">
               Waiting for host
             </div>
           )}
           <button
             onClick={onExit}
-            className="px-4 py-2 rounded-xl border border-[#3a3f49] text-neutral-200 font-bold font-mono cursor-pointer hover:border-yellow-500"
+            className="w-full rounded-xl border border-[#3a3f49] px-4 py-2 text-neutral-200 font-bold font-mono hover:border-yellow-500 cursor-pointer sm:w-auto"
             type="button"
           >
             Back
@@ -63,8 +61,8 @@ export default function MultiplayerWaitingRoom({
         </div>
       </div>
 
-      <div className="rounded-xl border border-[#3a3f49] bg-neutral-900 p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="rounded-xl border border-[#3a3f49] bg-neutral-900 p-4 md:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-semibold text-neutral-100">Players</h2>
             <p className="text-sm text-neutral-400">
@@ -73,9 +71,7 @@ export default function MultiplayerWaitingRoom({
                 : `${users.length} player${users.length === 1 ? "" : "s"} in room`}
             </p>
           </div>
-          <div className="text-sm text-neutral-300 font-mono">
-            Share code: {roomId}
-          </div>
+          <div className="text-sm text-neutral-300 font-mono">Share code: {roomId}</div>
         </div>
 
         <div className="mt-4 space-y-3">
@@ -92,7 +88,7 @@ export default function MultiplayerWaitingRoom({
                   className="flex items-center justify-between gap-4 rounded-lg border border-zinc-800 bg-neutral-800 px-4 py-3"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-full bg-neutral-900 flex items-center justify-center text-sm font-semibold border border-neutral-600">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-600 bg-neutral-900 text-sm font-semibold">
                       {user.name.slice(0, 1).toUpperCase()}
                     </div>
                     <div>
@@ -116,7 +112,7 @@ export default function MultiplayerWaitingRoom({
         </div>
       </div>
 
-      <div className="rounded-xl bg-neutral-900 p-6 text-sm text-zinc-400 font-mono">
+      <div className="rounded-xl bg-neutral-900 p-4 text-sm text-zinc-400 font-mono md:p-6">
         {isHost
           ? "You are the host. Duration controls are enabled for you."
           : "Only the host can start and control duration. You will sync automatically when the race starts."}

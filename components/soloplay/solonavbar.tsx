@@ -54,8 +54,8 @@ export default function SoloNavbar({
   );
 
   return (
-    <div className="w-full p-2 flex flex-col justify-center items-center gap-3">
-      <div className="flex  justify-between lg:px-32 md:px-12 py-4 w-full -mt-20">
+    <div className="w-full p-1 md:p-2 flex flex-col justify-center items-center gap-1 md:gap-3">
+      <div className="flex justify-between lg:px-32 md:px-12 py-1 md:py-4 w-full md:-mt-20">
         <div className="font-mono tracking-widest text-neutral-200">
           CLASHKEYS
         </div>

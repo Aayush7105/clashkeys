@@ -478,13 +478,18 @@ export default function MultiplayerArea({
   }
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-300 flex items-start justify-center px-2 py-16">
-      <div className="max-w-7xl w-full">
-        <MultiplayerNavbar
-          currentDuration={selectedDuration}
-          onDurationChange={onDurationChange}
-          isHost={isHost}
-        />
+    <main className="min-h-screen bg-neutral-900 text-neutral-300 flex items-start justify-center px-2 pt-2 md:items-center md:px-2 md:py-16">
+      <div className="w-full max-w-7xl min-h-screen py-0 md:py-20">
+        <div className="sticky top-0 z-50 bg-neutral-900/95 backdrop-blur md:relative md:top-auto md:bg-transparent md:backdrop-blur-none">
+          <MultiplayerNavbar
+            currentDuration={selectedDuration}
+            onDurationChange={onDurationChange}
+            isHost={isHost}
+          />
+        </div>
+        <div className="mt-10 flex items-center justify-between text-sm uppercase tracking-[0.2em] text-[#6b6f7a] md:px-16 lg:px-32">
+          <span className="font-mono text-md">Multiplayer</span>
+        </div>
 
         {!isRunning ? (
           <MultiplayerWaitingRoom

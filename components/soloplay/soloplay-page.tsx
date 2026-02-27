@@ -33,15 +33,15 @@ const SoloPlayPage: React.FC<SoloPlayPageProps> = ({
   };
 
   return (
-    <main className="min-h-screen bg-neutral-900 text-neutral-300 flex items-center justify-center px-2 py-16">
-      <div className="w-full max-w-7xl h-screen py-20">
-        <div className="relative z-50">
+    <main className="min-h-screen bg-neutral-900 text-neutral-300 flex items-start justify-center px-2 pt-2 md:items-center md:px-2 md:py-16">
+      <div className="w-full max-w-7xl min-h-screen py-0 md:h-screen md:py-20">
+        <div className="sticky top-0 z-50 bg-neutral-900/95 backdrop-blur md:relative md:top-auto md:bg-transparent md:backdrop-blur-none">
           <Solonavbar
             currentDuration={duration}
             onDurationChange={handleDurationChange}
           />
         </div>
-        <div className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a] mt-10 md:px-16lg:px-32">
+        <div className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a] mt-10 md:px-16 lg:px-32">
           <span className="font-mono text-md ">Solo Play</span>
         </div>
         {/* Reset component completely when duration changes */}
