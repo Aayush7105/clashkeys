@@ -46,6 +46,7 @@ type WpmGraphProps = {
   errorPoints: ErrorPoint[];
   durationSeconds?: number;
   forceOneSecondXTicks?: boolean;
+  shiftPlotLeft?: boolean;
 };
 
 const chartConfig = {
@@ -120,6 +121,7 @@ export default function WpmGraph({
   errorPoints,
   durationSeconds,
   forceOneSecondXTicks = false,
+  shiftPlotLeft = false,
 }: WpmGraphProps) {
   const hasFixedDuration = typeof durationSeconds === "number";
   const maxErrorSecond = errorPoints.reduce(
@@ -275,19 +277,20 @@ export default function WpmGraph({
       </CardHeader>
 
       <CardContent className="px-2 pt-1 md:px-3">
-        <ChartContainer
-          className="h-[clamp(10rem,30vh,22rem)] w-full md:h-[clamp(14rem,34vh,24rem)]"
-          config={chartConfig}
-        >
-          <LineChart
-            accessibilityLayer
-            data={chartData}
-            margin={{
-              left: 8,
-              right: 8,
-              top: 8,
-            }}
+        <div className={shiftPlotLeft ? "-ml-1 w-[calc(100%+0.25rem)]" : "w-full"}>
+          <ChartContainer
+            className="h-[clamp(10rem,30vh,22rem)] w-full md:h-[clamp(14rem,34vh,24rem)]"
+            config={chartConfig}
           >
+            <LineChart
+              accessibilityLayer
+              data={chartData}
+              margin={{
+                left: shiftPlotLeft ? 6 : 8,
+                right: 8,
+                top: 8,
+              }}
+            >
             <CartesianGrid
               vertical={false}
               stroke="hsl(0 0% 100%)"
@@ -406,8 +409,9 @@ export default function WpmGraph({
                 );
               }}
             />
-          </LineChart>
-        </ChartContainer>
+            </LineChart>
+          </ChartContainer>
+        </div>
       </CardContent>
     </Card>
   );
