@@ -34,6 +34,11 @@ type ErrorDotProps = {
   radius?: number;
 };
 
+type ErrorDotRenderProps = ErrorDotProps & {
+  key?: string | number;
+  index?: number;
+};
+
 type WpmGraphProps = {
   wpmData: number[];
   rawWpmData: number[];
@@ -370,12 +375,36 @@ export default function WpmGraph({
               stroke={chartConfig.error.color}
               strokeWidth={0}
               strokeOpacity={0}
-              dot={(props: unknown) => (
-                <ErrorPulseDot {...(props as ErrorDotProps)} radius={4} />
-              )}
-              activeDot={(props: unknown) => (
-                <ErrorPulseDot {...(props as ErrorDotProps)} radius={5} />
-              )}
+              dot={(props: unknown) => {
+                const dotProps = props as ErrorDotRenderProps;
+                const dotKey =
+                  dotProps.key ??
+                  `error-dot-${dotProps.index ?? "unknown"}-${dotProps.cx ?? "x"}-${dotProps.cy ?? "y"}`;
+                return (
+                  <ErrorPulseDot
+                    key={dotKey}
+                    cx={dotProps.cx}
+                    cy={dotProps.cy}
+                    value={dotProps.value}
+                    radius={4}
+                  />
+                );
+              }}
+              activeDot={(props: unknown) => {
+                const dotProps = props as ErrorDotRenderProps;
+                const dotKey =
+                  dotProps.key ??
+                  `error-active-dot-${dotProps.index ?? "unknown"}-${dotProps.cx ?? "x"}-${dotProps.cy ?? "y"}`;
+                return (
+                  <ErrorPulseDot
+                    key={dotKey}
+                    cx={dotProps.cx}
+                    cy={dotProps.cy}
+                    value={dotProps.value}
+                    radius={5}
+                  />
+                );
+              }}
             />
           </LineChart>
         </ChartContainer>
