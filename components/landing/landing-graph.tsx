@@ -23,13 +23,15 @@ const staticErrorPoints = [
 ];
 export default function LandingGraph() {
   return (
-    <div className="w-full max-w-full space-y-3 overflow-hidden lg:w-[calc(100%+2rem)] lg:-ml-8">
+    <div className="-ml-2 w-[calc(100%+0.5rem)] max-w-none space-y-3 overflow-hidden sm:-ml-3 sm:w-[calc(100%+0.75rem)] lg:w-[calc(100%+2rem)] lg:-ml-8 ">
       <WpmGraph
         wpmData={staticWpmData}
         rawWpmData={staticRawWpmData}
         burstWpmData={staticBurstWpmData}
         errorPoints={staticErrorPoints}
-        durationSeconds={15}
+        durationSeconds={10}
+        forceOneSecondXTicks
+        tightLeftContent
       />
     </div>
   );
