@@ -1,55 +1,68 @@
 # ClashKeys
 
-ClashKeys is a competitive typing arena with solo practice and real-time multiplayer rooms. Host a room, share a 4-digit code, race for 60 seconds, and review detailed post-race stats.
+ClashKeys is a competitive typing game with solo practice and real-time multiplayer races. Create or join a room with a 4-digit code, run timed rounds, and compare results on a live leaderboard.
 
-**Features**
+## Features
 
-- Real-time multiplayer rooms with live progress bars and host-controlled starts
-- Solo practice mode with adjustable durations and fresh text pulls from Wikipedia (with a local fallback)
-- Detailed metrics: WPM/CPM, accuracy, errors, missed characters, and confusion insights
-- Focused, high-contrast UI built for speed
+- Solo mode (`/soloplay`) with duration options: `15s`, `30s`, `60s`, `120s`
+- Multiplayer lobby (`/multiplayer`) to create or join rooms like `#1234`
+- Host-controlled room flow (`/room`): host starts rounds, sets duration, and can restart
+- Real-time multiplayer sync with Socket.IO
+- Post-race analytics: `WPM`, `Raw WPM`, `Burst WPM`, accuracy, errors, and ranked leaderboard
+- Prompt text pulled from Wikipedia random summaries with local fallback text pools
 
-**Tech Stack**
+## Tech Stack
 
-- Next.js 16 + React 19
+- Next.js 16 + React 19 + TypeScript
 - Tailwind CSS 4
-- Socket.io (client + server)
+- Socket.IO (client + server)
 - Express (socket server)
 
-**Local Development**
+## Local Development
 
-1. Install app dependencies:
-   `npm install`
+1. Install root dependencies:
+   ```bash
+   npm install
+   ```
 1. Install server dependencies:
-   `cd server`
-   `npm install`
+   ```bash
+   cd server
+   npm install
+   ```
 1. Start the socket server (Terminal 1):
-   `npm run dev`
+   ```bash
+   cd server
+   npm run dev
+   ```
+   Server runs on `http://localhost:4000`.
 1. Start the Next.js app (Terminal 2):
-   `cd ..`
-   `npm run dev`
-1. Open the app at `http://localhost:3000`.
+   ```bash
+   npm run dev
+   ```
+   App runs on `http://localhost:3000`.
 
-**Configuration**
+## Configuration
 
-- The client connects to the socket server at `http://localhost:4000`.
-- Update `lib/socket.ts` if you change the server host or port.
+- Client socket URL is set in `lib/socket.ts` (default: `http://localhost:4000`).
+- If you change socket host/port, update `lib/socket.ts`.
+- Server CORS is currently open (`origin: "*"` in `server/index.js`) for local development.
 
-**Scripts**
-App (`package.json`):
+## Scripts
 
-- `npm run dev` - start Next.js in dev mode
-- `npm run build` - build for production
-- `npm run start` - run the production build
+Root (`package.json`):
+
+- `npm run dev` - start Next.js in development mode
+- `npm run build` - create production build
+- `npm run start` - run production server
 - `npm run lint` - run ESLint
 
 Server (`server/package.json`):
 
-- `npm run dev` - start the Socket.io server
+- `npm run dev` - start Express + Socket.IO server
 
-**Project Structure**
+## Project Structure
 
-- `app/` - Next.js routes and layouts
-- `components/` - UI and game logic components
-- `lib/` - shared client utilities (socket connection)
-- `server/` - Express + Socket.io server
+- `app/` - Next.js routes (`/`, `/soloplay`, `/multiplayer`, `/room`)
+- `components/` - gameplay UI, score views, charts, and mode-specific logic
+- `lib/` - shared utilities (including socket client setup)
+- `server/` - standalone Express + Socket.IO backend
