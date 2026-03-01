@@ -6,8 +6,8 @@ import LandingGraph from "./landing-graph";
 const Landing = () => {
   return (
     <main className="relative min-h-screen overflow-hidden bg-neutral-950 text-neutral-200">
-      <div className="pointer-events-none absolute -top-32 right-0 h-[26rem] w-[26rem] rounded-full bg-[radial-gradient(circle_at_center,rgba(226,183,20,0.3),rgba(10,10,10,0))] sm:h-[30rem] sm:w-[30rem]" />
-      <div className="pointer-events-none absolute -bottom-24 left-0 h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(circle_at_center,rgba(64,64,64,0.45),rgba(10,10,10,0))] sm:h-[36rem] sm:w-[36rem]" />
+      <div className="pointer-events-none absolute -top-32 right-0 h-104 w-104 rounded-full bg-[radial-gradient(circle_at_center,rgba(226,183,20,0.3),rgba(10,10,10,0))] sm:h-120 sm:w-120" />
+      <div className="pointer-events-none absolute -bottom-24 left-0 h-128 w-lg rounded-full bg-[radial-gradient(circle_at_center,rgba(64,64,64,0.45),rgba(10,10,10,0))] sm:h-144 sm:w-xl" />
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col px-3 py-10 sm:px-6 sm:py-14 lg:py-16">
         <header className="flex items-center justify-between text-[11px] uppercase tracking-[0.22em] text-neutral-500 sm:text-xs sm:tracking-[0.35em]">
