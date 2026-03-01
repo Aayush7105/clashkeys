@@ -32,13 +32,6 @@ function cleanTextForWords(text: string) {
     .trim();
 }
 
-function cleanTextForPunctuation(text: string) {
-  return text
-    .replace(/[^A-Za-z\s.,?!:;'"()-]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
 function limitWords(text: string, maxWords: number) {
   return text.split(/\s+/).slice(0, maxWords).join(" ");
 }
@@ -56,6 +49,11 @@ function getPoolFallback(mode: SoloMode): string {
 
 // same structure you already use
 async function getSentence(mode: SoloMode): Promise<string> {
+  // Punctuation mode should always use punctuation-ready local pool.
+  if (mode === "punctuation") {
+    return getPoolFallback("punctuation");
+  }
+
   async function fetchWiki() {
     const r = await fetchWithTimeout(
       "https://en.wikipedia.org/api/rest_v1/page/random/summary",
@@ -69,10 +67,7 @@ async function getSentence(mode: SoloMode): Promise<string> {
 
     if (typeof extract !== "string") throw new Error();
 
-    const cleaned =
-      mode === "punctuation"
-        ? cleanTextForPunctuation(extract)
-        : cleanTextForWords(extract);
+    const cleaned = cleanTextForWords(extract);
 
     if (!cleaned) throw new Error();
 
@@ -89,7 +84,7 @@ async function getSentence(mode: SoloMode): Promise<string> {
     try {
       return await fetchWiki();
     } catch {
-      return getPoolFallback(mode);
+      return getPoolFallback("words");
     }
   }
 }

@@ -71,20 +71,16 @@ export default function GameNavbar({
         <Hash size={16} />
         <span>numbers</span>
       </div>
-      <div className="flex items-center gap-2 cursor-default text-neutral-600/60">
-        <MdOutlineTimer size={16} />
-        <span>time</span>
-      </div>
       <button
         type="button"
         onClick={() => handleModeChange("words")}
         className={modeButtonClass("words")}
         aria-pressed={canInteractModes && currentMode === "words"}
         disabled={!canInteractModes}
-        title={canInteractModes ? "Set mode to words" : disabledModeTitle}
+        title={canInteractModes ? "Set mode to time" : disabledModeTitle}
       >
-        <span>A</span>
-        <span>words</span>
+        <MdOutlineTimer size={16} />
+        <span>time</span>
       </button>
       <div className="flex items-center gap-2 cursor-default text-neutral-600/60">
         <MessageSquare size={16} />
