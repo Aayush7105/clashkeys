@@ -33,13 +33,13 @@ const Landing = () => {
             <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-row sm:flex-wrap sm:gap-4">
               <Link
                 href="/multiplayer"
-                className="w-full rounded-lg bg-[#e2b714] px-3 py-3 text-center text-sm font-semibold text-[#1a1b1f] tracking-wide hover:brightness-110 sm:w-auto sm:px-6"
+                className="w-full rounded-lg bg-[#e2b714] px-3 py-3 text-center text-[14px] font-semibold text-[#1a1b1f] tracking-wide hover:brightness-110 sm:w-auto sm:px-6 font-mono "
               >
                 Start a Room
               </Link>
               <Link
                 href="/soloplay"
-                className="w-full rounded-lg border border-neutral-700 px-3 py-3 text-center text-sm font-semibold tracking-wide text-neutral-200 hover:border-[#e2b714] sm:w-auto sm:px-6"
+                className="w-full rounded-lg border border-neutral-700 px-3 py-3 text-center text-[14px] font-semibold tracking-wide text-neutral-200 hover:border-[#e2b714] sm:w-auto sm:px-6 font-mono"
               >
                 Practice Solo
               </Link>
