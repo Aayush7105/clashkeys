@@ -5,6 +5,11 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import GameNavbar from "@/components/game-navbar";
 import SoloTypingArea from "./solotypingarea";
 import { DEFAULT_SOLO_DURATION, SOLO_DURATIONS } from "./soloplay-constants";
+import {
+  DEFAULT_SOLO_MODE,
+  isValidSoloMode,
+  type SoloMode,
+} from "./soloplay-modes";
 
 interface SoloPlayPageProps {
   initialText: string;
@@ -19,16 +24,25 @@ const SoloPlayPage: React.FC<SoloPlayPageProps> = ({
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const rawDuration = Number(searchParams.get("duration"));
+  const rawMode = searchParams.get("mode");
   const duration = SOLO_DURATIONS.includes(
     rawDuration as (typeof SOLO_DURATIONS)[number],
   )
     ? rawDuration
     : initialDuration || DEFAULT_SOLO_DURATION;
+  const mode: SoloMode = isValidSoloMode(rawMode) ? rawMode : DEFAULT_SOLO_MODE;
 
   const handleDurationChange = (next: number) => {
     if (next === duration) return;
     const params = new URLSearchParams(searchParams.toString());
     params.set("duration", String(next));
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  const handleModeChange = (nextMode: SoloMode) => {
+    if (nextMode === mode) return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("mode", nextMode);
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
@@ -40,6 +54,8 @@ const SoloPlayPage: React.FC<SoloPlayPageProps> = ({
             currentDuration={duration}
             durations={SOLO_DURATIONS}
             onDurationChange={handleDurationChange}
+            currentMode={mode}
+            onModeChange={handleModeChange}
           />
         </div>
         <div className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a] mt-10 md:px-16 lg:px-32">
@@ -47,9 +63,10 @@ const SoloPlayPage: React.FC<SoloPlayPageProps> = ({
         </div>
         {/* Reset component completely when duration changes */}
         <SoloTypingArea
-          key={duration}
+          key={`${duration}-${mode}`}
           duration={duration}
           initialText={initialText}
+          mode={mode}
         />
       </div>
     </main>

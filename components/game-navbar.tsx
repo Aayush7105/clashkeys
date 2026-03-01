@@ -5,11 +5,16 @@ import { useState } from "react";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
 import { FaKeyboard } from "react-icons/fa";
 import { MdOutlineTimer } from "react-icons/md";
+import type { SoloMode } from "@/components/soloplay/soloplay-modes";
 
 type GameNavbarProps = {
   currentDuration: number;
   durations: readonly number[];
   onDurationChange: (duration: number) => void;
+  currentMode?: SoloMode;
+  onModeChange?: (mode: SoloMode) => void;
+  canChangeMode?: boolean;
+  disabledModeTitle?: string;
   canChangeDuration?: boolean;
   disabledDurationTitle?: string;
 };
@@ -18,10 +23,15 @@ export default function GameNavbar({
   currentDuration,
   durations,
   onDurationChange,
+  currentMode = "words",
+  onModeChange,
+  canChangeMode = true,
+  disabledModeTitle = "Mode is locked",
   canChangeDuration = true,
   disabledDurationTitle = "Duration is locked",
 }: GameNavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const canInteractModes = canChangeMode && typeof onModeChange === "function";
 
   const handleDurationChange = (duration: number) => {
     if (!canChangeDuration) return;
@@ -29,29 +39,58 @@ export default function GameNavbar({
     setIsMobileMenuOpen(false);
   };
 
+  const handleModeChange = (mode: SoloMode) => {
+    if (!canInteractModes || !onModeChange) return;
+    onModeChange(mode);
+    setIsMobileMenuOpen(false);
+  };
+
+  const modeButtonClass = (mode: SoloMode) => {
+    const isActive = canInteractModes && currentMode === mode;
+    return `flex items-center gap-2 transition px-1 py-0.5 rounded-md ${
+      isActive
+        ? "text-yellow-500 font-semibold hover:text-yellow-400"
+        : "text-neutral-600 hover:text-slate-300"
+    } ${!canInteractModes ? "opacity-50 cursor-not-allowed hover:text-neutral-600" : "cursor-pointer"}`;
+  };
+
   const modeItems = (
     <>
-      <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition text-neutral-600">
+      <button
+        type="button"
+        onClick={() => handleModeChange("punctuation")}
+        className={modeButtonClass("punctuation")}
+        aria-pressed={canInteractModes && currentMode === "punctuation"}
+        disabled={!canInteractModes}
+        title={canInteractModes ? "Set mode to punctuation" : disabledModeTitle}
+      >
         <AiOutlineExclamationCircle size={16} />
         <span>punctuation</span>
-      </div>
-      <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition text-neutral-600">
+      </button>
+      <div className="flex items-center gap-2 cursor-default text-neutral-600/60">
         <Hash size={16} />
         <span>numbers</span>
       </div>
-      <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition text-yellow-500">
+      <div className="flex items-center gap-2 cursor-default text-neutral-600/60">
         <MdOutlineTimer size={16} />
         <span>time</span>
       </div>
-      <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition text-neutral-600">
+      <button
+        type="button"
+        onClick={() => handleModeChange("words")}
+        className={modeButtonClass("words")}
+        aria-pressed={canInteractModes && currentMode === "words"}
+        disabled={!canInteractModes}
+        title={canInteractModes ? "Set mode to words" : disabledModeTitle}
+      >
         <span>A</span>
         <span>words</span>
-      </div>
-      <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition text-neutral-600">
+      </button>
+      <div className="flex items-center gap-2 cursor-default text-neutral-600/60">
         <MessageSquare size={16} />
         <span>quote</span>
       </div>
-      <div className="flex items-center gap-2 cursor-pointer hover:text-slate-300 transition text-neutral-600">
+      <div className="flex items-center gap-2 cursor-default text-neutral-600/60">
         <Triangle size={16} />
         <span>zen</span>
       </div>

@@ -3,7 +3,15 @@ import {
   DEFAULT_SOLO_DURATION,
   SOLO_DURATIONS,
 } from "@/components/soloplay/soloplay-constants";
-import { SOLO_TEXT_POOL } from "@/components/soloplay/text-pool";
+import {
+  DEFAULT_SOLO_MODE,
+  isValidSoloMode,
+  type SoloMode,
+} from "@/components/soloplay/soloplay-modes";
+import {
+  PUNCTUATION_TEXT_POOL,
+  WORDS_TEXT_POOL,
+} from "@/components/soloplay/text-pool";
 
 export const dynamic = "force-dynamic";
 
@@ -17,9 +25,16 @@ function fetchWithTimeout(url: string, ms = 2000) {
   }).finally(() => clearTimeout(id));
 }
 
-function cleanText(text: string) {
+function cleanTextForWords(text: string) {
   return text
     .replace(/[^A-Za-z\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function cleanTextForPunctuation(text: string) {
+  return text
+    .replace(/[^A-Za-z\s.,?!:;'"()-]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -28,17 +43,19 @@ function limitWords(text: string, maxWords: number) {
   return text.split(/\s+/).slice(0, maxWords).join(" ");
 }
 
-function getPoolFallback(): string {
-  if (!Array.isArray(SOLO_TEXT_POOL) || SOLO_TEXT_POOL.length === 0) {
+function getPoolFallback(mode: SoloMode): string {
+  const pool = mode === "punctuation" ? PUNCTUATION_TEXT_POOL : WORDS_TEXT_POOL;
+
+  if (!Array.isArray(pool) || pool.length === 0) {
     return "";
   }
 
-  const idx = Math.floor(Math.random() * SOLO_TEXT_POOL.length);
-  return SOLO_TEXT_POOL[idx] ?? SOLO_TEXT_POOL[0];
+  const idx = Math.floor(Math.random() * pool.length);
+  return pool[idx] ?? pool[0];
 }
 
 // same structure you already use
-async function getSentence(): Promise<string> {
+async function getSentence(mode: SoloMode): Promise<string> {
   async function fetchWiki() {
     const r = await fetchWithTimeout(
       "https://en.wikipedia.org/api/rest_v1/page/random/summary",
@@ -52,7 +69,10 @@ async function getSentence(): Promise<string> {
 
     if (typeof extract !== "string") throw new Error();
 
-    const cleaned = cleanText(extract);
+    const cleaned =
+      mode === "punctuation"
+        ? cleanTextForPunctuation(extract)
+        : cleanTextForWords(extract);
 
     if (!cleaned) throw new Error();
 
@@ -69,17 +89,19 @@ async function getSentence(): Promise<string> {
     try {
       return await fetchWiki();
     } catch {
-      return getPoolFallback();
+      return getPoolFallback(mode);
     }
   }
 }
 export default async function Page({
   searchParams,
 }: {
-  searchParams?: Promise<{ duration?: string }>;
+  searchParams?: Promise<{ duration?: string; mode?: string }>;
 }) {
   const params = searchParams ? await searchParams : undefined;
   const rawDuration = Number(params?.duration);
+  const rawMode = params?.mode;
+  const mode: SoloMode = isValidSoloMode(rawMode) ? rawMode : DEFAULT_SOLO_MODE;
 
   const initialDuration = SOLO_DURATIONS.includes(
     rawDuration as (typeof SOLO_DURATIONS)[number],
@@ -87,7 +109,7 @@ export default async function Page({
     ? rawDuration
     : DEFAULT_SOLO_DURATION;
 
-  const initialText = await getSentence();
+  const initialText = await getSentence(mode);
 
   return (
     <div>

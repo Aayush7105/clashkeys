@@ -2,11 +2,13 @@
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import SoloScorePage from "./soloscorepage";
-import { SOLO_TEXT_POOL } from "./text-pool";
+import { PUNCTUATION_TEXT_POOL, WORDS_TEXT_POOL } from "./text-pool";
+import type { SoloMode } from "./soloplay-modes";
 
 interface SoloTypingAreaProps {
   duration: number;
   initialText: string;
+  mode: SoloMode;
 }
 
 type ErrorPoint = {
@@ -24,18 +26,41 @@ function countCorrectChars(typedText: string, sourceText: string) {
   return count;
 }
 
+function sanitizeTextByMode(text: string, mode: SoloMode) {
+  if (mode === "punctuation") {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z\s.,?!:;'"()-]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  return text
+    .toLowerCase()
+    .replace(/[^a-z\s]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getFallbackTextByMode(mode: SoloMode) {
+  const pool = mode === "punctuation" ? PUNCTUATION_TEXT_POOL : WORDS_TEXT_POOL;
+  if (Array.isArray(pool) && pool.length > 0) {
+    return pool[0];
+  }
+  return mode === "punctuation"
+    ? "ready? type this line exactly; punctuation matters!"
+    : "the quick brown fox jumps over the lazy dog";
+}
+
 const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
   duration,
   initialText,
+  mode,
 }) => {
-  const sanitizeText = (text: string) =>
-    text
-      .toLowerCase()
-      .replace(/[^a-z\s]/g, "")
-      .replace(/\s+/g, " ")
-      .trim();
-
-  const targetText = sanitizeText(initialText || SOLO_TEXT_POOL[0]);
+  const targetText = sanitizeTextByMode(
+    initialText || getFallbackTextByMode(mode),
+    mode,
+  );
 
   const [typed, setTyped] = useState("");
   const [isFocused, setIsFocused] = useState(true);

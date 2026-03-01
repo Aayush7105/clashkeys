@@ -1,4 +1,4 @@
-export const SOLO_TEXT_POOL = [
+export const WORDS_TEXT_POOL = [
   "the quick brown fox jumps over the lazy dog",
   "success is not final failure is not fatal it is the courage to continue that counts",
   "programming is the art of telling another human what he wants the computer to do",
@@ -15,3 +15,24 @@ export const SOLO_TEXT_POOL = [
   "success leaves clues in the routines and discipline of those who consistently achieve meaningful results if you wait until you feel ready you may wait forever because readiness often arrives after you take the first step",
   "clear goals turn scattered effort into focused action making each hour more productive and intentional mistakes are feedback not failure when you use them to refine your strategy instead of questioning your worth"
 ];
+
+export const PUNCTUATION_TEXT_POOL = [
+  "A developer's growth depends on today's effort, not yesterday's excuses, and when progress feels slow - do you quit, or do you adjust your plan and keep moving forward despite doubt and distraction, because improvement isn't magic, it's repetition and deliberate practice every single day.",
+
+  "Success isn't built in a day, it's built in small steps, and each step's importance grows over time - so when motivation disappears and comfort looks tempting, do you choose discipline, or do you choose delay, knowing that tomorrow's results depend entirely on today's decisions.",
+
+  "Your focus's strength determines your output, and in a world full of noise, notifications, and endless scrolling, can you protect your attention, or will you let minor distractions steal hours from your goals - hours you will never recover once they're gone.",
+
+  "A programmer's mindset requires patience, curiosity, and resilience, and when a bug refuses to disappear after hours of debugging, do you panic, or do you slow down, review the logic, and test each assumption - because every problem's solution hides behind careful thinking.",
+
+  "Confidence grows from preparation, not luck, and preparation's foundation is consistency, so when others ask why you're practicing again and again, do you feel embarrassed, or do you remember that mastery isn't random - it's built through repeated effort and honest self correction.",
+
+  "Time's value increases as deadlines approach, and when the clock's ticking faster than expected, do you freeze under pressure, or do you prioritize, eliminate distractions, and execute with clarity - because stress isn't the enemy, poor planning is.",
+
+  "Discipline isn't harsh, it's protective, and your future self's success depends on today's controlled actions, so when comfort's voice whispers that you deserve a break before you've earned it, do you listen, or do you choose long term growth over short term relief - knowing habits shape destiny.",
+
+  "Every skill's improvement follows a pattern, practice, mistake, adjustment, repetition, and when frustration builds after repeated errors, do you blame your ability, or do you refine your process and continue - understanding that progress isn't visible until consistency compounds over weeks and months."
+];
+
+// Backward-compatible alias used by multiplayer constants.
+export const SOLO_TEXT_POOL = WORDS_TEXT_POOL;
