@@ -34,5 +34,16 @@ export const PUNCTUATION_TEXT_POOL = [
   "Every skill's improvement follows a pattern, practice, mistake, adjustment, repetition, and when frustration builds after repeated errors, do you blame your ability, or do you refine your process and continue - understanding that progress isn't visible until consistency compounds over weeks and months."
 ];
 
+export const NUMBERS_TEXT_POOL = [
+  "version 2.4.1 shipped on 2026-03-02 after 17 review comments",
+  "pay 19.99 now and save 25% before 11:59 pm tonight",
+  "team alpha scored 84 points while team beta finished at 79",
+  "meeting starts at 09:30 and ends at 10:45 in room 12",
+  "daily target is 7500 steps and 2 liters of water",
+  "cpu usage hit 91% for 3 minutes during load test 07",
+  "invoice #1048 includes 6 items totaling 482.50 dollars",
+  "backup runs every 6 hours with a 30-day retention policy",
+];
+
 // Backward-compatible alias used by multiplayer constants.
 export const SOLO_TEXT_POOL = WORDS_TEXT_POOL;

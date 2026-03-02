@@ -9,6 +9,7 @@ import {
   type SoloMode,
 } from "@/components/soloplay/soloplay-modes";
 import {
+  NUMBERS_TEXT_POOL,
   PUNCTUATION_TEXT_POOL,
   WORDS_TEXT_POOL,
 } from "@/components/soloplay/text-pool";
@@ -37,7 +38,12 @@ function limitWords(text: string, maxWords: number) {
 }
 
 function getPoolFallback(mode: SoloMode): string {
-  const pool = mode === "punctuation" ? PUNCTUATION_TEXT_POOL : WORDS_TEXT_POOL;
+  const pool =
+    mode === "punctuation"
+      ? PUNCTUATION_TEXT_POOL
+      : mode === "numbers"
+        ? NUMBERS_TEXT_POOL
+        : WORDS_TEXT_POOL;
 
   if (!Array.isArray(pool) || pool.length === 0) {
     return "";
@@ -52,6 +58,9 @@ async function getSentence(mode: SoloMode): Promise<string> {
   // Punctuation mode should always use punctuation-ready local pool.
   if (mode === "punctuation") {
     return getPoolFallback("punctuation");
+  }
+  if (mode === "numbers") {
+    return getPoolFallback("numbers");
   }
 
   async function fetchWiki() {

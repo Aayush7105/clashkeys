@@ -2,7 +2,11 @@
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import SoloScorePage from "./soloscorepage";
-import { PUNCTUATION_TEXT_POOL, WORDS_TEXT_POOL } from "./text-pool";
+import {
+  NUMBERS_TEXT_POOL,
+  PUNCTUATION_TEXT_POOL,
+  WORDS_TEXT_POOL,
+} from "./text-pool";
 import type { SoloMode } from "./soloplay-modes";
 
 interface SoloTypingAreaProps {
@@ -34,6 +38,13 @@ function sanitizeTextByMode(text: string, mode: SoloMode) {
       .replace(/\s+/g, " ")
       .trim();
   }
+  if (mode === "numbers") {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s.,:%/-]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
 
   return text
     .toLowerCase()
@@ -43,13 +54,22 @@ function sanitizeTextByMode(text: string, mode: SoloMode) {
 }
 
 function getFallbackTextByMode(mode: SoloMode) {
-  const pool = mode === "punctuation" ? PUNCTUATION_TEXT_POOL : WORDS_TEXT_POOL;
+  const pool =
+    mode === "punctuation"
+      ? PUNCTUATION_TEXT_POOL
+      : mode === "numbers"
+        ? NUMBERS_TEXT_POOL
+        : WORDS_TEXT_POOL;
   if (Array.isArray(pool) && pool.length > 0) {
     return pool[0];
   }
-  return mode === "punctuation"
-    ? "ready? type this line exactly; punctuation matters!"
-    : "the quick brown fox jumps over the lazy dog";
+  if (mode === "punctuation") {
+    return "ready? type this line exactly; punctuation matters!";
+  }
+  if (mode === "numbers") {
+    return "version 2.4.1 released at 09:30 with 25% faster load times";
+  }
+  return "the quick brown fox jumps over the lazy dog";
 }
 
 const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({

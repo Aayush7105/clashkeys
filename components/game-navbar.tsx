@@ -67,10 +67,17 @@ export default function GameNavbar({
         <AiOutlineExclamationCircle size={16} />
         <span>punctuation</span>
       </button>
-      <div className="flex items-center gap-2 cursor-default text-neutral-600/60">
+      <button
+        type="button"
+        onClick={() => handleModeChange("numbers")}
+        className={modeButtonClass("numbers")}
+        aria-pressed={canInteractModes && currentMode === "numbers"}
+        disabled={!canInteractModes}
+        title={canInteractModes ? "Set mode to numbers" : disabledModeTitle}
+      >
         <Hash size={16} />
         <span>numbers</span>
-      </div>
+      </button>
       <button
         type="button"
         onClick={() => handleModeChange("words")}
@@ -104,7 +111,11 @@ export default function GameNavbar({
       } ${!canChangeDuration ? "opacity-50 cursor-not-allowed hover:text-slate-500" : ""}`}
       disabled={!canChangeDuration}
       type="button"
-      title={canChangeDuration ? `Set duration to ${duration}s` : disabledDurationTitle}
+      title={
+        canChangeDuration
+          ? `Set duration to ${duration}s`
+          : disabledDurationTitle
+      }
     >
       {duration}
     </button>
@@ -113,7 +124,9 @@ export default function GameNavbar({
   return (
     <div className="w-full p-2 md:p-2 flex flex-col justify-center items-center gap-2 md:gap-3">
       <div className="flex justify-between lg:px-32 md:px-12 py-2 md:py-4 w-full md:-mt-20">
-        <div className="font-mono tracking-widest text-neutral-200">CLASHKEYS</div>
+        <div className="font-mono tracking-widest text-neutral-200">
+          CLASHKEYS
+        </div>
         <div className="flex items-center gap-4 text-slate-400">
           <button
             type="button"
@@ -124,8 +137,14 @@ export default function GameNavbar({
           >
             {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
-          <FaKeyboard size={20} className="cursor-default hover:text-white transition" />
-          <User size={20} className="cursor-default hover:text-white transition" />
+          <FaKeyboard
+            size={20}
+            className="cursor-default hover:text-white transition"
+          />
+          <User
+            size={20}
+            className="cursor-default hover:text-white transition"
+          />
         </div>
       </div>
 
@@ -135,7 +154,9 @@ export default function GameNavbar({
           <div className="h-full w-0.5 bg-white" />
         </div>
 
-        <div className="flex items-center gap-4 text-slate-500">{durationButtons}</div>
+        <div className="flex items-center gap-4 text-slate-500">
+          {durationButtons}
+        </div>
       </div>
 
       {isMobileMenuOpen && (
