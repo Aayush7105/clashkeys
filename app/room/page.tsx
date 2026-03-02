@@ -5,6 +5,7 @@ type RoomSearchParams = {
   roomId?: string;
   name?: string;
   duration?: string;
+  mode?: string;
 };
 
 export default async function Room({
@@ -19,6 +20,7 @@ export default async function Room({
       initialRoomId={params?.roomId}
       initialName={params?.name}
       initialDuration={params?.duration}
+      initialMode={params?.mode}
     />
   );
 }

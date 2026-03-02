@@ -9,17 +9,21 @@ import MultiplayerTypingArea from "./multiplayer-typing-area";
 import MultiplayerWaitingRoom from "./multiplayer-waiting-room";
 import {
   DEFAULT_MULTIPLAYER_DURATION,
+  DEFAULT_MULTIPLAYER_MODE,
   MULTIPLAYER_DURATIONS,
   getRandomMultiplayerText,
+  isValidMultiplayerMode,
   isValidMultiplayerDuration,
 } from "./multiplayer-constants";
 import type { RoomUser, TestStartedPayload } from "./multiplayer-types";
+import type { SoloMode } from "../soloplay/soloplay-modes";
 export const dynamic = "force-dynamic";
 
 type MultiplayerAreaProps = {
   initialRoomId?: string;
   initialName?: string;
   initialDuration?: string;
+  initialMode?: string;
 };
 
 type ErrorPoint = {
@@ -55,9 +59,19 @@ function fetchWithTimeout(url: string, ms = 2000) {
   }).finally(() => clearTimeout(id));
 }
 
-function cleanText(text: string) {
+function cleanTextForWords(text: string) {
   return text
     .replace(/[^A-Za-z\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function cleanTextForQuote(text: string) {
+  return text
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u2019]/g, "'")
+    .replace(/[\u2013\u2014]/g, "-")
+    .replace(/[^A-Za-z0-9\s.,?!:;'"()-]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -66,7 +80,39 @@ function limitWords(text: string, maxWords: number) {
   return text.split(/\s+/).slice(0, maxWords).join(" ");
 }
 
-async function getMultiplayerSentence(): Promise<string> {
+async function getMultiplayerSentence(mode: SoloMode): Promise<string> {
+  if (mode === "punctuation" || mode === "numbers") {
+    return getRandomMultiplayerText(mode);
+  }
+
+  if (mode === "quote") {
+    try {
+      const response = await fetchWithTimeout("https://api.quotable.io/random", 2500);
+      if (!response.ok) {
+        throw new Error("Failed to fetch quote text");
+      }
+
+      const data = await response.json();
+      const content = typeof data?.content === "string" ? data.content : "";
+      const author = typeof data?.author === "string" ? data.author : "";
+      const combined = author ? `${content} - ${author}` : content;
+      const cleaned = cleanTextForQuote(combined);
+
+      if (!cleaned) {
+        throw new Error("Quote cleaned to empty text");
+      }
+
+      const limited = limitWords(cleaned, 45);
+      if (limited.split(/\s+/).length < 6) {
+        throw new Error("Quote too short");
+      }
+
+      return limited;
+    } catch {
+      return getRandomMultiplayerText("quote");
+    }
+  }
+
   async function fetchWiki() {
     const response = await fetchWithTimeout(
       "https://en.wikipedia.org/api/rest_v1/page/random/summary",
@@ -84,7 +130,7 @@ async function getMultiplayerSentence(): Promise<string> {
       throw new Error("Missing extract text");
     }
 
-    const cleaned = cleanText(extract);
+    const cleaned = cleanTextForWords(extract);
     if (!cleaned) {
       throw new Error("Extract cleaned to empty text");
     }
@@ -103,7 +149,7 @@ async function getMultiplayerSentence(): Promise<string> {
     try {
       return await fetchWiki();
     } catch {
-      return getRandomMultiplayerText();
+      return getRandomMultiplayerText("words");
     }
   }
 }
@@ -133,6 +179,7 @@ export default function MultiplayerArea({
   initialRoomId = "",
   initialName = "",
   initialDuration: initialDurationParam = "",
+  initialMode: initialModeParam = "",
 }: MultiplayerAreaProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -144,17 +191,23 @@ export default function MultiplayerArea({
   const rawDuration = Number(
     searchParams.get("duration") ?? initialDurationParam,
   );
+  const rawMode = searchParams.get("mode") ?? initialModeParam;
   const initialDuration = isValidMultiplayerDuration(rawDuration)
     ? rawDuration
     : DEFAULT_MULTIPLAYER_DURATION;
+  const initialMode = isValidMultiplayerMode(rawMode)
+    ? rawMode
+    : DEFAULT_MULTIPLAYER_MODE;
 
   const [users, setUsers] = useState<RoomUser[]>([]);
-  const [text, setText] = useState(getRandomMultiplayerText());
+  const [text, setText] = useState(getRandomMultiplayerText(initialMode));
   const [typed, setTyped] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const [isFocused, setIsFocused] = useState(true);
   const [selectedDuration, setSelectedDuration] = useState(initialDuration);
   const selectedDurationRef = useRef(initialDuration);
+  const [selectedMode, setSelectedMode] = useState<SoloMode>(initialMode);
+  const selectedModeRef = useRef<SoloMode>(initialMode);
   const [roundDuration, setRoundDuration] = useState(initialDuration);
   const [roundStartedAt, setRoundStartedAt] = useState<number | null>(null);
   const [finishedAt, setFinishedAt] = useState<number | null>(null);
@@ -180,6 +233,10 @@ export default function MultiplayerArea({
   useEffect(() => {
     selectedDurationRef.current = selectedDuration;
   }, [selectedDuration]);
+
+  useEffect(() => {
+    selectedModeRef.current = selectedMode;
+  }, [selectedMode]);
 
   const elapsedMs =
     roundStartedAt === null
@@ -232,6 +289,9 @@ export default function MultiplayerArea({
       const nextDuration = isValidMultiplayerDuration(incomingDuration)
         ? incomingDuration
         : selectedDurationRef.current;
+      const nextMode = isValidMultiplayerMode(payload.mode)
+        ? payload.mode
+        : selectedModeRef.current;
       const startedAt =
         typeof payload.startedAt === "number" &&
         Number.isFinite(payload.startedAt)
@@ -241,8 +301,10 @@ export default function MultiplayerArea({
       setText(
         typeof payload.text === "string" && payload.text.trim().length > 0
           ? payload.text
-          : getRandomMultiplayerText(),
+          : getRandomMultiplayerText(nextMode),
       );
+      setSelectedMode(nextMode);
+      selectedModeRef.current = nextMode;
       setTyped("");
       setTotalKeystrokes(0);
       setCorrectKeystrokes(0);
@@ -350,15 +412,29 @@ export default function MultiplayerArea({
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }
 
+  function onModeChange(nextMode: SoloMode) {
+    if (!isHost || !isValidMultiplayerMode(nextMode)) return;
+    if (nextMode === selectedMode) return;
+
+    setSelectedMode(nextMode);
+    selectedModeRef.current = nextMode;
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("mode", nextMode);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }
+
   function startTest() {
     if (!ready || !isHost) return;
 
     void (async () => {
-      const nextText = await getMultiplayerSentence();
+      const mode = selectedModeRef.current;
+      const nextText = await getMultiplayerSentence(mode);
       socket.emit("start-test", {
         roomId,
         text: nextText,
         duration: selectedDuration,
+        mode,
       });
     })();
   }
@@ -486,6 +562,10 @@ export default function MultiplayerArea({
             currentDuration={selectedDuration}
             durations={MULTIPLAYER_DURATIONS}
             onDurationChange={onDurationChange}
+            currentMode={selectedMode}
+            onModeChange={onModeChange}
+            canChangeMode={isHost}
+            disabledModeTitle="Host controls mode"
             canChangeDuration={isHost}
             disabledDurationTitle="Host controls duration"
           />
@@ -502,6 +582,7 @@ export default function MultiplayerArea({
             hostId={hostId}
             isHost={isHost}
             selectedDuration={selectedDuration}
+            selectedMode={selectedMode}
             onStart={startTest}
             onExit={() => router.push("/multiplayer")}
           />

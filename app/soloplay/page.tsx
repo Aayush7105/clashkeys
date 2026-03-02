@@ -36,9 +36,9 @@ function cleanTextForWords(text: string) {
 
 function cleanTextForQuote(text: string) {
   return text
-    .replace(/[“”]/g, '"')
-    .replace(/[’]/g, "'")
-    .replace(/[–—]/g, "-")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u2019]/g, "'")
+    .replace(/[\u2013\u2014]/g, "-")
     .replace(/[^A-Za-z0-9\s.,?!:;'"()-]/g, " ")
     .replace(/\s+/g, " ")
     .trim();

@@ -1,3 +1,5 @@
+import type { SoloMode } from "../soloplay/soloplay-modes";
+
 export type RoomUser = {
   id: string;
   name: string;
@@ -9,6 +11,7 @@ export type RoomUser = {
 export type TestStartedPayload = {
   text?: string;
   duration?: number;
+  mode?: SoloMode;
   startedAt?: number;
   users?: RoomUser[];
 };

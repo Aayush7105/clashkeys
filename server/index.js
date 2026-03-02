@@ -17,6 +17,7 @@ const io = new Server(server, {
 
 const rooms = {};
 const ALLOWED_DURATIONS = new Set([15, 30, 60, 120]);
+const ALLOWED_MODES = new Set(["words", "punctuation", "numbers", "quote"]);
 
 function normalizeDuration(value) {
   const parsed = Number(value);
@@ -36,13 +37,52 @@ function normalizeCount(value) {
   return Math.max(0, Math.round(parsed));
 }
 
-function sanitizeText(value) {
+function normalizeMode(value) {
+  if (typeof value !== "string") return "words";
+  return ALLOWED_MODES.has(value) ? value : "words";
+}
+
+function sanitizeTextByMode(value, mode) {
   if (typeof value !== "string") return "";
+  if (mode === "punctuation") {
+    return value
+      .toLowerCase()
+      .replace(/[^a-z\s.,?!:;'"()-]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+  if (mode === "numbers") {
+    return value
+      .toLowerCase()
+      .replace(/[^a-z0-9\s.,:%/-]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+  if (mode === "quote") {
+    return value
+      .toLowerCase()
+      .replace(/[^a-z0-9\s.,?!:;'"()-]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
   return value
-    .replace(/[^A-Za-z\s]/g, " ")
+    .toLowerCase()
+    .replace(/[^a-z\s]/g, "")
     .replace(/\s+/g, " ")
-    .trim()
-    .toLowerCase();
+    .trim();
+}
+
+function getModeFallback(mode) {
+  if (mode === "punctuation") {
+    return "ready? type this line exactly; punctuation matters!";
+  }
+  if (mode === "numbers") {
+    return "version 2.4.1 released at 09:30 with 25% faster load times";
+  }
+  if (mode === "quote") {
+    return "the journey of a thousand miles begins with a single step";
+  }
+  return "the quick brown fox jumps over the lazy dog";
 }
 
 function serializeUsers(room) {
@@ -97,11 +137,12 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("progress-update", serializeUsers(room));
   });
 
-  socket.on("start-test", ({ roomId, text, duration }) => {
+  socket.on("start-test", ({ roomId, text, duration, mode }) => {
     const room = rooms[roomId];
     if (!room) return;
     const nextDuration = normalizeDuration(duration);
-    const nextText = sanitizeText(text);
+    const nextMode = normalizeMode(mode);
+    const nextText = sanitizeTextByMode(text, nextMode) || getModeFallback(nextMode);
     const startedAt = Date.now();
 
     room.users.forEach((u) => {
@@ -113,6 +154,7 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("test-started", {
       text: nextText,
       duration: nextDuration,
+      mode: nextMode,
       startedAt,
       users: serializeUsers(room),
     });

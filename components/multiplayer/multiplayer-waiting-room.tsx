@@ -1,6 +1,7 @@
 "use client";
 
 import type { RoomUser } from "./multiplayer-types";
+import type { SoloMode } from "../soloplay/soloplay-modes";
 
 type MultiplayerWaitingRoomProps = {
   roomId: string;
@@ -9,6 +10,7 @@ type MultiplayerWaitingRoomProps = {
   hostId: string | null;
   isHost: boolean;
   selectedDuration: number;
+  selectedMode: SoloMode;
   onStart: () => void;
   onExit: () => void;
 };
@@ -20,6 +22,7 @@ export default function MultiplayerWaitingRoom({
   hostId,
   isHost,
   selectedDuration,
+  selectedMode,
   onStart,
   onExit,
 }: MultiplayerWaitingRoomProps) {
@@ -32,6 +35,9 @@ export default function MultiplayerWaitingRoom({
           </h1>
           <p className="mt-1 text-neutral-400 font-mono">Waiting room - {name}</p>
           <p className="mt-2 text-xs uppercase tracking-[0.2em] text-neutral-500">
+            Mode {selectedMode}
+          </p>
+          <p className="mt-1 text-xs uppercase tracking-[0.2em] text-neutral-500">
             Duration {selectedDuration}
             <span className="text-[10px]">s</span>
           </p>
@@ -114,8 +120,8 @@ export default function MultiplayerWaitingRoom({
 
       <div className="rounded-xl bg-neutral-900 p-4 text-sm text-zinc-400 font-mono md:p-6">
         {isHost
-          ? "You are the host. Duration controls are enabled for you."
-          : "Only the host can start and control duration. You will sync automatically when the race starts."}
+          ? "You are the host. Mode and duration controls are enabled for you."
+          : "Only the host can start and control mode and duration. You will sync automatically when the race starts."}
       </div>
     </div>
   );

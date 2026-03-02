@@ -2,17 +2,52 @@ import {
   DEFAULT_SOLO_DURATION,
   SOLO_DURATIONS,
 } from "../soloplay/soloplay-constants";
-import { SOLO_TEXT_POOL } from "../soloplay/text-pool";
+import {
+  NUMBERS_TEXT_POOL,
+  PUNCTUATION_TEXT_POOL,
+  QUOTE_TEXT_POOL,
+  WORDS_TEXT_POOL,
+} from "../soloplay/text-pool";
+import {
+  DEFAULT_SOLO_MODE,
+  isValidSoloMode,
+  type SoloMode,
+} from "../soloplay/soloplay-modes";
 
 export const MULTIPLAYER_DURATIONS = SOLO_DURATIONS;
 export const DEFAULT_MULTIPLAYER_DURATION = DEFAULT_SOLO_DURATION;
+export const DEFAULT_MULTIPLAYER_MODE = DEFAULT_SOLO_MODE;
 
-function cleanText(text: string) {
+function sanitizeTextByMode(text: string, mode: SoloMode) {
+  if (mode === "punctuation") {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z\s.,?!:;'"()-]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  if (mode === "numbers") {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s.,:%/-]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  if (mode === "quote") {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s.,?!:;'"()-]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
   return text
-    .replace(/[^A-Za-z\s]/g, " ")
+    .toLowerCase()
+    .replace(/[^a-z\s]/g, "")
     .replace(/\s+/g, " ")
-    .trim()
-    .toLowerCase();
+    .trim();
 }
 
 export function isValidMultiplayerDuration(
@@ -23,14 +58,41 @@ export function isValidMultiplayerDuration(
   );
 }
 
-export function getRandomMultiplayerText() {
-  if (!Array.isArray(SOLO_TEXT_POOL) || SOLO_TEXT_POOL.length === 0) {
+export function isValidMultiplayerMode(value: unknown): value is SoloMode {
+  return isValidSoloMode(value);
+}
+
+export function getRandomMultiplayerText(
+  mode: SoloMode = DEFAULT_MULTIPLAYER_MODE,
+): string {
+  const pool =
+    mode === "punctuation"
+      ? PUNCTUATION_TEXT_POOL
+      : mode === "numbers"
+        ? NUMBERS_TEXT_POOL
+        : mode === "quote"
+          ? QUOTE_TEXT_POOL
+          : WORDS_TEXT_POOL;
+
+  if (!Array.isArray(pool) || pool.length === 0) {
+    if (mode === "punctuation") {
+      return "ready? type this line exactly; punctuation matters!";
+    }
+    if (mode === "numbers") {
+      return "version 2.4.1 released at 09:30 with 25% faster load times";
+    }
+    if (mode === "quote") {
+      return "the journey of a thousand miles begins with a single step";
+    }
     return "the quick brown fox jumps over the lazy dog";
   }
 
-  const idx = Math.floor(Math.random() * SOLO_TEXT_POOL.length);
-  const selected = SOLO_TEXT_POOL[idx] ?? SOLO_TEXT_POOL[0];
-  const cleaned = cleanText(selected);
+  const idx = Math.floor(Math.random() * pool.length);
+  const selected = pool[idx] ?? pool[0];
+  const cleaned = sanitizeTextByMode(selected, mode);
 
-  return cleaned || "the quick brown fox jumps over the lazy dog";
+  if (cleaned) return cleaned;
+  return mode === "words"
+    ? "the quick brown fox jumps over the lazy dog"
+    : getRandomMultiplayerText("words");
 }
