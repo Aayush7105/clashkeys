@@ -80,6 +80,17 @@ export default function GameNavbar({
       </button>
       <button
         type="button"
+        onClick={() => handleModeChange("quote")}
+        className={modeButtonClass("quote")}
+        aria-pressed={canInteractModes && currentMode === "quote"}
+        disabled={!canInteractModes}
+        title={canInteractModes ? "Set mode to quote" : disabledModeTitle}
+      >
+        <MessageSquare size={16} />
+        <span>quote</span>
+      </button>
+      <button
+        type="button"
         onClick={() => handleModeChange("words")}
         className={modeButtonClass("words")}
         aria-pressed={canInteractModes && currentMode === "words"}
@@ -89,10 +100,6 @@ export default function GameNavbar({
         <MdOutlineTimer size={16} />
         <span>time</span>
       </button>
-      <div className="flex items-center gap-2 cursor-default text-neutral-600/60">
-        <MessageSquare size={16} />
-        <span>quote</span>
-      </div>
       <div className="flex items-center gap-2 cursor-default text-neutral-600/60">
         <Triangle size={16} />
         <span>zen</span>

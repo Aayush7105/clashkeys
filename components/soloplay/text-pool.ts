@@ -45,5 +45,13 @@ export const NUMBERS_TEXT_POOL = [
   "backup runs every 6 hours with a 30-day retention policy",
 ];
 
+export const QUOTE_TEXT_POOL = [
+  "Do what you can, with what you have, where you are.",
+  "The best way out is always through.",
+  "Action is the foundational key to all success.",
+  "If you are going through hell, keep going.",
+  "Simplicity is the ultimate sophistication.",
+];
+
 // Backward-compatible alias used by multiplayer constants.
 export const SOLO_TEXT_POOL = WORDS_TEXT_POOL;

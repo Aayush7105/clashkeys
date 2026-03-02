@@ -11,6 +11,7 @@ import {
 import {
   NUMBERS_TEXT_POOL,
   PUNCTUATION_TEXT_POOL,
+  QUOTE_TEXT_POOL,
   WORDS_TEXT_POOL,
 } from "@/components/soloplay/text-pool";
 
@@ -33,6 +34,16 @@ function cleanTextForWords(text: string) {
     .trim();
 }
 
+function cleanTextForQuote(text: string) {
+  return text
+    .replace(/[“”]/g, '"')
+    .replace(/[’]/g, "'")
+    .replace(/[–—]/g, "-")
+    .replace(/[^A-Za-z0-9\s.,?!:;'"()-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function limitWords(text: string, maxWords: number) {
   return text.split(/\s+/).slice(0, maxWords).join(" ");
 }
@@ -43,6 +54,8 @@ function getPoolFallback(mode: SoloMode): string {
       ? PUNCTUATION_TEXT_POOL
       : mode === "numbers"
         ? NUMBERS_TEXT_POOL
+        : mode === "quote"
+          ? QUOTE_TEXT_POOL
         : WORDS_TEXT_POOL;
 
   if (!Array.isArray(pool) || pool.length === 0) {
@@ -61,6 +74,31 @@ async function getSentence(mode: SoloMode): Promise<string> {
   }
   if (mode === "numbers") {
     return getPoolFallback("numbers");
+  }
+  if (mode === "quote") {
+    async function fetchQuote() {
+      const r = await fetchWithTimeout("https://api.quotable.io/random", 2500);
+      if (!r.ok) throw new Error();
+
+      const d = await r.json();
+      const content = typeof d?.content === "string" ? d.content : "";
+      const author = typeof d?.author === "string" ? d.author : "";
+      const combined = author ? `${content} - ${author}` : content;
+      const cleaned = cleanTextForQuote(combined);
+
+      if (!cleaned) throw new Error();
+
+      const limited = limitWords(cleaned, 45);
+      if (limited.split(/\s+/).length < 6) throw new Error();
+
+      return limited;
+    }
+
+    try {
+      return await fetchQuote();
+    } catch {
+      return getPoolFallback("quote");
+    }
   }
 
   async function fetchWiki() {

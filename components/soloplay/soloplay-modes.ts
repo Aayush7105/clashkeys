@@ -1,4 +1,4 @@
-export const SOLO_MODES = ["words", "punctuation", "numbers"] as const;
+export const SOLO_MODES = ["words", "punctuation", "numbers", "quote"] as const;
 
 export type SoloMode = (typeof SOLO_MODES)[number];
 

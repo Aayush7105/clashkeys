@@ -5,6 +5,7 @@ import SoloScorePage from "./soloscorepage";
 import {
   NUMBERS_TEXT_POOL,
   PUNCTUATION_TEXT_POOL,
+  QUOTE_TEXT_POOL,
   WORDS_TEXT_POOL,
 } from "./text-pool";
 import type { SoloMode } from "./soloplay-modes";
@@ -45,6 +46,13 @@ function sanitizeTextByMode(text: string, mode: SoloMode) {
       .replace(/\s+/g, " ")
       .trim();
   }
+  if (mode === "quote") {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s.,?!:;'"()-]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
 
   return text
     .toLowerCase()
@@ -59,6 +67,8 @@ function getFallbackTextByMode(mode: SoloMode) {
       ? PUNCTUATION_TEXT_POOL
       : mode === "numbers"
         ? NUMBERS_TEXT_POOL
+        : mode === "quote"
+          ? QUOTE_TEXT_POOL
         : WORDS_TEXT_POOL;
   if (Array.isArray(pool) && pool.length > 0) {
     return pool[0];
@@ -68,6 +78,9 @@ function getFallbackTextByMode(mode: SoloMode) {
   }
   if (mode === "numbers") {
     return "version 2.4.1 released at 09:30 with 25% faster load times";
+  }
+  if (mode === "quote") {
+    return "the journey of a thousand miles begins with a single step";
   }
   return "the quick brown fox jumps over the lazy dog";
 }
