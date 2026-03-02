@@ -10,10 +10,10 @@ type MultiplayerTypingAreaProps = {
   typed: string;
   timeLeft: number;
   isFocused: boolean;
-  inputRef: React.RefObject<HTMLInputElement | null>;
+  inputRef: React.RefObject<HTMLTextAreaElement | null>;
   onTypedChange: (value: string) => void;
-  onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
-  onPaste: (event: React.ClipboardEvent<HTMLInputElement>) => void;
+  onKeyDown: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  onPaste: (event: React.ClipboardEvent<HTMLTextAreaElement>) => void;
   onFocusChange: (focused: boolean) => void;
 };
 
@@ -63,7 +63,7 @@ export default function MultiplayerTypingArea({
         }`}
       >
         <div
-          className="relative text-2xl md:text-3xl lg:text-4xl font-mono leading-[1.6] tracking-tight text-left select-none"
+          className="relative whitespace-pre-wrap text-2xl md:text-3xl lg:text-4xl font-mono leading-[1.6] tracking-tight text-left select-none"
           suppressHydrationWarning={true}
         >
           <div
@@ -117,9 +117,8 @@ export default function MultiplayerTypingArea({
         </div>
       )}
 
-      <input
+      <textarea
         ref={inputRef}
-        type="text"
         autoFocus
         value={typed}
         onChange={(event) => onTypedChange(event.target.value)}
@@ -130,6 +129,7 @@ export default function MultiplayerTypingArea({
         className="fixed opacity-0 pointer-events-none"
         autoComplete="off"
         spellCheck={false}
+        rows={1}
       />
     </div>
   );

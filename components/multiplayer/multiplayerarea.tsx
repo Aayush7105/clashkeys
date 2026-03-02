@@ -206,7 +206,7 @@ export default function MultiplayerArea({
   const [users, setUsers] = useState<RoomUser[]>([]);
   const [text, setText] = useState(getRandomMultiplayerText(initialMode));
   const [typed, setTyped] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const [isFocused, setIsFocused] = useState(true);
   const [selectedDuration, setSelectedDuration] = useState(initialDuration);
   const selectedDurationRef = useRef(initialDuration);
@@ -505,13 +505,13 @@ export default function MultiplayerArea({
     }
   }
 
-  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+  function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (!isRunning || testEnded) return;
     // Keystrokes are counted from onChange deltas to avoid focus/key-event edge cases.
     void event;
   }
 
-  function handlePaste(event: React.ClipboardEvent<HTMLInputElement>) {
+  function handlePaste(event: React.ClipboardEvent<HTMLTextAreaElement>) {
     if (!isRunning || testEnded) {
       event.preventDefault();
     }

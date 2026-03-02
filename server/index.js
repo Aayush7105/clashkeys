@@ -73,10 +73,11 @@ function sanitizeTextByMode(value, mode) {
   }
   if (mode === "code") {
     return value
-      .toLowerCase()
-      .replace(/[^a-z0-9\s.,?!:;'"(){}\[\]<>_=+\-*/%`]/g, "")
-      .replace(/\s+/g, " ")
-      .trim();
+      .replace(/\r\n?/g, "\n")
+      .replace(/\t/g, "  ")
+      .replace(/[^A-Za-z0-9\n .,?!:;'"(){}\[\]<>_=+\-*/%`$&|]/g, "")
+      .replace(/\n{3,}/g, "\n\n")
+      .trimEnd();
   }
   return value
     .toLowerCase()
@@ -96,7 +97,11 @@ function getModeFallback(mode) {
     return "the journey of a thousand miles begins with a single step";
   }
   if (mode === "code") {
-    return "const total = items.length > 0 ? items[0] : 0;";
+    return `for (let i = 0; i < items.length; i++) {
+  if (items[i] > 0) {
+    total += items[i];
+  }
+}`;
   }
   return "the quick brown fox jumps over the lazy dog";
 }

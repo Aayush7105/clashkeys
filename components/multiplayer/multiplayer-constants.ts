@@ -45,10 +45,11 @@ function sanitizeTextByMode(text: string, mode: SoloMode) {
   }
   if (mode === "code") {
     return text
-      .toLowerCase()
-      .replace(/[^a-z0-9\s.,?!:;'"(){}\[\]<>_=+\-*/%`]/g, "")
-      .replace(/\s+/g, " ")
-      .trim();
+      .replace(/\r\n?/g, "\n")
+      .replace(/\t/g, "  ")
+      .replace(/[^A-Za-z0-9\n .,?!:;'"(){}\[\]<>_=+\-*/%`$&|]/g, "")
+      .replace(/\n{3,}/g, "\n\n")
+      .trimEnd();
   }
 
   return text
@@ -95,7 +96,9 @@ export function getRandomMultiplayerText(
       return "the journey of a thousand miles begins with a single step";
     }
     if (mode === "code") {
-      return "const total = items.length > 0 ? items[0] : 0;";
+      return `if (items.length > 0) {
+  total += items[0];
+}`;
     }
     return "the quick brown fox jumps over the lazy dog";
   }

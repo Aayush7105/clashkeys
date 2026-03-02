@@ -54,14 +54,52 @@ export const QUOTE_TEXT_POOL = [
 ];
 
 export const CODE_TEXT_POOL = [
-  "const score = points + bonus;",
-  "if (isReady) { startTest(); }",
-  "for (let i = 0; i < items.length; i++) { total += items[i]; }",
-  "function greet(name) { return `hello ${name}`; }",
-  "await fetch('/api/room?mode=code');",
-  "socket.emit('start-test', { mode: 'code', duration: 30 });",
-  "type Player = { id: string; wpm: number };",
-  "const isValid = value !== null && value !== undefined;",
+  `for (let i = 0; i < arr.length; i++) {
+  if (arr[i] > 0) {
+    total += arr[i];
+  }
+}`,
+  `function factorial(n) {
+  if (n <= 1) {
+    return 1;
+  }
+  return n * factorial(n - 1);
+}`,
+  `while (left <= right) {
+  const mid = Math.floor((left + right) / 2);
+  if (arr[mid] === target) {
+    return mid;
+  }
+  if (arr[mid] < target) {
+    left = mid + 1;
+  } else {
+    right = mid - 1;
+  }
+}`,
+  `if (!response.ok) {
+  throw new Error("Request failed");
+}
+const data = await response.json();`,
+  `try {
+  const result = await runTask();
+  return result;
+} catch (error) {
+  console.error(error);
+  return null;
+}`,
+  `const user = {
+  id: "u_123",
+  name: "alex",
+  isOnline: true,
+};`,
+  `type Player = {
+  id: string;
+  wpm: number;
+  accuracy: number;
+};`,
+  `if (mode === "code") {
+  return getRandomText("code");
+}`
 ];
 
 // Backward-compatible alias used by multiplayer constants.

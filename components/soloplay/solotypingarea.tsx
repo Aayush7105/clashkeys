@@ -56,10 +56,11 @@ function sanitizeTextByMode(text: string, mode: SoloMode) {
   }
   if (mode === "code") {
     return text
-      .toLowerCase()
-      .replace(/[^a-z0-9\s.,?!:;'"(){}\[\]<>_=+\-*/%`]/g, "")
-      .replace(/\s+/g, " ")
-      .trim();
+      .replace(/\r\n?/g, "\n")
+      .replace(/\t/g, "  ")
+      .replace(/[^A-Za-z0-9\n .,?!:;'"(){}\[\]<>_=+\-*/%`$&|]/g, "")
+      .replace(/\n{3,}/g, "\n\n")
+      .trimEnd();
   }
 
   return text
@@ -93,7 +94,11 @@ function getFallbackTextByMode(mode: SoloMode) {
     return "the journey of a thousand miles begins with a single step";
   }
   if (mode === "code") {
-    return "const total = items.length > 0 ? items[0] : 0;";
+    return `for (let i = 0; i < items.length; i++) {
+  if (items[i] > 0) {
+    total += items[i];
+  }
+}`;
   }
   return "the quick brown fox jumps over the lazy dog";
 }
@@ -121,7 +126,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
   const [burstWpmHistory, setBurstWpmHistory] = useState<number[]>([]);
   const [errorPoints, setErrorPoints] = useState<ErrorPoint[]>([]);
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const caretRef = useRef<HTMLDivElement>(null);
   const lastSampleSecondRef = useRef<number>(-1);
@@ -234,7 +239,9 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
           }`}
       >
         <div
-          className="relative text-2xl md:text-3xl lg:text-4xl font-mono leading-[1.6] tracking-tight text-left select-none"
+          className={`relative text-2xl md:text-3xl lg:text-4xl font-mono leading-[1.6] tracking-tight text-left select-none ${
+            mode === "code" ? "whitespace-pre-wrap" : ""
+          }`}
           suppressHydrationWarning={true}
         >
           <div
@@ -292,9 +299,8 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
         </div>
       )}
 
-      <input
+      <textarea
         ref={inputRef}
-        type="text"
         autoFocus
         value={typed}
         onChange={(e) => {
@@ -363,6 +369,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
         className="fixed opacity-0 pointer-events-none"
         autoComplete="off"
         spellCheck={false}
+        rows={1}
       />
     </div>
   );
