@@ -9,6 +9,7 @@ import {
   type SoloMode,
 } from "@/components/soloplay/soloplay-modes";
 import {
+  CODE_TEXT_POOL,
   NUMBERS_TEXT_POOL,
   PUNCTUATION_TEXT_POOL,
   QUOTE_TEXT_POOL,
@@ -56,6 +57,8 @@ function getPoolFallback(mode: SoloMode): string {
         ? NUMBERS_TEXT_POOL
         : mode === "quote"
           ? QUOTE_TEXT_POOL
+          : mode === "code"
+            ? CODE_TEXT_POOL
         : WORDS_TEXT_POOL;
 
   if (!Array.isArray(pool) || pool.length === 0) {
@@ -99,6 +102,9 @@ async function getSentence(mode: SoloMode): Promise<string> {
     } catch {
       return getPoolFallback("quote");
     }
+  }
+  if (mode === "code") {
+    return getPoolFallback("code");
   }
 
   async function fetchWiki() {

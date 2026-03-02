@@ -81,7 +81,11 @@ function limitWords(text: string, maxWords: number) {
 }
 
 async function getMultiplayerSentence(mode: SoloMode): Promise<string> {
-  if (mode === "punctuation" || mode === "numbers") {
+  if (
+    mode === "punctuation" ||
+    mode === "numbers" ||
+    mode === "code"
+  ) {
     return getRandomMultiplayerText(mode);
   }
 

@@ -17,7 +17,13 @@ const io = new Server(server, {
 
 const rooms = {};
 const ALLOWED_DURATIONS = new Set([15, 30, 60, 120]);
-const ALLOWED_MODES = new Set(["words", "punctuation", "numbers", "quote"]);
+const ALLOWED_MODES = new Set([
+  "words",
+  "punctuation",
+  "numbers",
+  "quote",
+  "code",
+]);
 
 function normalizeDuration(value) {
   const parsed = Number(value);
@@ -65,6 +71,13 @@ function sanitizeTextByMode(value, mode) {
       .replace(/\s+/g, " ")
       .trim();
   }
+  if (mode === "code") {
+    return value
+      .toLowerCase()
+      .replace(/[^a-z0-9\s.,?!:;'"(){}\[\]<>_=+\-*/%`]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
   return value
     .toLowerCase()
     .replace(/[^a-z\s]/g, "")
@@ -81,6 +94,9 @@ function getModeFallback(mode) {
   }
   if (mode === "quote") {
     return "the journey of a thousand miles begins with a single step";
+  }
+  if (mode === "code") {
+    return "const total = items.length > 0 ? items[0] : 0;";
   }
   return "the quick brown fox jumps over the lazy dog";
 }

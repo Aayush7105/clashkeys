@@ -1,9 +1,9 @@
 "use client";
 
-import { Hash, Menu, MessageSquare, Triangle, User, X } from "lucide-react";
+import { Hash, Menu, MessageSquare, User, X } from "lucide-react";
 import { useState } from "react";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
-import { FaKeyboard } from "react-icons/fa";
+import { FaCode, FaKeyboard } from "react-icons/fa";
 import { MdOutlineTimer } from "react-icons/md";
 import type { SoloMode } from "@/components/soloplay/soloplay-modes";
 
@@ -91,6 +91,17 @@ export default function GameNavbar({
       </button>
       <button
         type="button"
+        onClick={() => handleModeChange("code")}
+        className={modeButtonClass("code")}
+        aria-pressed={canInteractModes && currentMode === "code"}
+        disabled={!canInteractModes}
+        title={canInteractModes ? "Set mode to code" : disabledModeTitle}
+      >
+        <FaCode size={16} />
+        <span>code</span>
+      </button>
+      <button
+        type="button"
         onClick={() => handleModeChange("words")}
         className={modeButtonClass("words")}
         aria-pressed={canInteractModes && currentMode === "words"}
@@ -100,10 +111,6 @@ export default function GameNavbar({
         <MdOutlineTimer size={16} />
         <span>time</span>
       </button>
-      <div className="flex items-center gap-2 cursor-default text-neutral-600/60">
-        <Triangle size={16} />
-        <span>zen</span>
-      </div>
     </>
   );
 

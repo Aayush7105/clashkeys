@@ -3,6 +3,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import SoloScorePage from "./soloscorepage";
 import {
+  CODE_TEXT_POOL,
   NUMBERS_TEXT_POOL,
   PUNCTUATION_TEXT_POOL,
   QUOTE_TEXT_POOL,
@@ -53,6 +54,13 @@ function sanitizeTextByMode(text: string, mode: SoloMode) {
       .replace(/\s+/g, " ")
       .trim();
   }
+  if (mode === "code") {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s.,?!:;'"(){}\[\]<>_=+\-*/%`]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
 
   return text
     .toLowerCase()
@@ -69,6 +77,8 @@ function getFallbackTextByMode(mode: SoloMode) {
         ? NUMBERS_TEXT_POOL
         : mode === "quote"
           ? QUOTE_TEXT_POOL
+          : mode === "code"
+            ? CODE_TEXT_POOL
         : WORDS_TEXT_POOL;
   if (Array.isArray(pool) && pool.length > 0) {
     return pool[0];
@@ -81,6 +91,9 @@ function getFallbackTextByMode(mode: SoloMode) {
   }
   if (mode === "quote") {
     return "the journey of a thousand miles begins with a single step";
+  }
+  if (mode === "code") {
+    return "const total = items.length > 0 ? items[0] : 0;";
   }
   return "the quick brown fox jumps over the lazy dog";
 }

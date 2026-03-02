@@ -53,5 +53,16 @@ export const QUOTE_TEXT_POOL = [
   "Simplicity is the ultimate sophistication.",
 ];
 
+export const CODE_TEXT_POOL = [
+  "const score = points + bonus;",
+  "if (isReady) { startTest(); }",
+  "for (let i = 0; i < items.length; i++) { total += items[i]; }",
+  "function greet(name) { return `hello ${name}`; }",
+  "await fetch('/api/room?mode=code');",
+  "socket.emit('start-test', { mode: 'code', duration: 30 });",
+  "type Player = { id: string; wpm: number };",
+  "const isValid = value !== null && value !== undefined;",
+];
+
 // Backward-compatible alias used by multiplayer constants.
 export const SOLO_TEXT_POOL = WORDS_TEXT_POOL;
