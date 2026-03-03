@@ -4,6 +4,22 @@ import { Server } from "socket.io";
 
 const app = express();
 const server = createServer(app);
+const port = Number(process.env.PORT) || 4000;
+
+const DEFAULT_ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"];
+
+function parseAllowedOrigins() {
+  const rawOrigins = process.env.FRONTEND_ORIGIN ?? process.env.CORS_ORIGIN ?? "";
+  const parsed = rawOrigins
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+    .map((origin) => origin.replace(/\/+$/, ""));
+
+  return parsed.length > 0 ? parsed : DEFAULT_ALLOWED_ORIGINS;
+}
+
+const allowedOrigins = parseAllowedOrigins();
 
 app.get("/", (_req, res) => {
   res.status(200).send("OK");
@@ -11,7 +27,21 @@ app.get("/", (_req, res) => {
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: (origin, callback) => {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      const normalizedOrigin = origin.replace(/\/+$/, "");
+      if (allowedOrigins.includes(normalizedOrigin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error(`Socket CORS blocked origin: ${origin}`));
+    },
+    methods: ["GET", "POST"],
   },
 });
 
@@ -199,6 +229,7 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(4000, () => {
-  console.log("Server running on 4000");
+server.listen(port, () => {
+  console.log(`Server running on ${port}`);
+  console.log(`Allowed origins: ${allowedOrigins.join(", ")}`);
 });

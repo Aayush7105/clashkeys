@@ -43,9 +43,33 @@ ClashKeys is a competitive typing game with solo practice and real-time multipla
 
 ## Configuration
 
-- Client socket URL is set in `lib/socket.ts` (default: `http://localhost:4000`).
-- If you change socket host/port, update `lib/socket.ts`.
-- Server CORS is currently open (`origin: "*"` in `server/index.js`) for local development.
+- Frontend socket URL uses `NEXT_PUBLIC_SOCKET_URL`.
+- If `NEXT_PUBLIC_SOCKET_URL` is not set:
+  - Development fallback is `http://localhost:4000`
+  - Production fallback is same-origin (`window.location.origin`)
+- Socket server listens on `PORT` (Render sets this automatically).
+- Allowed socket origins are controlled by `FRONTEND_ORIGIN` (or `CORS_ORIGIN`) as a comma-separated list.
+- Local default allowed origins are `http://localhost:3000` and `http://127.0.0.1:3000`.
+
+## Deploy: Vercel + Render (Multiplayer)
+
+1. Deploy socket server on Render:
+   - Create a new `Web Service` from this repo.
+   - Set `Root Directory` to `server`.
+   - Build command: `npm install`
+   - Start command: `npm start`
+   - Add env var:
+     - `FRONTEND_ORIGIN=https://<your-vercel-domain>`
+   - Deploy and copy the Render URL (example: `https://clashkeys-socket.onrender.com`).
+1. Configure Vercel frontend:
+   - Add env var:
+     - `NEXT_PUBLIC_SOCKET_URL=https://<your-render-service>.onrender.com`
+   - Redeploy the Vercel project.
+1. Optional for preview deployments:
+   - Set `FRONTEND_ORIGIN` on Render to a comma-separated list, for example:
+     - `https://<prod>.vercel.app,https://<preview>.vercel.app,http://localhost:3000`
+1. Verify:
+   - Open the Vercel app, join the same room from two browsers/devices, and confirm live progress updates.
 
 ## Scripts
 
@@ -59,6 +83,7 @@ Root (`package.json`):
 Server (`server/package.json`):
 
 - `npm run dev` - start Express + Socket.IO server
+- `npm run start` - production start for Render
 
 ## Project Structure
 
