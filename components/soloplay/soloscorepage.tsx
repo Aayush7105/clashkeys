@@ -143,7 +143,7 @@ const SoloScorePage: React.FC<Props> = ({
         <div className="mt-5 flex flex-col justify-center items-center gap-5 text-[11px] uppercase tracking-[0.2em] text-[#646669] md:gap-4 md:text-xs">
           <button
             onClick={() => window.location.reload()}
-            className="transition-colors hover:text-[#e2b714]"
+            className="cursor-pointer transition-colors hover:text-[#e2b714]"
             type="button"
           >
             <RxReload className="size-8" />

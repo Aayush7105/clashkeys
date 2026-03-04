@@ -526,6 +526,13 @@ export default function MultiplayerArea({
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (!isRunning || testEnded) return;
+
+    if (selectedMode === "code" && event.key === "Tab") {
+      event.preventDefault();
+      handleTypedChange(`${typed}  `);
+      return;
+    }
+
     // Keystrokes are counted from onChange deltas to avoid focus/key-event edge cases.
     void event;
   }

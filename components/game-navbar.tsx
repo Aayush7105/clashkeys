@@ -136,7 +136,7 @@ export default function GameNavbar({
   ));
 
   return (
-    <div className="w-full p-2 md:p-2 flex flex-col justify-center items-center gap-2 md:gap-3">
+    <div className="w-full p-2 md:p-2 flex flex-col justify-center items-center gap-2 md:gap-3 font-mono">
       <div className="flex justify-between lg:px-32 md:px-12 py-2 md:py-4 w-full md:-mt-20">
         <div className="font-mono tracking-widest text-neutral-200">
           CLASHKEYS
@@ -162,7 +162,7 @@ export default function GameNavbar({
         </div>
       </div>
 
-      <div className="hidden md:flex items-center gap-6 px-6 py-3 text-sm text-neutral-300 border border-neutral-700 rounded-2xl bg-neutral-900 w-fit">
+      <div className="hidden md:flex items-center gap-6 px-6 py-3 text-sm text-neutral-300 border-2 border-neutral-800 rounded-2xl bg-neutral-900 w-fit">
         <div className="flex items-center gap-6">
           {modeItems}
           <div className="h-full w-0.5 bg-white" />

@@ -207,7 +207,7 @@ export default function MultiplayerScorePage({
             {isHost ? (
               <button
                 onClick={onRestart}
-                className="rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-[#e2b714] md:text-sm"
+                className="cursor-pointer rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-[#e2b714] md:text-sm"
                 type="button"
                 aria-label="restart test"
               >
