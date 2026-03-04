@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { socket } from "@/lib/socket";
 import GameNavbar from "@/components/game-navbar";
@@ -234,6 +234,25 @@ export default function MultiplayerArea({
   const hostId = users[0]?.id ?? null;
   const isHost = Boolean(hostId && socketId && hostId === socketId);
 
+  const focusInput = useCallback(() => {
+    const input = inputRef.current;
+    if (!input) return;
+
+    const isMobileViewport =
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 767px)").matches;
+    if (isMobileViewport) {
+      input.focus();
+      return;
+    }
+
+    try {
+      input.focus({ preventScroll: true });
+    } catch {
+      input.focus();
+    }
+  }, []);
+
   useEffect(() => {
     selectedDurationRef.current = selectedDuration;
   }, [selectedDuration]);
@@ -330,7 +349,7 @@ export default function MultiplayerArea({
       }
       setIsRunning(true);
       setTestEnded(false);
-      setTimeout(() => inputRef.current?.focus(), 0);
+      setTimeout(() => focusInput(), 0);
     };
 
     socket.on("room-users-update", handleUsersUpdate);
@@ -344,7 +363,7 @@ export default function MultiplayerArea({
       socket.off("test-started", handleTestStarted);
       socket.disconnect();
     };
-  }, [ready, roomId, name]);
+  }, [ready, roomId, name, focusInput]);
 
   useEffect(() => {
     if (!isRunning || roundStartedAt === null) return;
@@ -400,8 +419,8 @@ export default function MultiplayerArea({
 
   useEffect(() => {
     if (!ready || !isRunning) return;
-    inputRef.current?.focus();
-  }, [ready, isRunning]);
+    focusInput();
+  }, [ready, isRunning, focusInput]);
 
   function onDurationChange(nextDuration: number) {
     if (!isHost || !isValidMultiplayerDuration(nextDuration)) return;

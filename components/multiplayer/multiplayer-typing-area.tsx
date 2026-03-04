@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
 type MultiplayerTypingAreaProps = {
   roomId: string;
@@ -33,6 +33,48 @@ export default function MultiplayerTypingArea({
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const caretRef = useRef<HTMLDivElement>(null);
 
+  const focusInput = useCallback(() => {
+    const input = inputRef.current;
+    if (!input) return;
+
+    const isMobileViewport =
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 767px)").matches;
+    if (isMobileViewport) {
+      input.focus();
+      return;
+    }
+
+    try {
+      input.focus({ preventScroll: true });
+    } catch {
+      input.focus();
+    }
+  }, [inputRef]);
+
+  const keepActiveCharInView = useCallback(() => {
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia("(max-width: 767px)").matches) return;
+
+    const activeChar = charRefs.current[Math.min(typed.length, text.length)];
+    if (!activeChar) return;
+
+    const viewport = window.visualViewport;
+    const viewportTop = viewport?.offsetTop ?? 0;
+    const viewportHeight = viewport?.height ?? window.innerHeight;
+    const safeTop = viewportTop + 88;
+    const safeBottom = viewportTop + viewportHeight - 20;
+    const rect = activeChar.getBoundingClientRect();
+
+    if (rect.top < safeTop || rect.bottom > safeBottom) {
+      activeChar.scrollIntoView({
+        block: "center",
+        inline: "nearest",
+        behavior: "auto",
+      });
+    }
+  }, [typed.length, text.length]);
+
   useLayoutEffect(() => {
     const target = charRefs.current[typed.length];
     const caret = caretRef.current;
@@ -42,10 +84,28 @@ export default function MultiplayerTypingArea({
     caret.style.transform = `translate(${target.offsetLeft}px, ${target.offsetTop}px)`;
   }, [typed, text]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const run = () => {
+      window.requestAnimationFrame(keepActiveCharInView);
+    };
+
+    run();
+    const viewport = window.visualViewport;
+    viewport?.addEventListener("resize", run);
+    viewport?.addEventListener("scroll", run);
+
+    return () => {
+      viewport?.removeEventListener("resize", run);
+      viewport?.removeEventListener("scroll", run);
+    };
+  }, [keepActiveCharInView]);
+
   return (
     <div
       className="relative w-full max-w-5xl mx-auto mt-10"
-      onClick={() => inputRef.current?.focus()}
+      onClick={focusInput}
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2 md:mb-8 md:gap-4">
         <div>
@@ -108,7 +168,7 @@ export default function MultiplayerTypingArea({
 
       {!isFocused && (
         <div
-          onClick={() => inputRef.current?.focus()}
+          onClick={focusInput}
           className="fixed inset-0 z-40 flex flex-col gap-10 items-center justify-center bg-black/10 cursor-pointer"
         >
           <div className="px-6 py-3 rounded-xl bg-neutral-800/80 border border-neutral-700 text-neutral-200 font-mono text-lg uppercase tracking-widest">
@@ -126,7 +186,7 @@ export default function MultiplayerTypingArea({
         onPaste={onPaste}
         onFocus={() => onFocusChange(true)}
         onBlur={() => onFocusChange(false)}
-        className="fixed opacity-0 pointer-events-none"
+        className="fixed left-0 top-0 h-px w-px opacity-0 pointer-events-none"
         autoComplete="off"
         spellCheck={false}
         rows={1}
