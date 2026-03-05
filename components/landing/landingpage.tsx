@@ -2,6 +2,12 @@ import React from "react";
 import Link from "next/link";
 import TypingOnce from "../typingonce";
 import LandingGraph from "./landing-graph";
+import { ImGithub } from "react-icons/im";
+import { FaSquareXTwitter } from "react-icons/fa6";
+import { RiTwitterXLine } from "react-icons/ri";
+import { FiGithub } from "react-icons/fi";
+import { IoLogoLinkedin } from "react-icons/io";
+import { BsLinkedin } from "react-icons/bs";
 
 const Landing = () => {
   return (
@@ -11,8 +17,24 @@ const Landing = () => {
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col px-3 py-10 sm:px-6 sm:py-14 lg:py-16">
         <header className="flex items-center justify-between text-[11px] uppercase tracking-[0.22em] text-neutral-500 sm:text-xs sm:tracking-[0.35em]">
-          <span></span>
-          <span className="text-[#e2b714]">ClashKeys</span>
+          <div className="text-[#e2b714]">ClashKeys</div>
+          <div className="flex gap-3  ">
+            <Link
+              href={"https://www.linkedin.com/in/aayushrawat7105/"}
+              target="_blank"
+            >
+              <BsLinkedin className="size-5 text-neutral-400 hover:text-neutral-200" />
+            </Link>
+            <Link href={"https://x.com/AayushRawat715"} target="_blank">
+              <RiTwitterXLine className="size-5 text-neutral-400 hover:text-neutral-200" />
+            </Link>
+            <Link
+              href={"https://github.com/Aayush7105/clashkeys"}
+              target="_blank"
+            >
+              <FiGithub className="size-5 text-neutral-400 hover:text-neutral-200" />
+            </Link>
+          </div>
         </header>
 
         <div className="mt-10 grid gap-8 sm:mt-14 sm:gap-10 lg:mt-16 lg:gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
