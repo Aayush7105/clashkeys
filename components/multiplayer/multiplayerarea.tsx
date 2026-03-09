@@ -15,7 +15,11 @@ import {
   isValidMultiplayerMode,
   isValidMultiplayerDuration,
 } from "./multiplayer-constants";
-import type { RoomUser, TestStartedPayload } from "./multiplayer-types";
+import type {
+  RoomSettingsPayload,
+  RoomUser,
+  TestStartedPayload,
+} from "./multiplayer-types";
 import type { SoloMode } from "../soloplay/soloplay-modes";
 export const dynamic = "force-dynamic";
 
@@ -307,6 +311,19 @@ export default function MultiplayerArea({
       }
     };
 
+    const handleRoomSettingsUpdate = (payload: RoomSettingsPayload) => {
+      const incomingDuration = Number(payload?.duration);
+      if (isValidMultiplayerDuration(incomingDuration)) {
+        setSelectedDuration(incomingDuration);
+        selectedDurationRef.current = incomingDuration;
+      }
+
+      if (isValidMultiplayerMode(payload?.mode)) {
+        setSelectedMode(payload.mode);
+        selectedModeRef.current = payload.mode;
+      }
+    };
+
     const handleTestStarted = (payload: TestStartedPayload) => {
       const incomingDuration = Number(payload.duration);
       const nextDuration = isValidMultiplayerDuration(incomingDuration)
@@ -354,12 +371,14 @@ export default function MultiplayerArea({
 
     socket.on("room-users-update", handleUsersUpdate);
     socket.on("progress-update", handleProgressUpdate);
+    socket.on("room-settings-update", handleRoomSettingsUpdate);
     socket.on("test-started", handleTestStarted);
 
     return () => {
       socket.off("connect", handleConnect);
       socket.off("room-users-update", handleUsersUpdate);
       socket.off("progress-update", handleProgressUpdate);
+      socket.off("room-settings-update", handleRoomSettingsUpdate);
       socket.off("test-started", handleTestStarted);
       socket.disconnect();
     };
@@ -423,6 +442,7 @@ export default function MultiplayerArea({
   }, [ready, isRunning, focusInput]);
 
   function onDurationChange(nextDuration: number) {
+    if (isRunning) return;
     if (!isHost || !isValidMultiplayerDuration(nextDuration)) return;
     if (nextDuration === selectedDuration) return;
 
@@ -433,9 +453,15 @@ export default function MultiplayerArea({
     const params = new URLSearchParams(searchParams.toString());
     params.set("duration", String(nextDuration));
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    socket.emit("room-settings-update", {
+      roomId,
+      duration: nextDuration,
+      mode: selectedModeRef.current,
+    });
   }
 
   function onModeChange(nextMode: SoloMode) {
+    if (isRunning) return;
     if (!isHost || !isValidMultiplayerMode(nextMode)) return;
     if (nextMode === selectedMode) return;
 
@@ -445,6 +471,11 @@ export default function MultiplayerArea({
     const params = new URLSearchParams(searchParams.toString());
     params.set("mode", nextMode);
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    socket.emit("room-settings-update", {
+      roomId,
+      duration: selectedDurationRef.current,
+      mode: nextMode,
+    });
   }
 
   function startTest() {

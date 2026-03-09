@@ -45,6 +45,8 @@ const io = new Server(server, {
   },
 });
 
+const DEFAULT_DURATION = 30;
+const DEFAULT_MODE = "words";
 const rooms = {};
 const ALLOWED_DURATIONS = new Set([15, 30, 60, 120]);
 const ALLOWED_MODES = new Set([
@@ -57,8 +59,8 @@ const ALLOWED_MODES = new Set([
 
 function normalizeDuration(value) {
   const parsed = Number(value);
-  if (!Number.isFinite(parsed)) return 30;
-  return ALLOWED_DURATIONS.has(parsed) ? parsed : 30;
+  if (!Number.isFinite(parsed)) return DEFAULT_DURATION;
+  return ALLOWED_DURATIONS.has(parsed) ? parsed : DEFAULT_DURATION;
 }
 
 function normalizeProgress(value) {
@@ -74,8 +76,8 @@ function normalizeCount(value) {
 }
 
 function normalizeMode(value) {
-  if (typeof value !== "string") return "words";
-  return ALLOWED_MODES.has(value) ? value : "words";
+  if (typeof value !== "string") return DEFAULT_MODE;
+  return ALLOWED_MODES.has(value) ? value : DEFAULT_MODE;
 }
 
 function sanitizeTextByMode(value, mode) {
@@ -146,6 +148,28 @@ function serializeUsers(room) {
   }));
 }
 
+function getOrCreateRoom(roomId) {
+  if (!rooms[roomId]) {
+    rooms[roomId] = {
+      users: [],
+      duration: DEFAULT_DURATION,
+      mode: DEFAULT_MODE,
+    };
+  }
+
+  const room = rooms[roomId];
+  room.duration = normalizeDuration(room.duration);
+  room.mode = normalizeMode(room.mode);
+  return room;
+}
+
+function emitRoomSettings(roomId, room) {
+  io.to(roomId).emit("room-settings-update", {
+    duration: room.duration,
+    mode: room.mode,
+  });
+}
+
 io.on("connection", (socket) => {
   console.log("connected:", socket.id);
 
@@ -153,17 +177,12 @@ io.on("connection", (socket) => {
     if (!roomId || !name) return;
 
     socket.join(roomId);
-
-    if (!rooms[roomId]) {
-      rooms[roomId] = { users: [] };
-    }
+    const room = getOrCreateRoom(roomId);
 
     // Avoid duplicate entries if join-room fires twice (e.g., React strict mode)
-    rooms[roomId].users = rooms[roomId].users.filter(
-      (u) => u.socketId !== socket.id,
-    );
+    room.users = room.users.filter((u) => u.socketId !== socket.id);
 
-    rooms[roomId].users.push({
+    room.users.push({
       socketId: socket.id,
       name,
       progress: 0,
@@ -171,7 +190,8 @@ io.on("connection", (socket) => {
       totalKeystrokes: 0,
     });
 
-    io.to(roomId).emit("room-users-update", serializeUsers(rooms[roomId]));
+    io.to(roomId).emit("room-users-update", serializeUsers(room));
+    emitRoomSettings(roomId, room);
   });
 
   socket.on("user-typing", ({ roomId, progress, correctChars, totalKeystrokes }) => {
@@ -188,6 +208,20 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("progress-update", serializeUsers(room));
   });
 
+  socket.on("room-settings-update", ({ roomId, duration, mode }) => {
+    const room = rooms[roomId];
+    if (!room) return;
+
+    const hostSocketId = room.users[0]?.socketId;
+    if (!hostSocketId || hostSocketId !== socket.id) return;
+
+    room.duration =
+      duration === undefined ? room.duration : normalizeDuration(duration);
+    room.mode = mode === undefined ? room.mode : normalizeMode(mode);
+
+    emitRoomSettings(roomId, room);
+  });
+
   socket.on("start-test", ({ roomId, text, duration, mode }) => {
     const room = rooms[roomId];
     if (!room) return;
@@ -195,6 +229,8 @@ io.on("connection", (socket) => {
     const nextMode = normalizeMode(mode);
     const nextText = sanitizeTextByMode(text, nextMode) || getModeFallback(nextMode);
     const startedAt = Date.now();
+    room.duration = nextDuration;
+    room.mode = nextMode;
 
     room.users.forEach((u) => {
       u.progress = 0;

@@ -33,7 +33,9 @@ export default function MultiplayerWaitingRoom({
           <h1 className="text-2xl font-bold font-mono text-neutral-200 md:text-3xl">
             Room {roomId}
           </h1>
-          <p className="mt-1 text-neutral-400 font-mono">Waiting room - {name}</p>
+          <p className="mt-1 text-neutral-400 font-mono">
+            Waiting room - {name}
+          </p>
           <p className="mt-2 text-xs uppercase tracking-[0.2em] text-neutral-500">
             Mode {selectedMode}
           </p>
@@ -71,13 +73,15 @@ export default function MultiplayerWaitingRoom({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-semibold text-neutral-100">Players</h2>
-            <p className="text-sm text-neutral-400">
+            <p className="text-sm text-neutral-400 font-mono">
               {users.length === 0
                 ? "Waiting for players to join..."
                 : `${users.length} player${users.length === 1 ? "" : "s"} in room`}
             </p>
           </div>
-          <div className="text-sm text-neutral-300 font-mono">Share code: {roomId}</div>
+          <div className="text-sm text-neutral-300 font-mono">
+            Share code: {roomId}
+          </div>
         </div>
 
         <div className="mt-4 space-y-3">

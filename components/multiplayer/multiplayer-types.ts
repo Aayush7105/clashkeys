@@ -15,3 +15,8 @@ export type TestStartedPayload = {
   startedAt?: number;
   users?: RoomUser[];
 };
+
+export type RoomSettingsPayload = {
+  duration?: number;
+  mode?: SoloMode;
+};
