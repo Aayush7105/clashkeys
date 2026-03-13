@@ -1,6 +1,6 @@
 "use client";
 
-import type { RoomUser } from "./multiplayer-types";
+import type { RoomUser, SocketConnectionStatus } from "./multiplayer-types";
 import type { SoloMode } from "../soloplay/soloplay-modes";
 
 type MultiplayerWaitingRoomProps = {
@@ -9,10 +9,13 @@ type MultiplayerWaitingRoomProps = {
   users: RoomUser[];
   hostId: string | null;
   isHost: boolean;
+  connectionStatus: SocketConnectionStatus;
+  connectionError: string | null;
   selectedDuration: number;
   selectedMode: SoloMode;
   onStart: () => void;
   onExit: () => void;
+  onRetryConnection: () => void;
 };
 
 export default function MultiplayerWaitingRoom({
@@ -21,11 +24,23 @@ export default function MultiplayerWaitingRoom({
   users,
   hostId,
   isHost,
+  connectionStatus,
+  connectionError,
   selectedDuration,
   selectedMode,
   onStart,
   onExit,
+  onRetryConnection,
 }: MultiplayerWaitingRoomProps) {
+  const connectionLabel =
+    connectionStatus === "connected"
+      ? "Connected"
+      : connectionStatus === "reconnecting"
+        ? "Reconnecting..."
+        : connectionStatus === "error"
+          ? "Connection failed"
+          : "Connecting...";
+
   return (
     <div className="mx-auto mt-10 w-full max-w-5xl space-y-6 px-2 md:space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -66,6 +81,40 @@ export default function MultiplayerWaitingRoom({
           >
             Back
           </button>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-[#3a3f49] bg-neutral-900 p-4 md:p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-neutral-500">
+              Socket status
+            </p>
+            <p
+              className={`font-mono text-sm ${
+                connectionStatus === "connected"
+                  ? "text-emerald-300"
+                  : connectionStatus === "error"
+                    ? "text-rose-300"
+                    : "text-yellow-300"
+              }`}
+            >
+              {connectionLabel}
+            </p>
+            <p className="mt-1 text-xs text-neutral-400 font-mono">
+              {connectionError ??
+                "If this takes too long, retry to reconnect to the room."}
+            </p>
+          </div>
+          {connectionStatus !== "connected" && (
+            <button
+              type="button"
+              onClick={onRetryConnection}
+              className="w-full rounded-xl border border-[#e2b714] px-4 py-2 font-mono text-[#e2b714] hover:bg-[#e2b714]/10 cursor-pointer sm:w-auto"
+            >
+              Retry connection
+            </button>
+          )}
         </div>
       </div>
 

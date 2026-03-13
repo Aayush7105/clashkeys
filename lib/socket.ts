@@ -12,6 +12,11 @@ const socketUrl =
 
 export const socket = io(socketUrl, {
   autoConnect: false,
-  transports: ["websocket", "polling"],
+  transports: ["polling", "websocket"],
+  timeout: 10000,
+  reconnection: true,
+  reconnectionAttempts: Infinity,
+  reconnectionDelay: 500,
+  reconnectionDelayMax: 4000,
 });
 
