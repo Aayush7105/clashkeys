@@ -51,6 +51,20 @@ ClashKeys is a competitive typing game with solo practice and real-time multipla
 - Allowed socket origins are controlled by `FRONTEND_ORIGIN` (or `CORS_ORIGIN`) as a comma-separated list.
 - Local default allowed origins are `http://localhost:3000` and `http://127.0.0.1:3000`.
 
+## Health Check (UptimeRobot)
+
+- Health endpoint: `/api/health`
+- Example response:
+  ```json
+  {
+    "status": "ok",
+    "service": "clashkeys-web",
+    "timestamp": "2026-03-16T12:34:56.789Z"
+  }
+  ```
+- Use your deployed URL in UptimeRobot, for example:
+  - `https://clashkeys.aayushrawat.in/api/health`
+
 ## Deploy: Vercel + Render (Multiplayer)
 
 1. Deploy socket server on Render:
@@ -87,7 +101,7 @@ Server (`server/package.json`):
 
 ## Project Structure
 
-- `app/` - Next.js routes (`/`, `/soloplay`, `/multiplayer`, `/room`)
+- `app/` - Next.js routes (`/`, `/soloplay`, `/multiplayer`, `/room`, `/api/health`)
 - `components/` - gameplay UI, score views, charts, and mode-specific logic
 - `lib/` - shared utilities (including socket client setup)
 - `server/` - standalone Express + Socket.IO backend
