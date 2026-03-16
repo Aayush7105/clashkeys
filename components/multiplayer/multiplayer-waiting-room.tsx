@@ -69,6 +69,7 @@ export default function MultiplayerWaitingRoom({
         </div>
       </div>
 <<<<<<< HEAD
+<<<<<<< HEAD
       {/* 
       <div className="rounded-xl border border-[#3a3f49] bg-neutral-900 p-4 md:p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -103,6 +104,8 @@ export default function MultiplayerWaitingRoom({
           )}
         </div>
       </div> */}
+=======
+>>>>>>> parent of 8283f11 (some minor bug fixed)
 =======
 >>>>>>> parent of 8283f11 (some minor bug fixed)
 
