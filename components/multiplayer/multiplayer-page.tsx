@@ -1,14 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { IoMdArrowRoundBack } from "react-icons/io";
+import { socket } from "@/lib/socket";
 
 export default function MultiplayerPage() {
   const router = useRouter();
 
   const [name, setName] = useState("");
   const [room, setRoom] = useState("");
+
+  useEffect(() => {
+    router.prefetch("/room");
+    if (!socket.connected) {
+      socket.connect();
+    }
+  }, [router]);
 
   function makeRoomCode() {
     const code = Math.floor(1000 + Math.random() * 9000).toString();
@@ -29,6 +37,10 @@ export default function MultiplayerPage() {
       return;
     }
 
+    if (!socket.connected) {
+      socket.connect();
+    }
+
     const newRoom = makeRoomCode();
     router.push(
       `/room?roomId=${encodeURIComponent(newRoom)}&name=${encodeURIComponent(
@@ -47,6 +59,10 @@ export default function MultiplayerPage() {
     if (!normalized) {
       alert("Room code must be 4 digits");
       return;
+    }
+
+    if (!socket.connected) {
+      socket.connect();
     }
 
     router.push(

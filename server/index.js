@@ -170,28 +170,56 @@ function emitRoomSettings(roomId, room) {
   });
 }
 
+function removeSocketFromRoom(roomId, socketId) {
+  const room = rooms[roomId];
+  if (!room) return false;
+
+  const before = room.users.length;
+  room.users = room.users.filter((u) => u.socketId !== socketId);
+
+  if (room.users.length !== before) {
+    io.to(roomId).emit("room-users-update", serializeUsers(room));
+  }
+
+  if (room.users.length === 0) {
+    delete rooms[roomId];
+  }
+
+  return room.users.length !== before;
+}
+
 io.on("connection", (socket) => {
   console.log("connected:", socket.id);
 
   socket.on("join-room", ({ roomId, name }) => {
-    if (!roomId || !name) return;
+    const nextRoomId = typeof roomId === "string" ? roomId.trim() : "";
+    const nextName = typeof name === "string" ? name.trim() : "";
+    if (!nextRoomId || !nextName) return;
 
-    socket.join(roomId);
-    const room = getOrCreateRoom(roomId);
+    const previousRoomId =
+      typeof socket.data.roomId === "string" ? socket.data.roomId : "";
+    if (previousRoomId && previousRoomId !== nextRoomId) {
+      removeSocketFromRoom(previousRoomId, socket.id);
+      socket.leave(previousRoomId);
+    }
+
+    socket.join(nextRoomId);
+    socket.data.roomId = nextRoomId;
+    const room = getOrCreateRoom(nextRoomId);
 
     // Avoid duplicate entries if join-room fires twice (e.g., React strict mode)
     room.users = room.users.filter((u) => u.socketId !== socket.id);
 
     room.users.push({
       socketId: socket.id,
-      name,
+      name: nextName,
       progress: 0,
       correctChars: 0,
       totalKeystrokes: 0,
     });
 
-    io.to(roomId).emit("room-users-update", serializeUsers(room));
-    emitRoomSettings(roomId, room);
+    io.to(nextRoomId).emit("room-users-update", serializeUsers(room));
+    emitRoomSettings(nextRoomId, room);
   });
 
   socket.on("user-typing", ({ roomId, progress, correctChars, totalKeystrokes }) => {
@@ -247,19 +275,32 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("leave-room", ({ roomId } = {}) => {
+    const requestedRoomId = typeof roomId === "string" ? roomId.trim() : "";
+    const activeRoomId =
+      requestedRoomId ||
+      (typeof socket.data.roomId === "string" ? socket.data.roomId : "");
+    if (!activeRoomId) return;
+
+    removeSocketFromRoom(activeRoomId, socket.id);
+    socket.leave(activeRoomId);
+
+    if (socket.data.roomId === activeRoomId) {
+      socket.data.roomId = undefined;
+    }
+  });
+
   socket.on("disconnect", () => {
+    const activeRoomId =
+      typeof socket.data.roomId === "string" ? socket.data.roomId : "";
+    if (activeRoomId) {
+      removeSocketFromRoom(activeRoomId, socket.id);
+      return;
+    }
+
     for (const roomId of Object.keys(rooms)) {
-      const room = rooms[roomId];
-      const before = room.users.length;
-
-      room.users = room.users.filter((u) => u.socketId !== socket.id);
-
-      if (room.users.length !== before) {
-        io.to(roomId).emit("room-users-update", serializeUsers(room));
-      }
-
-      if (room.users.length === 0) {
-        delete rooms[roomId];
+      if (removeSocketFromRoom(roomId, socket.id)) {
+        return;
       }
     }
   });

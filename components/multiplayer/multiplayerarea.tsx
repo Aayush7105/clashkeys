@@ -235,7 +235,24 @@ export default function MultiplayerArea({
   const correctKeystrokesRef = useRef(0);
 
   const ready = roomId.trim().length > 0 && name.trim().length > 0;
-  const hostId = users[0]?.id ?? null;
+  const optimisticUserId = useMemo(
+    () => `local:${roomId}:${name}`,
+    [roomId, name],
+  );
+  const visibleUsers = useMemo(() => {
+    if (!ready) return users;
+    if (users.length > 0) return users;
+    return [
+      {
+        id: socketId ?? optimisticUserId,
+        name,
+        progress: 0,
+        correctChars: 0,
+        totalKeystrokes: 0,
+      },
+    ];
+  }, [ready, users, socketId, optimisticUserId, name]);
+  const hostId = visibleUsers[0]?.id ?? null;
   const isHost = Boolean(hostId && socketId && hostId === socketId);
 
   const focusInput = useCallback(() => {
@@ -283,21 +300,6 @@ export default function MultiplayerArea({
 
   useEffect(() => {
     if (!ready) return;
-
-    if (!socket.connected) {
-      socket.connect();
-    }
-
-    const handleConnect = () => {
-      setSocketId(socket.id ?? null);
-    };
-
-    socket.on("connect", handleConnect);
-    if (socket.connected) {
-      handleConnect();
-    }
-
-    socket.emit("join-room", { roomId, name });
 
     const handleUsersUpdate = (payload: RoomUser[]) => {
       if (Array.isArray(payload)) {
@@ -369,18 +371,40 @@ export default function MultiplayerArea({
       setTimeout(() => focusInput(), 0);
     };
 
+    const joinRoom = () => {
+      socket.emit("join-room", { roomId, name });
+    };
+
+    const handleConnect = () => {
+      const nextSocketId = socket.id ?? null;
+      setSocketId(nextSocketId);
+      joinRoom();
+    };
+
+    const handleDisconnect = () => {
+      setSocketId(null);
+    };
+
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
     socket.on("room-users-update", handleUsersUpdate);
     socket.on("progress-update", handleProgressUpdate);
     socket.on("room-settings-update", handleRoomSettingsUpdate);
     socket.on("test-started", handleTestStarted);
+    if (!socket.connected) {
+      socket.connect();
+    } else {
+      handleConnect();
+    }
 
     return () => {
+      socket.emit("leave-room", { roomId });
       socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
       socket.off("room-users-update", handleUsersUpdate);
       socket.off("progress-update", handleProgressUpdate);
       socket.off("room-settings-update", handleRoomSettingsUpdate);
       socket.off("test-started", handleTestStarted);
-      socket.disconnect();
     };
   }, [ready, roomId, name, focusInput]);
 
@@ -606,7 +630,7 @@ export default function MultiplayerArea({
         rawWpmHistory={rawWpmHistory}
         burstWpmHistory={burstWpmHistory}
         errorPoints={errorPoints}
-        users={users}
+        users={visibleUsers}
         currentUserId={socketId}
         isHost={isHost}
         onRestart={startTest}
@@ -639,7 +663,7 @@ export default function MultiplayerArea({
           <MultiplayerWaitingRoom
             roomId={roomId}
             name={name}
-            users={users}
+            users={visibleUsers}
             hostId={hostId}
             isHost={isHost}
             selectedDuration={selectedDuration}
