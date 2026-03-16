@@ -83,7 +83,7 @@ export default function MultiplayerWaitingRoom({
           </button>
         </div>
       </div>
-
+      {/* 
       <div className="rounded-xl border border-[#3a3f49] bg-neutral-900 p-4 md:p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -116,7 +116,7 @@ export default function MultiplayerWaitingRoom({
             </button>
           )}
         </div>
-      </div>
+      </div> */}
 
       <div className="rounded-xl border border-[#3a3f49] bg-neutral-900 p-4 md:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
