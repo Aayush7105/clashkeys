@@ -68,47 +68,6 @@ export default function MultiplayerWaitingRoom({
           </button>
         </div>
       </div>
-<<<<<<< HEAD
-<<<<<<< HEAD
-      {/* 
-      <div className="rounded-xl border border-[#3a3f49] bg-neutral-900 p-4 md:p-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-neutral-500">
-              Socket status
-            </p>
-            <p
-              className={`font-mono text-sm ${
-                connectionStatus === "connected"
-                  ? "text-emerald-300"
-                  : connectionStatus === "error"
-                    ? "text-rose-300"
-                    : "text-yellow-300"
-              }`}
-            >
-              {connectionLabel}
-            </p>
-            <p className="mt-1 text-xs text-neutral-400 font-mono">
-              {connectionError ??
-                "If this takes too long, retry to reconnect to the room."}
-            </p>
-          </div>
-          {connectionStatus !== "connected" && (
-            <button
-              type="button"
-              onClick={onRetryConnection}
-              className="w-full rounded-xl border border-[#e2b714] px-4 py-2 font-mono text-[#e2b714] hover:bg-[#e2b714]/10 cursor-pointer sm:w-auto"
-            >
-              Retry connection
-            </button>
-          )}
-        </div>
-      </div> */}
-=======
->>>>>>> parent of 8283f11 (some minor bug fixed)
-=======
->>>>>>> parent of 8283f11 (some minor bug fixed)
-
       <div className="rounded-xl border border-[#3a3f49] bg-neutral-900 p-4 md:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
