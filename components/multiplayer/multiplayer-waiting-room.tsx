@@ -1,6 +1,6 @@
 "use client";
 
-import type { RoomUser, SocketConnectionStatus } from "./multiplayer-types";
+import type { RoomUser } from "./multiplayer-types";
 import type { SoloMode } from "../soloplay/soloplay-modes";
 
 type MultiplayerWaitingRoomProps = {
@@ -9,13 +9,10 @@ type MultiplayerWaitingRoomProps = {
   users: RoomUser[];
   hostId: string | null;
   isHost: boolean;
-  connectionStatus: SocketConnectionStatus;
-  connectionError: string | null;
   selectedDuration: number;
   selectedMode: SoloMode;
   onStart: () => void;
   onExit: () => void;
-  onRetryConnection: () => void;
 };
 
 export default function MultiplayerWaitingRoom({
@@ -24,23 +21,11 @@ export default function MultiplayerWaitingRoom({
   users,
   hostId,
   isHost,
-  connectionStatus,
-  connectionError,
   selectedDuration,
   selectedMode,
   onStart,
   onExit,
-  onRetryConnection,
 }: MultiplayerWaitingRoomProps) {
-  const connectionLabel =
-    connectionStatus === "connected"
-      ? "Connected"
-      : connectionStatus === "reconnecting"
-        ? "Reconnecting..."
-        : connectionStatus === "error"
-          ? "Connection failed"
-          : "Connecting...";
-
   return (
     <div className="mx-auto mt-10 w-full max-w-5xl space-y-6 px-2 md:space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -83,6 +68,7 @@ export default function MultiplayerWaitingRoom({
           </button>
         </div>
       </div>
+<<<<<<< HEAD
       {/* 
       <div className="rounded-xl border border-[#3a3f49] bg-neutral-900 p-4 md:p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -117,6 +103,8 @@ export default function MultiplayerWaitingRoom({
           )}
         </div>
       </div> */}
+=======
+>>>>>>> parent of 8283f11 (some minor bug fixed)
 
       <div className="rounded-xl border border-[#3a3f49] bg-neutral-900 p-4 md:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

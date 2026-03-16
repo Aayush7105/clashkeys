@@ -8,12 +8,6 @@ export type RoomUser = {
   totalKeystrokes: number;
 };
 
-export type SocketConnectionStatus =
-  | "connecting"
-  | "connected"
-  | "reconnecting"
-  | "error";
-
 export type TestStartedPayload = {
   text?: string;
   duration?: number;

@@ -18,7 +18,6 @@ import {
 import type {
   RoomSettingsPayload,
   RoomUser,
-  SocketConnectionStatus,
   TestStartedPayload,
 } from "./multiplayer-types";
 import type { SoloMode } from "../soloplay/soloplay-modes";
@@ -52,13 +51,6 @@ function safeDecode(value: string) {
   } catch {
     return value;
   }
-}
-
-function getSocketErrorMessage(error: unknown) {
-  if (error instanceof Error && error.message.trim().length > 0) {
-    return error.message;
-  }
-  return "Unable to connect to the multiplayer server.";
 }
 
 function fetchWithTimeout(url: string, ms = 2000) {
@@ -231,9 +223,6 @@ export default function MultiplayerArea({
   const [isRunning, setIsRunning] = useState(false);
   const [testEnded, setTestEnded] = useState(false);
   const [socketId, setSocketId] = useState<string | null>(null);
-  const [connectionStatus, setConnectionStatus] =
-    useState<SocketConnectionStatus>("connecting");
-  const [connectionError, setConnectionError] = useState<string | null>(null);
   const [totalKeystrokes, setTotalKeystrokes] = useState(0);
   const [correctKeystrokes, setCorrectKeystrokes] = useState(0);
   const [wpmHistory, setWpmHistory] = useState<number[]>([]);
@@ -268,20 +257,6 @@ export default function MultiplayerArea({
     }
   }, []);
 
-  const retryConnection = useCallback(() => {
-    if (!ready) return;
-
-    setConnectionError(null);
-    if (socket.connected) {
-      setConnectionStatus("connected");
-      socket.emit("join-room", { roomId, name });
-      return;
-    }
-
-    setConnectionStatus("connecting");
-    socket.connect();
-  }, [ready, roomId, name]);
-
   useEffect(() => {
     selectedDurationRef.current = selectedDuration;
   }, [selectedDuration]);
@@ -308,54 +283,21 @@ export default function MultiplayerArea({
 
   useEffect(() => {
     if (!ready) return;
-    let isCleanedUp = false;
 
-    const joinRoom = () => {
-      if (!socket.connected) return;
-      socket.emit("join-room", { roomId, name });
-    };
+    if (!socket.connected) {
+      socket.connect();
+    }
 
     const handleConnect = () => {
-      if (isCleanedUp) return;
       setSocketId(socket.id ?? null);
-      setConnectionStatus("connected");
-      setConnectionError(null);
-      joinRoom();
-    };
-
-    const handleDisconnect = (reason: string) => {
-      if (isCleanedUp) return;
-      setSocketId(null);
-      if (reason === "io client disconnect") {
-        setConnectionStatus("connecting");
-        return;
-      }
-      setConnectionStatus("reconnecting");
-      setConnectionError("Connection lost. Trying to reconnect...");
-    };
-
-    const handleConnectError = (error: unknown) => {
-      if (isCleanedUp) return;
-      setConnectionStatus(socket.active ? "reconnecting" : "error");
-      setConnectionError(getSocketErrorMessage(error));
-    };
-
-    const handleReconnectAttempt = () => {
-      if (isCleanedUp) return;
-      setConnectionStatus("reconnecting");
-      setConnectionError("Reconnecting to room...");
     };
 
     socket.on("connect", handleConnect);
-    socket.on("disconnect", handleDisconnect);
-    socket.on("connect_error", handleConnectError);
-    socket.io.on("reconnect_attempt", handleReconnectAttempt);
-
     if (socket.connected) {
       handleConnect();
-    } else {
-      socket.connect();
     }
+
+    socket.emit("join-room", { roomId, name });
 
     const handleUsersUpdate = (payload: RoomUser[]) => {
       if (Array.isArray(payload)) {
@@ -433,11 +375,7 @@ export default function MultiplayerArea({
     socket.on("test-started", handleTestStarted);
 
     return () => {
-      isCleanedUp = true;
       socket.off("connect", handleConnect);
-      socket.off("disconnect", handleDisconnect);
-      socket.off("connect_error", handleConnectError);
-      socket.io.off("reconnect_attempt", handleReconnectAttempt);
       socket.off("room-users-update", handleUsersUpdate);
       socket.off("progress-update", handleProgressUpdate);
       socket.off("room-settings-update", handleRoomSettingsUpdate);
@@ -704,13 +642,10 @@ export default function MultiplayerArea({
             users={users}
             hostId={hostId}
             isHost={isHost}
-            connectionStatus={connectionStatus}
-            connectionError={connectionError}
             selectedDuration={selectedDuration}
             selectedMode={selectedMode}
             onStart={startTest}
             onExit={() => router.push("/multiplayer")}
-            onRetryConnection={retryConnection}
           />
         ) : (
           <MultiplayerTypingArea
