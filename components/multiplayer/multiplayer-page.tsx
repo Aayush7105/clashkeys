@@ -89,114 +89,114 @@ export default function MultiplayerPage() {
         </motion.div>
 
         {/* Card */}
-        <motion.div
-          layout
-          transition={{ duration: 0.55, ease: "easeInOut" }}
-          className="rounded-2xl border border-neutral-700 bg-neutral-900 p-6 sm:p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.05)] font-mono"
-        >
-          {/* Title */}
-          <h2 className="text-xl sm:text-3xl font-semibold text-center">
-            Typing Rooms
-          </h2>
-          <p className="mt-2 text-sm text-neutral-400 text-center">
-            Create a room or join with a 4-digit code.
-          </p>
+        <motion.div className="rounded-2xl border border-neutral-700 bg-neutral-900 p-6 sm:p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.05)] font-mono min-h-80 flex flex-col justify-between">
+          {/* Top (STATIC) */}
+          <div>
+            <h2 className="text-xl sm:text-3xl font-semibold text-center">
+              Typing Rooms
+            </h2>
+            <p className="mt-2 text-sm text-neutral-400 text-center">
+              Create a room or join with a 4-digit code.
+            </p>
 
-          {/* Toggle */}
-          <div className="flex justify-center mt-6">
-            <div className="relative flex bg-neutral-800 p-1 rounded-lg overflow-hidden select-none">
-              {/* Sliding Pill */}
-              {mode === "create" ? (
-                <motion.div
-                  layoutId="toggle-pill"
-                  className="absolute inset-y-1 left-1 w-[calc(50%-4px)] bg-[#e2b714] rounded-md"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              ) : (
-                <motion.div
-                  layoutId="toggle-pill"
-                  className="absolute inset-y-1 right-1 w-[calc(50%-4px)] bg-[#e2b714] rounded-md"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              )}
+            {/* Toggle */}
+            <div className="flex justify-center mt-6">
+              <div className="relative flex bg-neutral-800 p-1 rounded-lg overflow-hidden">
+                {/* Sliding pill */}
+                {mode === "create" ? (
+                  <motion.div
+                    layoutId="toggle-pill"
+                    className="absolute inset-y-1 left-1 w-[calc(50%-4px)] bg-[#e2b714] rounded-md"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                ) : (
+                  <motion.div
+                    layoutId="toggle-pill"
+                    className="absolute inset-y-1 right-1 w-[calc(50%-4px)] bg-[#e2b714] rounded-md"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
 
-              {/* Create */}
-              <button
-                onClick={() => handleModeChange("create")}
-                className={`relative z-10 px-4 py-1.5 text-sm font-semibold ${
-                  mode === "create" ? "text-black" : "text-neutral-400"
-                }`}
-              >
-                Create Room
-              </button>
+                <button
+                  onClick={() => setMode("create")}
+                  className={`relative z-10 px-4 py-1.5 text-sm font-semibold ${
+                    mode === "create" ? "text-black" : "text-neutral-400"
+                  }`}
+                >
+                  Create Room
+                </button>
 
-              {/* Join */}
-              <button
-                onClick={() => handleModeChange("join")}
-                className={`relative z-10 px-4 py-1.5 text-sm font-semibold ${
-                  mode === "join" ? "text-black" : "text-neutral-400"
-                }`}
-              >
-                Join Room
-              </button>
+                <button
+                  onClick={() => setMode("join")}
+                  className={`relative z-10 px-4 py-1.5 text-sm font-semibold ${
+                    mode === "join" ? "text-black" : "text-neutral-400"
+                  }`}
+                >
+                  Join Room
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Inputs */}
-          <motion.div layout className="mt-5 flex flex-col gap-3">
-            {/* Name */}
-            <div>
-              <label className="block text-sm uppercase tracking-[0.2em]">
-                Your name
-              </label>
-              <input
-                placeholder="Type your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="mt-2 w-full rounded-lg bg-neutral-800 border border-neutral-600 px-4 py-2.5 text-sm outline-none focus:border-[#e2b714]"
-              />
-            </div>
-
-            {/* Room Input */}
-            <AnimatePresence mode="popLayout">
-              {mode === "join" && (
-                <motion.div
-                  key="room"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.25 }}
-                >
-                  <label className="block text-sm uppercase tracking-[0.2em]">
-                    Room code
-                  </label>
-                  <input
-                    placeholder="#1234"
-                    value={room}
-                    onChange={(e) => setRoom(e.target.value)}
-                    className="mt-2 w-full rounded-lg bg-neutral-800 border border-neutral-600 px-4 py-2.5 text-sm outline-none focus:border-[#e2b714]"
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-
-          {/* Button */}
-          <motion.div layout className="mt-6">
-            <motion.button
-              whileTap={{ scale: 0.97 }}
-              onClick={mode === "create" ? createRoom : joinRoom}
-              className={`w-full rounded-xl px-5 py-3 text-sm font-semibold ${
-                mode === "create"
-                  ? "bg-[#e2b714] text-black"
-                  : "border border-[#3a3f49] text-neutral-200 hover:border-[#e2b714]"
-              }`}
+          {/* Bottom (EXPANDING AREA) */}
+          <div className="mt-4">
+            <motion.div
+              layout
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="flex flex-col gap-3 overflow-hidden"
             >
-              {mode === "create" ? "Create Room" : "Join Room"}
-            </motion.button>
-          </motion.div>
-        </motion.div>
+              {/* Name */}
+              <div>
+                <label className="block text-sm uppercase tracking-[0.2em]">
+                  Your name
+                </label>
+                <input
+                  placeholder="Enter your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="mt-2 w-full rounded-lg bg-neutral-800 border border-neutral-600 px-4 py-2.5 text-sm outline-none focus:border-[#e2b714]"
+                />
+              </div>
 
+              {/* Room Input */}
+              <AnimatePresence>
+                {mode === "join" && (
+                  <motion.div
+                    layout
+                    key="room"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    <label className="block text-sm uppercase tracking-[0.2em]">
+                      Room code
+                    </label>
+                    <input
+                      placeholder="#1234"
+                      value={room}
+                      onChange={(e) => setRoom(e.target.value)}
+                      className="mt-2 w-full rounded-lg bg-neutral-800 border border-neutral-600 px-4 py-2.5 text-sm outline-none focus:border-[#e2b714]"
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Button */}
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                onClick={mode === "create" ? createRoom : joinRoom}
+                className={`w-full rounded-xl px-5 py-3 text-sm font-semibold mt-2 ${
+                  mode === "create"
+                    ? "bg-[#e2b714] text-black"
+                    : "border border-[#3a3f49] text-neutral-200 hover:border-[#e2b714]"
+                }`}
+              >
+                {mode === "create" ? "Create Room" : "Join Room"}
+              </motion.button>
+            </motion.div>
+          </div>
+        </motion.div>
         <p className="text-center text-sm text-[#6b6f7a] font-mono">
           Tip: Codes are four digits (e.g. 1234)
         </p>
