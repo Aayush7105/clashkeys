@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { SetStateAction, useEffect, useState } from "react";
@@ -151,7 +152,7 @@ export default function MultiplayerPage() {
                   Your name
                 </label>
                 <input
-                  placeholder="Enter your name"
+                  placeholder="Type your name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="mt-2 w-full rounded-lg bg-neutral-800 border border-neutral-600 px-4 py-2.5 text-sm outline-none focus:border-[#e2b714]"
@@ -173,7 +174,7 @@ export default function MultiplayerPage() {
                       Room code
                     </label>
                     <input
-                      placeholder="#1234"
+                      placeholder="#your room code"
                       value={room}
                       onChange={(e) => setRoom(e.target.value)}
                       className="mt-2 w-full rounded-lg bg-neutral-800 border border-neutral-600 px-4 py-2.5 text-sm outline-none focus:border-[#e2b714]"
@@ -197,9 +198,16 @@ export default function MultiplayerPage() {
             </motion.div>
           </div>
         </motion.div>
-        <p className="text-center text-sm text-[#6b6f7a] font-mono">
-          Tip: Codes are four digits (e.g. 1234)
-        </p>
+        {mode == "join" && (
+          <p className="text-center text-sm text-[#6b6f7a] font-mono">
+            Tip: Codes are four digits (e.g. 1234)
+          </p>
+        )}
+        {mode == "create" && (
+          <p className="text-center text-sm text-[#6b6f7a] font-mono">
+            Just start already
+          </p>
+        )}
       </div>
     </main>
   );
