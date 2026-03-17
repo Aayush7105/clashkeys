@@ -1,6 +1,7 @@
 "use client";
 
 import { SetStateAction, useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { socket } from "@/lib/socket";
@@ -9,7 +10,6 @@ export default function MultiplayerPage() {
   const router = useRouter();
 
   const [mode, setMode] = useState("create");
-  const [showRoomField, setShowRoomField] = useState(false);
   const [name, setName] = useState("");
   const [room, setRoom] = useState("");
 
@@ -19,24 +19,16 @@ export default function MultiplayerPage() {
   }, [router]);
 
   function makeRoomCode() {
-    const code = Math.floor(1000 + Math.random() * 9000).toString();
-    return `#${code}`;
+    return `#${Math.floor(1000 + Math.random() * 9000)}`;
   }
 
   function normalizeRoomCode(input: string) {
     const digits = input.replace(/[^0-9]/g, "");
-    if (digits.length === 4) return `#${digits}`;
-    return "";
+    return digits.length === 4 ? `#${digits}` : "";
   }
 
   function handleModeChange(newMode: SetStateAction<string>) {
     setMode(newMode);
-
-    if (newMode === "join") {
-      setTimeout(() => setShowRoomField(true), 120);
-    } else {
-      setShowRoomField(false);
-    }
   }
 
   function createRoom() {
@@ -44,8 +36,6 @@ export default function MultiplayerPage() {
       alert("Enter your name");
       return;
     }
-
-    if (!socket.connected) socket.connect();
 
     const newRoom = makeRoomCode();
     router.push(
@@ -56,18 +46,12 @@ export default function MultiplayerPage() {
   }
 
   function joinRoom() {
-    if (!name.trim() || !room.trim()) {
-      alert("Enter name and room code");
-      return;
-    }
-
     const normalized = normalizeRoomCode(room);
-    if (!normalized) {
-      alert("Room code must be 4 digits");
+
+    if (!name.trim() || !normalized) {
+      alert("Enter valid name & 4-digit code");
       return;
     }
-
-    if (!socket.connected) socket.connect();
 
     router.push(
       `/room?roomId=${encodeURIComponent(normalized)}&name=${encodeURIComponent(
@@ -84,23 +68,32 @@ export default function MultiplayerPage() {
 
       <div className="relative max-w-xl w-full space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-neutral-400">
+        <motion.div
+          layout
+          transition={{ duration: 0.3 }}
+          className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-neutral-400"
+        >
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push("/")}
-              className="rounded-full text-neutral-300 hover:text-[#e2b714]"
+              className="text-neutral-300 hover:text-[#e2b714]"
             >
               <IoMdArrowRoundBack className="size-5" />
             </button>
             <span className="font-mono text-lg font-semibold">Multiplayer</span>
           </div>
+
           <span className="text-[#e2b714] text-lg font-mono font-semibold">
             clashkeys
           </span>
-        </div>
+        </motion.div>
 
         {/* Card */}
-        <div className="rounded-2xl border border-neutral-700 bg-neutral-900 p-6 sm:p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.05)] font-mono">
+        <motion.div
+          layout
+          transition={{ duration: 0.55, ease: "easeInOut" }}
+          className="rounded-2xl border border-neutral-700 bg-neutral-900 p-6 sm:p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.05)] font-mono"
+        >
           {/* Title */}
           <h2 className="text-xl sm:text-3xl font-semibold text-center">
             Typing Rooms
@@ -111,18 +104,18 @@ export default function MultiplayerPage() {
 
           {/* Toggle */}
           <div className="flex justify-center mt-6">
-            <div className="relative flex bg-neutral-800 p-1 rounded-lg w-fit">
+            <div className="relative flex bg-neutral-800 p-1 rounded-lg overflow-hidden">
               {/* Sliding Pill */}
-              <div
-                className={`absolute top-1 bottom-1 w-1/2 rounded-md bg-[#e2b714] transition-all duration-300 ${
-                  mode === "create" ? "left-1" : "left-1/2"
-                }`}
+              <motion.div
+                layout
+                className="absolute top-1 bottom-1 w-1/2 rounded-md bg-[#e2b714]"
+                animate={{ x: mode === "create" ? "0%" : "100%" }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
               />
 
-              {/* Buttons */}
               <button
                 onClick={() => handleModeChange("create")}
-                className={`relative z-10 px-4 py-1.5 text-sm font-semibold transition ${
+                className={`relative z-10 px-4 py-1.5 text-sm font-semibold ${
                   mode === "create" ? "text-black" : "text-neutral-400"
                 }`}
               >
@@ -131,7 +124,7 @@ export default function MultiplayerPage() {
 
               <button
                 onClick={() => handleModeChange("join")}
-                className={`relative z-10 px-4 py-1.5 text-sm font-semibold transition ${
+                className={`relative z-10 px-4 py-1.5 text-sm font-semibold ${
                   mode === "join" ? "text-black" : "text-neutral-400"
                 }`}
               >
@@ -141,7 +134,7 @@ export default function MultiplayerPage() {
           </div>
 
           {/* Inputs */}
-          <div className="mt-5 flex flex-col gap-3">
+          <motion.div layout className="mt-5 flex flex-col gap-3">
             {/* Name */}
             <div>
               <label className="block text-sm uppercase tracking-[0.2em]">
@@ -155,16 +148,16 @@ export default function MultiplayerPage() {
               />
             </div>
 
-            {/* Animated Room Field */}
-            <div
-              className={`transition-all duration-300 ease-in-out ${
-                showRoomField
-                  ? "opacity-100 translate-y-0 mt-2"
-                  : "opacity-0 -translate-y-2 h-0 overflow-hidden"
-              }`}
-            >
-              {showRoomField && (
-                <div>
+            {/* Room Input */}
+            <AnimatePresence mode="wait">
+              {mode === "join" && (
+                <motion.div
+                  key="room"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.25 }}
+                >
                   <label className="block text-sm uppercase tracking-[0.2em]">
                     Room code
                   </label>
@@ -174,36 +167,26 @@ export default function MultiplayerPage() {
                     onChange={(e) => setRoom(e.target.value)}
                     className="mt-2 w-full rounded-lg bg-neutral-800 border border-neutral-600 px-4 py-2.5 text-sm outline-none focus:border-[#e2b714]"
                   />
-                </div>
+                </motion.div>
               )}
-            </div>
-          </div>
+            </AnimatePresence>
+          </motion.div>
 
           {/* Button */}
-          <div
-            className={`mt-6 transition-all duration-300 ${
-              mode === "join" ? "translate-y-2" : "translate-y-0"
-            }`}
-          >
-            {mode === "create" ? (
-              <button
-                onClick={createRoom}
-                disabled={!name}
-                className="w-full rounded-xl bg-[#e2b714] px-5 py-3 text-sm font-semibold text-black hover:brightness-110 disabled:opacity-50"
-              >
-                Create Room
-              </button>
-            ) : (
-              <button
-                onClick={joinRoom}
-                disabled={!name || !room}
-                className="w-full rounded-xl border border-[#3a3f49] px-5 py-3 text-sm font-semibold hover:border-[#e2b714] disabled:opacity-50"
-              >
-                Join Room
-              </button>
-            )}
-          </div>
-        </div>
+          <motion.div layout className="mt-6">
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              onClick={mode === "create" ? createRoom : joinRoom}
+              className={`w-full rounded-xl px-5 py-3 text-sm font-semibold ${
+                mode === "create"
+                  ? "bg-[#e2b714] text-black"
+                  : "border border-[#3a3f49] text-neutral-200 hover:border-[#e2b714]"
+              }`}
+            >
+              {mode === "create" ? "Create Room" : "Join Room"}
+            </motion.button>
+          </motion.div>
+        </motion.div>
 
         <p className="text-center text-sm text-[#6b6f7a] font-mono">
           Tip: Codes are four digits (e.g. 1234)
