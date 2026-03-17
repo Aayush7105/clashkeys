@@ -149,7 +149,7 @@ export default function MultiplayerPage() {
             </div>
 
             {/* Room Input */}
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="popLayout">
               {mode === "join" && (
                 <motion.div
                   key="room"
