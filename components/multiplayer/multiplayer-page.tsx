@@ -104,15 +104,23 @@ export default function MultiplayerPage() {
 
           {/* Toggle */}
           <div className="flex justify-center mt-6">
-            <div className="relative flex bg-neutral-800 p-1 rounded-lg overflow-hidden">
+            <div className="relative flex bg-neutral-800 p-1 rounded-lg overflow-hidden select-none">
               {/* Sliding Pill */}
-              <motion.div
-                layout
-                className="absolute top-1 bottom-1 w-1/2 rounded-md bg-[#e2b714]"
-                animate={{ x: mode === "create" ? "0%" : "100%" }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              />
+              {mode === "create" ? (
+                <motion.div
+                  layoutId="toggle-pill"
+                  className="absolute inset-y-1 left-1 w-[calc(50%-4px)] bg-[#e2b714] rounded-md"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+              ) : (
+                <motion.div
+                  layoutId="toggle-pill"
+                  className="absolute inset-y-1 right-1 w-[calc(50%-4px)] bg-[#e2b714] rounded-md"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+              )}
 
+              {/* Create */}
               <button
                 onClick={() => handleModeChange("create")}
                 className={`relative z-10 px-4 py-1.5 text-sm font-semibold ${
@@ -122,6 +130,7 @@ export default function MultiplayerPage() {
                 Create Room
               </button>
 
+              {/* Join */}
               <button
                 onClick={() => handleModeChange("join")}
                 className={`relative z-10 px-4 py-1.5 text-sm font-semibold ${
