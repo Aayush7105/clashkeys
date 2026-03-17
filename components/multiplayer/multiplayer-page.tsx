@@ -78,7 +78,7 @@ export default function MultiplayerPage() {
       <div className="pointer-events-none absolute -top-32 right-0 h-105 w-105 rounded-full bg-[radial-gradient(circle_at_center,rgba(226,183,20,0.3),rgba(10,10,10,0))]" />
       <div className="pointer-events-none absolute -bottom-24 left-0 h-130 w-130 rounded-full bg-[radial-gradient(circle_at_center,rgba(64,64,64,0.45),rgba(10,10,10,0))]" />
 
-      <div className="relative max-w-3xl w-full space-y-10">
+      <div className="relative max-w-xl w-full space-y-8">
         <div className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-neutral-400">
           <div className="flex items-center gap-3">
             <button
@@ -162,7 +162,7 @@ export default function MultiplayerPage() {
               <button
                 onClick={createRoom}
                 disabled={!name}
-                className="w-full rounded-xl bg-[#e2b714] px-5 py-2.5 text-sm font-semibold text-black hover:brightness-110 disabled:opacity-50"
+                className="w-full rounded-xl bg-[#e2b714] px-5 py-2.5 text-sm font-semibold text-black"
               >
                 Create Room
               </button>
@@ -170,7 +170,7 @@ export default function MultiplayerPage() {
               <button
                 onClick={joinRoom}
                 disabled={!name || !room}
-                className="w-full rounded-xl border border-[#3a3f49] px-5 py-2.5 text-sm font-semibold hover:border-[#e2b714] disabled:opacity-50"
+                className="w-full rounded-xl border border-[#3a3f49] px-5 py-2.5 text-sm font-semibold hover:border-[#e2b714]"
               >
                 Join Room
               </button>
