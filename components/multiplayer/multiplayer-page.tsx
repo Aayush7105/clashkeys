@@ -205,7 +205,7 @@ export default function MultiplayerPage() {
         )}
         {mode == "create" && (
           <p className="text-center text-sm text-[#6b6f7a] font-mono">
-            Just start already
+            Create a room and invite your friends
           </p>
         )}
       </div>
