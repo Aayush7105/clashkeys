@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { socket } from "@/lib/socket";
+import { toast } from "sonner";
 
 export default function MultiplayerPage() {
   const router = useRouter();
@@ -34,7 +35,7 @@ export default function MultiplayerPage() {
 
   function createRoom() {
     if (!name.trim()) {
-      alert("Enter your name");
+      toast.error("Enter valid name");
       return;
     }
 
@@ -50,7 +51,7 @@ export default function MultiplayerPage() {
     const normalized = normalizeRoomCode(room);
 
     if (!name.trim() || !normalized) {
-      alert("Enter valid name & 4-digit code");
+      toast.error("Enter valid name & 4-digit code");
       return;
     }
 
