@@ -55,6 +55,17 @@ app.head("/health", (_req, res) => {
   res.sendStatus(200);
 });
 
+// Backward-compatible alias so monitors using /api/health still work on Render.
+app.get("/api/health", (_req, res) => {
+  setNoStoreHeaders(res);
+  res.status(200).json(getHealthPayload());
+});
+
+app.head("/api/health", (_req, res) => {
+  setNoStoreHeaders(res);
+  res.sendStatus(200);
+});
+
 const io = new Server(server, {
   cors: {
     origin: (origin, callback) => {
