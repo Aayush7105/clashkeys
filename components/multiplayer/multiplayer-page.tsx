@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { IoMdArrowRoundBack } from "react-icons/io";
-import { socket } from "@/lib/socket";
+import { primeRealtimeConnection } from "@/lib/socket";
 import { toast } from "sonner";
 
 export default function MultiplayerPage() {
@@ -17,7 +16,7 @@ export default function MultiplayerPage() {
 
   useEffect(() => {
     router.prefetch("/room");
-    if (!socket.connected) socket.connect();
+    primeRealtimeConnection();
   }, [router]);
 
   function makeRoomCode() {
@@ -29,10 +28,6 @@ export default function MultiplayerPage() {
     return digits.length === 4 ? `#${digits}` : "";
   }
 
-  function handleModeChange(newMode: SetStateAction<string>) {
-    setMode(newMode);
-  }
-
   function createRoom() {
     if (!name.trim()) {
       toast.error("Enter valid name");
@@ -40,6 +35,7 @@ export default function MultiplayerPage() {
     }
 
     const newRoom = makeRoomCode();
+    primeRealtimeConnection();
     router.push(
       `/room?roomId=${encodeURIComponent(newRoom)}&name=${encodeURIComponent(
         name,
@@ -55,6 +51,7 @@ export default function MultiplayerPage() {
       return;
     }
 
+    primeRealtimeConnection();
     router.push(
       `/room?roomId=${encodeURIComponent(normalized)}&name=${encodeURIComponent(
         name,
