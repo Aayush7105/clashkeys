@@ -51,19 +51,15 @@ ClashKeys is a competitive typing game with solo practice and real-time multipla
 - Allowed socket origins are controlled by `FRONTEND_ORIGIN` (or `CORS_ORIGIN`) as a comma-separated list.
 - Local default allowed origins are `http://localhost:3000` and `http://127.0.0.1:3000`.
 
-## Health Check (UptimeRobot)
+## Health Checks (UptimeRobot)
 
-- Health endpoint: `/api/health`
-- Example response:
-  ```json
-  {
-    "status": "ok",
-    "service": "clashkeys-web",
-    "timestamp": "2026-03-16T12:34:56.789Z"
-  }
-  ```
-- Use your deployed URL in UptimeRobot, for example:
-  - `https://clashkeys.aayushrawat.in/api/health`
+- Frontend health endpoint (Vercel): `/api/health`
+- Realtime socket health endpoint (Render): `/health`
+- To prevent multiplayer cold starts, monitor the Render socket URL (not only the Vercel URL), for example:
+  - `https://<your-render-service>.onrender.com/health`
+- Optional second monitor for frontend availability:
+  - `https://<your-frontend-domain>/api/health`
+- Recommended UptimeRobot interval: `5 minutes` with `GET` (or `HEAD`) requests.
 
 ## Deploy: Vercel + Render (Multiplayer)
 

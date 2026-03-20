@@ -21,8 +21,38 @@ function parseAllowedOrigins() {
 
 const allowedOrigins = parseAllowedOrigins();
 
+const noStoreHeaders = {
+  "Cache-Control": "no-store, max-age=0",
+  Pragma: "no-cache",
+  Expires: "0",
+};
+
+function setNoStoreHeaders(res) {
+  res.set(noStoreHeaders);
+}
+
+function getHealthPayload() {
+  return {
+    status: "ok",
+    service: "clashkeys-socket",
+    timestamp: new Date().toISOString(),
+    uptimeSeconds: Math.round(process.uptime()),
+  };
+}
+
 app.get("/", (_req, res) => {
+  setNoStoreHeaders(res);
   res.status(200).send("OK");
+});
+
+app.get("/health", (_req, res) => {
+  setNoStoreHeaders(res);
+  res.status(200).json(getHealthPayload());
+});
+
+app.head("/health", (_req, res) => {
+  setNoStoreHeaders(res);
+  res.sendStatus(200);
 });
 
 const io = new Server(server, {
