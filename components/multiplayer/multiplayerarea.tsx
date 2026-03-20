@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { socket } from "@/lib/socket";
+import { primeRealtimeConnection, socket } from "@/lib/socket";
 import GameNavbar from "@/components/game-navbar";
 import MultiplayerScorePage from "./multiplayer-score-page";
 import MultiplayerTypingArea from "./multiplayer-typing-area";
@@ -391,9 +391,9 @@ export default function MultiplayerArea({
     socket.on("progress-update", handleProgressUpdate);
     socket.on("room-settings-update", handleRoomSettingsUpdate);
     socket.on("test-started", handleTestStarted);
-    if (!socket.connected) {
-      socket.connect();
-    } else {
+
+    primeRealtimeConnection();
+    if (socket.connected) {
       handleConnect();
     }
 
