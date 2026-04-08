@@ -2,102 +2,143 @@
 
 ClashKeys is a competitive typing game with solo practice and real-time multiplayer races. Create or join a room with a 4-digit code, run timed rounds, and compare results on a live leaderboard.
 
-## Features
+## Highlights
 
-- Solo mode (`/soloplay`) with duration options: `15s`, `30s`, `60s`, `120s`
-- Multiplayer lobby (`/multiplayer`) to create or join rooms like `#1234`
-- Host-controlled room flow (`/room`): host starts rounds, sets duration, and can restart
-- Real-time multiplayer sync with Socket.IO
-- Post-race analytics: `WPM`, `Raw WPM`, `Burst WPM`, accuracy, errors, and ranked leaderboard
-- Prompt text pulled from Wikipedia random summaries with local fallback text pools
+- Solo mode at `/soloplay` with durations: `15s`, `30s`, `60s`, `120s`
+- Multiplayer lobby at `/multiplayer` with room codes like `#1234`
+- Host-controlled multiplayer room at `/room` (host sets mode + duration and starts/restarts rounds)
+- Real-time progress sync through Socket.IO
+- Post-race analytics: `WPM`, `Raw WPM`, `Burst WPM`, accuracy, error points, and leaderboard ranking
+
+## Typing Modes
+
+Both solo and multiplayer support:
+
+- `words`
+- `punctuation`
+- `numbers`
+- `quote`
+- `code`
+
+Text sourcing behavior:
+
+- `words`: Wikipedia random summary API with local fallback pool
+- `quote`: Quotable API with local fallback pool
+- `punctuation`, `numbers`, `code`: local curated text pools
 
 ## Tech Stack
 
 - Next.js 16 + React 19 + TypeScript
 - Tailwind CSS 4
-- Socket.IO (client + server)
-- Express (socket server)
+- Socket.IO client + server
+- Express socket server
+
+## Routes
+
+- `/` - landing page
+- `/soloplay` - solo typing
+- `/multiplayer` - create/join room
+- `/room` - multiplayer room
+- `/api/health` - frontend health endpoint
+
+Useful query params:
+
+- `/soloplay?duration=60&mode=quote`
+- `/room?roomId=%231234&name=Alex&duration=30&mode=words`
 
 ## Local Development
 
-1. Install root dependencies:
+1. Install frontend dependencies:
    ```bash
    npm install
    ```
-1. Install server dependencies:
+2. Install socket server dependencies:
    ```bash
    cd server
    npm install
    ```
-1. Start the socket server (Terminal 1):
+3. Start socket server (Terminal 1):
    ```bash
    cd server
    npm run dev
    ```
-   Server runs on `http://localhost:4000`.
-1. Start the Next.js app (Terminal 2):
+   Socket server runs on `http://localhost:4000`.
+4. Start Next.js app (Terminal 2):
    ```bash
    npm run dev
    ```
-   App runs on `http://localhost:3000`.
+   Frontend runs on `http://localhost:3000`.
 
-## Configuration
+## Environment Variables
 
-- Frontend socket URL uses `NEXT_PUBLIC_SOCKET_URL`.
-- If `NEXT_PUBLIC_SOCKET_URL` is not set:
-  - Development fallback is `http://localhost:4000`
-  - Production fallback is same-origin (`window.location.origin`)
-- Socket server listens on `PORT` (Render sets this automatically).
-- Allowed socket origins are controlled by `FRONTEND_ORIGIN` (or `CORS_ORIGIN`) as a comma-separated list.
-- Local default allowed origins are `http://localhost:3000` and `http://127.0.0.1:3000`.
+Frontend:
 
-## Health Checks (UptimeRobot)
+- `NEXT_PUBLIC_SOCKET_URL` - socket server URL.
+- If not set:
+  - development fallback: `http://localhost:4000`
+  - production fallback: same-origin (`window.location.origin`)
 
-- Frontend health endpoint (Vercel): `/api/health`
-- Realtime socket health endpoint (Render): `/health`
-- To prevent multiplayer cold starts, monitor the Render socket URL (not only the Vercel URL), for example:
-  - `https://<your-render-service>.onrender.com/health`
-- Optional second monitor for frontend availability:
-  - `https://<your-frontend-domain>/api/health`
-- Recommended UptimeRobot interval: `5 minutes` with `GET` (or `HEAD`) requests.
+Socket server:
 
-## Deploy: Vercel + Render (Multiplayer)
+- `PORT` - server port (defaults to `4000`; Render sets this automatically)
+- `FRONTEND_ORIGIN` - comma-separated allowed origins for Socket.IO CORS
+- `CORS_ORIGIN` - fallback if `FRONTEND_ORIGIN` is not set
+
+Local default allowed origins:
+
+- `http://localhost:3000`
+- `http://127.0.0.1:3000`
+
+## Health Checks
+
+- Frontend (Vercel): `/api/health`
+- Socket server (Render): `/health`
+- Socket server also supports `/api/health` for backward compatibility
+
+Recommended UptimeRobot setup:
+
+- Primary monitor: `https://<your-render-service>.onrender.com/health`
+- Optional frontend monitor: `https://<your-frontend-domain>/api/health`
+- Method: `GET` or `HEAD`
+- Interval: `5 minutes`
+
+## Deploy (Vercel + Render)
 
 1. Deploy socket server on Render:
-   - Create a new `Web Service` from this repo.
-   - Set `Root Directory` to `server`.
+   - Create a `Web Service` from this repo
+   - Set `Root Directory` to `server`
    - Build command: `npm install`
    - Start command: `npm start`
    - Add env var:
      - `FRONTEND_ORIGIN=https://<your-vercel-domain>`
-   - Deploy and copy the Render URL (example: `https://clashkeys-socket.onrender.com`).
-1. Configure Vercel frontend:
-   - Add env var:
-     - `NEXT_PUBLIC_SOCKET_URL=https://<your-render-service>.onrender.com`
-   - Redeploy the Vercel project.
-1. Optional for preview deployments:
-   - Set `FRONTEND_ORIGIN` on Render to a comma-separated list, for example:
-     - `https://<prod>.vercel.app,https://<preview>.vercel.app,http://localhost:3000`
-1. Verify:
-   - Open the Vercel app, join the same room from two browsers/devices, and confirm live progress updates.
+2. Copy Render URL (example: `https://clashkeys-socket.onrender.com`).
+3. Configure Vercel project env vars:
+   - `NEXT_PUBLIC_SOCKET_URL=https://<your-render-service>.onrender.com`
+4. Redeploy frontend.
+5. Verify by joining the same room from two devices/browsers and confirming live sync.
+
+Optional preview support:
+
+- Set `FRONTEND_ORIGIN` on Render as a comma-separated list, for example:
+  - `https://<prod>.vercel.app,https://<preview>.vercel.app,http://localhost:3000`
 
 ## Scripts
 
 Root (`package.json`):
 
-- `npm run dev` - start Next.js in development mode
+- `npm run dev` - start Next.js development server
 - `npm run build` - create production build
-- `npm run start` - run production server
+- `npm run start` - run Next.js production server
 - `npm run lint` - run ESLint
 
 Server (`server/package.json`):
 
 - `npm run dev` - start Express + Socket.IO server
-- `npm run start` - production start for Render
+- `npm run start` - production start
 
 ## Project Structure
 
 - `app/` - Next.js routes (`/`, `/soloplay`, `/multiplayer`, `/room`, `/api/health`)
-- `components/` - gameplay UI, score views, charts, and mode-specific logic
-- `lib/` - shared utilities (including socket client setup)
+- `components/` - gameplay UI, charts, score screens, and mode logic
+- `lib/` - shared utilities (`socket` warmup/connect logic, helpers)
 - `server/` - standalone Express + Socket.IO backend
