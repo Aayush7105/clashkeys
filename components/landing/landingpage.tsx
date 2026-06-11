@@ -2,11 +2,8 @@ import React from "react";
 import Link from "next/link";
 import TypingOnce from "../typingonce";
 import LandingGraph from "./landing-graph";
-import { ImGithub } from "react-icons/im";
-import { FaSquareXTwitter } from "react-icons/fa6";
 import { RiTwitterXLine } from "react-icons/ri";
 import { FiGithub } from "react-icons/fi";
-import { IoLogoLinkedin } from "react-icons/io";
 import { BsLinkedin } from "react-icons/bs";
 
 const Landing = () => {
