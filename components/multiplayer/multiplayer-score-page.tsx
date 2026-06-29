@@ -89,8 +89,9 @@ export default function MultiplayerScorePage({
     <div className="fixed inset-0 z-50 overflow-y-auto bg-neutral-950 text-[#d1d0c5]">
       <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col justify-center gap-3 px-3 py-6 font-mono md:gap-5 md:px-4 md:py-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm uppercase tracking-[0.2em] text-neutral-400 font-semibold mt-">
-            Test completed - room {roomId}
+          <p className="text-xl uppercase tracking-[0.2em] text-neutral-400 font-semibold mt-">
+            Test completed
+            room {roomId}
           </p>
           <button
             onClick={() => setShowLeaderboardOnly((value) => !value)}
