@@ -1,144 +1,72 @@
 # ClashKeys
 
-ClashKeys is a competitive typing game with solo practice and real-time multiplayer races. Create or join a room with a 4-digit code, run timed rounds, and compare results on a live leaderboard.
+ClashKeys is a full-stack web application designed to help users improve
+their typing speed, accuracy, and consistency through interactive typing
+challenges. The platform provides real-time feedback, tracks user
+performance over time, and maintains a competitive leaderboard to
+encourage continuous improvement.
 
-## Highlights
+The application is suitable for students, professionals, and anyone
+looking to enhance their typing skills. By combining timed typing tests
+with detailed performance analytics, ClashKeys offers an engaging and
+effective learning experience.
 
-- Solo mode at `/soloplay` with durations: `15s`, `30s`, `60s`, `120s`
-- Multiplayer lobby at `/multiplayer` with room codes like `#1234`
-- Host-controlled multiplayer room at `/room` (host sets mode + duration and starts/restarts rounds)
-- Real-time progress sync through Socket.IO
-- Post-race analytics: `WPM`, `Raw WPM`, `Burst WPM`, accuracy, error points, and leaderboard ranking
+## Features
 
-## Typing Modes
+-   User authentication and secure account management
+-   Timed typing tests with configurable durations
+-   Real-time calculation of Words Per Minute (WPM) and typing accuracy
+-   Detailed performance statistics and progress tracking
+-   Personal typing history and stored test results
+-   Global leaderboard to compare performance with other users
+-   Responsive interface optimized for desktop and mobile devices
+-   Clean and intuitive user experience with fast page navigation
 
-Both solo and multiplayer support:
+## Real-Time Communication
 
-- `words`
-- `punctuation`
-- `numbers`
-- `quote`
-- `code`
+ClashKeys uses Socket.IO to establish a persistent real-time connection
+between the client and the server. Instead of repeatedly sending HTTP
+requests, the application maintains a WebSocket connection that allows
+data to be exchanged instantly.
 
-Text sourcing behavior:
+This enables features such as:
 
-- `words`: Wikipedia random summary API with local fallback pool
-- `quote`: Quotable API with local fallback pool
-- `punctuation`, `numbers`, `code`: local curated text pools
+-   Live typing synchronization during multiplayer typing sessions
+-   Instant broadcasting of player progress and results
+-   Real-time leaderboard updates
+-   Immediate game state synchronization for all connected players
+-   Low-latency communication for a smooth competitive experience
 
-## Tech Stack
+The socket-based architecture ensures that every participant receives
+updates as soon as they occur, making multiplayer typing battles
+responsive and interactive.
 
-- Next.js 16 + React 19 + TypeScript
-- Tailwind CSS 4
-- Socket.IO client + server
-- Express socket server
+## Technology Stack
 
-## Routes
+### Frontend
 
-- `/` - landing page
-- `/soloplay` - solo typing
-- `/multiplayer` - create/join room
-- `/room` - multiplayer room
-- `/api/health` - frontend health endpoint
+-   Next.js
+-   React
+-   TypeScript
+-   Tailwind CSS
 
-Useful query params:
+### Backend
 
-- `/soloplay?duration=60&mode=quote`
-- `/room?roomId=%231234&name=Alex&duration=30&mode=words`
+-   Node.js
+-   Express.js
+-   TypeScript
 
-## Local Development
 
-1. Install frontend dependencies:
-   ```bash
-   npm install
-   ```
-2. Install socket server dependencies:
-   ```bash
-   cd server
-   npm install
-   ```
-3. Start socket server (Terminal 1):
-   ```bash
-   cd server
-   npm run dev
-   ```
-   Socket server runs on `http://localhost:4000`.
-4. Start Next.js app (Terminal 2):
-   ```bash
-   npm run dev
-   ```
-   Frontend runs on `http://localhost:3000`.
+### Real-Time
 
-## Environment Variables
+-   Socket.IO (WebSockets)
 
-Frontend:
 
-- `NEXT_PUBLIC_SOCKET_URL` - socket server URL.
-- If not set:
-  - development fallback: `http://localhost:4000`
-  - production fallback: same-origin (`window.location.origin`)
+## Purpose
 
-Socket server:
-
-- `PORT` - server port (defaults to `4000`; Render sets this automatically)
-- `FRONTEND_ORIGIN` - comma-separated allowed origins for Socket.IO CORS
-- `CORS_ORIGIN` - fallback if `FRONTEND_ORIGIN` is not set
-
-Local default allowed origins:
-
-- `http://localhost:3000`
-- `http://127.0.0.1:3000`
-
-## Health Checks
-
-- Frontend (Vercel): `/api/health`
-- Socket server (Render): `/health`
-- Socket server also supports `/api/health` for backward compatibility
-
-Recommended UptimeRobot setup:
-
-- Primary monitor: `https://<your-render-service>.onrender.com/health`
-- Optional frontend monitor: `https://<your-frontend-domain>/api/health`
-- Method: `GET` or `HEAD`
-- Interval: `5 minutes`
-
-## Deploy (Vercel + Render)
-
-1. Deploy socket server on Render:
-   - Create a `Web Service` from this repo
-   - Set `Root Directory` to `server`
-   - Build command: `npm install`
-   - Start command: `npm start`
-   - Add env var:
-     - `FRONTEND_ORIGIN=https://<your-vercel-domain>`
-2. Copy Render URL (example: `https://clashkeys-socket.onrender.com`).
-3. Configure Vercel project env vars:
-   - `NEXT_PUBLIC_SOCKET_URL=https://<your-render-service>.onrender.com`
-4. Redeploy frontend.
-5. Verify by joining the same room from two devices/browsers and confirming live sync.
-
-Optional preview support:
-
-- Set `FRONTEND_ORIGIN` on Render as a comma-separated list, for example:
-  - `https://<prod>.vercel.app,https://<preview>.vercel.app,http://localhost:3000`
-
-## Scripts
-
-Root (`package.json`):
-
-- `npm run dev` - start Next.js development server
-- `npm run build` - create production build
-- `npm run start` - run Next.js production server
-- `npm run lint` - run ESLint
-
-Server (`server/package.json`):
-
-- `npm run dev` - start Express + Socket.IO server
-- `npm run start` - production start
-
-## Project Structure
-
-- `app/` - Next.js routes (`/`, `/soloplay`, `/multiplayer`, `/room`, `/api/health`)
-- `components/` - gameplay UI, charts, score screens, and mode logic
-- `lib/` - shared utilities (`socket` warmup/connect logic, helpers)
-- `server/` - standalone Express + Socket.IO backend
+The primary goal of ClashKeys is to provide a modern platform where
+users can regularly practice typing, measure their improvement, and
+compete with others. The project demonstrates the implementation of a
+complete full-stack application, including authentication, database
+management, REST APIs, real-time communication using WebSockets, and
+responsive frontend development.
