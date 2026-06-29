@@ -39,7 +39,7 @@ export default function MultiplayerWaitingRoom({
           <p className="mt-2 text-xs uppercase tracking-[0.2em] text-neutral-500">
             Mode {selectedMode}
           </p>
-          <p className="mt-1 text-xs uppercase tracking-[0.2em] text-neutral-500">
+          <p className="text-lg uppercase tracking-widest text-[#f6cb30] font-bold mt-5 font-mono">
             Duration {selectedDuration}
             <span className="text-[10px]">s</span>
           </p>
