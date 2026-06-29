@@ -63,113 +63,101 @@ export default function MultiplayerLeaderboard({
   const gridCols = "grid-cols-[2.5rem_minmax(0,1fr)_4rem_4.5rem_4rem]";
 
   return (
-    <div className="space-y-3 font-mono">
-      {/* Heading */}
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight text-[#d1d0c5]">
-          room leaderboard
-        </h2>
-        <p className="mt-0.5 text-xs tracking-[0.15em] text-[#646669] uppercase">
-          test completed
-        </p>
+    <div className="space-y-2 border-t border-neutral-600 font-mono">
+      {/* Header */}
+      <div
+        className={`grid ${gridCols} gap-2 px-3 pt-1 text-[10px] uppercase tracking-[0.2em] text-[#646669] border-b border-[#2c2f36] pb-2`}
+      >
+        <div>rank</div>
+        <div>player</div>
+        <div className="text-right">wpm</div>
+        <div className="text-right">acc</div>
+        <div className="text-right">error</div>
       </div>
 
-      {/* Table */}
-      <div className="space-y-2 border-t border-neutral-600">
-        <div
-          className={`grid ${gridCols} gap-2 px-3 pt-2 pb-1 text-[10px] uppercase tracking-[0.2em] text-[#646669] border-b border-[#2c2f36]`}
-        >
-          <div>rank</div>
-          <div>player</div>
-          <div className="text-right">wpm</div>
-          <div className="text-right">acc</div>
-          <div className="text-right">error</div>
+      {rows.length === 0 ? (
+        <div className="text-sm text-[#646669]">
+          No players found in this room.
         </div>
+      ) : (
+        rows.map((row, index) => {
+          const isCurrentUser = Boolean(
+            currentUserId && row.id === currentUserId,
+          );
+          const isFirst = index === 0;
 
-        {rows.length === 0 ? (
-          <div className="text-sm text-[#646669]">
-            No players found in this room.
-          </div>
-        ) : (
-          rows.map((row, index) => {
-            const isCurrentUser = Boolean(
-              currentUserId && row.id === currentUserId,
-            );
-            const isFirst = index === 0;
-
-            return (
+          return (
+            <div
+              key={row.id}
+              className={`grid ${gridCols} items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors ${
+                isCurrentUser
+                  ? "border-[#e2b714]/60 bg-[#e2b714]/10 hover:border-[#e2b714]/80"
+                  : "border-[#3a3f49] bg-neutral-900 hover:border-[#4a5060]"
+              }`}
+            >
+              {/* Rank */}
               <div
-                key={row.id}
-                className={`grid ${gridCols} items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors ${
-                  isCurrentUser
-                    ? "border-[#e2b714]/60 bg-[#e2b714]/10 hover:border-[#e2b714]/80"
-                    : "border-[#3a3f49] bg-neutral-900 hover:border-[#4a5060]"
-                }`}
+                className={`font-semibold ${isFirst ? "text-[#e2b714]" : "text-[#646669]"}`}
               >
-                {/* Rank */}
-                <div
-                  className={`font-semibold ${isFirst ? "text-[#e2b714]" : "text-[#646669]"}`}
-                >
-                  #{index + 1}
-                </div>
+                #{index + 1}
+              </div>
 
-                {/* Player */}
-                <div className="flex min-w-0 items-center gap-2">
-                  <div
-                    className={`flex h-[22px] w-[22px] flex-shrink-0 items-center justify-center rounded-full border text-[9px] font-semibold ${
-                      isCurrentUser
-                        ? "border-[#e2b714]/40 bg-[#e2b714]/15 text-[#e2b714]"
-                        : "border-[#3a3f49] bg-[#2a2d35] text-[#646669]"
-                    }`}
-                  >
-                    {getInitials(row.name)}
-                  </div>
-                  <div className="min-w-0">
-                    <span className="block truncate text-[#d1d0c5]">
-                      {row.name}
+              {/* Player */}
+              <div className="flex min-w-0 items-center gap-2">
+                <div
+                  className={`flex h-[22px] w-[22px] flex-shrink-0 items-center justify-center rounded-full border text-[9px] font-semibold ${
+                    isCurrentUser
+                      ? "border-[#e2b714]/40 bg-[#e2b714]/15 text-[#e2b714]"
+                      : "border-[#3a3f49] bg-[#2a2d35] text-[#646669]"
+                  }`}
+                >
+                  {getInitials(row.name)}
+                </div>
+                <div className="min-w-0">
+                  <span className="block truncate text-[#d1d0c5]">
+                    {row.name}
+                  </span>
+                  {isCurrentUser && (
+                    <span className="block text-[9px] leading-none tracking-[0.05em] text-[#e2b714]">
+                      you
                     </span>
-                    {isCurrentUser && (
-                      <span className="block text-[9px] leading-none tracking-[0.05em] text-[#e2b714]">
-                        you
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* WPM */}
-                <div className="text-right">
-                  <span className="block text-[15px] font-semibold leading-none text-[#d1d0c5]">
-                    {Math.round(row.wpm)}
-                  </span>
-                  <span className="block mt-0.5 text-[9px] tracking-[0.1em] text-[#646669]">
-                    wpm
-                  </span>
-                </div>
-
-                {/* Accuracy */}
-                <div className="text-right">
-                  <div className="mb-1 h-[2px] w-full rounded-full bg-[#2c2f36]">
-                    <div
-                      className="h-[2px] rounded-full bg-[#e2b714]"
-                      style={{ width: `${row.accuracy}%` }}
-                    />
-                  </div>
-                  <span className="text-[#d1d0c5]">
-                    {Math.round(row.accuracy)}%
-                  </span>
-                </div>
-
-                {/* Errors */}
-                <div
-                  className={`text-right ${row.errors === 0 ? "text-[#646669]" : "text-[#ca4754]"}`}
-                >
-                  {row.errors}
+                  )}
                 </div>
               </div>
-            );
-          })
-        )}
-      </div>
+
+              {/* WPM */}
+              <div className="text-right">
+                <span className="block text-[15px] font-semibold leading-none text-[#d1d0c5]">
+                  {Math.round(row.wpm)}
+                </span>
+                <span className="block mt-0.5 text-[9px] tracking-[0.1em] text-[#646669]">
+                  wpm
+                </span>
+              </div>
+
+              {/* Accuracy */}
+              <div className="text-right">
+                <div className="mb-1 h-[2px] w-full rounded-full bg-[#2c2f36]">
+                  <div
+                    className="h-[2px] rounded-full bg-[#e2b714]"
+                    style={{ width: `${row.accuracy}%` }}
+                  />
+                </div>
+                <span className="text-[#d1d0c5]">
+                  {Math.round(row.accuracy)}%
+                </span>
+              </div>
+
+              {/* Errors */}
+              <div
+                className={`text-right ${row.errors === 0 ? "text-[#646669]" : "text-[#ca4754]"}`}
+              >
+                {row.errors}
+              </div>
+            </div>
+          );
+        })
+      )}
     </div>
   );
 }
