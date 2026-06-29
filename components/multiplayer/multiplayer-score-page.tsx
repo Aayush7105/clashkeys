@@ -192,9 +192,6 @@ export default function MultiplayerScorePage({
           </>
         ) : (
           <section className="w-full border-t border-[#44464a] pt-3 md:pt-4">
-            <div className="mb-2 text-lg uppercase tracking-[0.2em] text-neutral-300 font-semibold">
-              Room leaderboard
-            </div>
             <MultiplayerLeaderboard
               users={users}
               elapsedMs={safeElapsedMs}
