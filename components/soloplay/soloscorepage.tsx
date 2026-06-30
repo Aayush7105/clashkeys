@@ -56,16 +56,20 @@ const SoloScorePage: React.FC<Props> = ({
         : "text-[#ca4754]";
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-neutral-950 text-[#d1d0c5]">
-      <div className="mx-auto flex h-screen w-full max-w-7xl flex-col justify-center gap-3 px-3 py-3 font-mono md:gap-5 md:px-4 md:py-4">
-        <p className="text-xs uppercase tracking-[0.2em] text-neutral-200">
-          Test completed
-        </p>
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-neutral-950 text-[#d1d0c5]">
+      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col justify-center gap-3 px-3 py-6 font-mono md:gap-5 md:px-4 md:py-8">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-5xl font-semibold uppercase tracking-normal text-neutral-400">
+            Test completed
+            <br />
+            <span className="text-3xl tracking-normal">solo play</span>
+          </p>
+        </div>
 
         <section className="flex w-full flex-col gap-2 md:gap-4 lg:flex-row lg:items-start">
           <div className="flex gap-4 md:gap-6 lg:w-[15%] lg:flex-col">
             <div>
-              <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
+              <div className="text-xs uppercase tracking-[0.2em] text-neutral-500">
                 wpm
               </div>
               <div className="text-4xl font-semibold leading-none text-[#e2b714] md:text-6xl">
@@ -73,7 +77,7 @@ const SoloScorePage: React.FC<Props> = ({
               </div>
             </div>
             <div>
-              <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
+              <div className="text-xs uppercase tracking-[0.2em] text-neutral-500">
                 acc
               </div>
               <div
@@ -95,67 +99,121 @@ const SoloScorePage: React.FC<Props> = ({
           </div>
         </section>
 
-        <section className="grid w-full grid-cols-2 gap-3 border-t border-[#44464a] pt-3 md:grid-cols-5 md:gap-4 md:pt-4">
-          <div>
-            <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
-              characters
+        <section className="overflow-hidden rounded-lg border border-[#30343d] bg-[#14161a] font-mono">
+          <div className="flex flex-col gap-3 border-b border-[#30343d] bg-[#181b20] px-4 py-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-[#646669]">
+                score breakdown
+              </p>
+              <h2 className="mt-1 text-2xl font-semibold leading-none text-[#d1d0c5] sm:text-3xl">
+                Metrics
+              </h2>
             </div>
-            <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">
-              {correctChars}
-              <span className="mx-1 text-[#646669]">/</span>
-              <span className="text-[#ca4754]">{incorrectChars}</span>
-            </div>
-          </div>
-          <div>
-            <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
-              keystrokes
-            </div>
-            <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">
-              {totalChars}
-            </div>
-          </div>
-          <div>
-            <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
-              time
-            </div>
-            <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">
-              {timeElapsed}s
+            <div className="text-left sm:text-right">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#646669]">
+                duration
+              </p>
+              <p className="mt-0.5 text-lg font-semibold leading-none text-[#e2b714]">
+                {timeElapsed}s
+              </p>
             </div>
           </div>
-          <div>
-            <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
-              raw
-            </div>
-            <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">
-              {Math.round(rawWpm)}
-            </div>
+
+          <div className="grid grid-cols-[minmax(0,1fr)_5rem_6rem] gap-2 border-b border-[#30343d] bg-[#111317] px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#646669] sm:grid-cols-[minmax(0,1fr)7rem_7rem]">
+            <div>metric</div>
+            <div className="text-right">value</div>
+            <div className="text-right">detail</div>
           </div>
-          <div>
-            <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
-              errors
+
+          <div className="divide-y divide-[#242832]">
+            <div className="grid grid-cols-[minmax(0,1fr)_5rem_6rem] items-center gap-2 px-4 py-3.5 text-sm sm:grid-cols-[minmax(0,1fr)7rem_7rem]">
+              <div>
+                <div className="text-[15px] font-semibold leading-tight text-[#d1d0c5]">
+                  Characters
+                </div>
+              </div>
+              <div className="text-right text-xl font-semibold leading-none text-[#d1d0c5] tabular-nums">
+                {correctChars}
+              </div>
+              <div className="text-right text-sm font-semibold text-[#8f949e] tabular-nums">
+                <span className="text-[#d1d0c5]">{correctChars}</span>
+                <span className="mx-1 text-[#646669]">/</span>
+                <span className="text-[#ca4754]">{incorrectChars}</span>
+              </div>
             </div>
-            <div className="mt-1 text-xl text-[#ca4754] md:mt-1.5 md:text-3xl">
-              {incorrectChars}
+
+            <div className="grid grid-cols-[minmax(0,1fr)_5rem_6rem] items-center gap-2 px-4 py-3.5 text-sm sm:grid-cols-[minmax(0,1fr)7rem_7rem]">
+              <div>
+                <div className="text-[15px] font-semibold leading-tight text-[#d1d0c5]">
+                  Keystrokes
+                </div>
+                <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#646669]">
+                  total input
+                </p>
+              </div>
+              <div className="text-right text-xl font-semibold leading-none text-[#d1d0c5] tabular-nums">
+                {totalChars}
+              </div>
+              <div className="text-right text-sm font-semibold uppercase text-emerald-500 tabular-nums">
+                {correctChars}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-[minmax(0,1fr)_5rem_6rem] items-center gap-2 px-4 py-3.5 text-sm sm:grid-cols-[minmax(0,1fr)7rem_7rem]">
+              <div>
+                <div className="text-[15px] font-semibold leading-tight text-[#d1d0c5]">
+                  Raw speed
+                </div>
+                <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#646669]">
+                  before errors
+                </p>
+              </div>
+              <div className="text-right text-xl font-semibold leading-none text-[#d1d0c5] tabular-nums">
+                {Math.round(rawWpm)}
+              </div>
+              <div className="text-right text-sm font-semibold uppercase text-[#8f949e]">
+                wpm
+              </div>
+            </div>
+
+            <div className="grid grid-cols-[minmax(0,1fr)_5rem_6rem] items-center gap-2 px-4 py-3.5 text-sm sm:grid-cols-[minmax(0,1fr)7rem_7rem]">
+              <div>
+                <div className="text-[15px] font-semibold leading-tight text-[#d1d0c5]">
+                  Errors
+                </div>
+                <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#646669]">
+                  missed characters
+                </p>
+              </div>
+              <div className="text-right text-xl font-semibold leading-none text-[#ca4754] tabular-nums">
+                {incorrectChars}
+              </div>
+              <div className="text-right text-sm font-semibold uppercase text-[#8f949e] tabular-nums">
+                {Math.round(accuracy)}% acc
+              </div>
             </div>
           </div>
         </section>
 
-        <div className="mt-5 flex flex-col justify-center items-center gap-5 text-[11px] uppercase tracking-[0.2em] text-[#646669] md:gap-4 md:text-xs">
+        <section className="mt-3 w-full border-t border-[#44464a] pt-3 md:pt-4">
+          <div className="flex flex-col items-center justify-center gap-2">
           <button
             onClick={() => window.location.reload()}
-            className="cursor-pointer transition-colors hover:text-[#e2b714]"
+            className="cursor-pointer rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-[#e2b714] md:text-sm"
             type="button"
+            aria-label="restart test"
           >
-            <RxReload className="size-8" />
+            <RxReload className="size-7" />
           </button>
           <button
             onClick={onRestart}
-            className="transition-colors hover:text-[#d1d0c5]"
+            className="rounded-xl text-center text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:border-[#e2b714] hover:text-[#e2b714] md:text-sm"
             type="button"
           >
-            back to home
+            go back
           </button>
-        </div>
+          </div>
+        </section>
       </div>
     </div>
   );
