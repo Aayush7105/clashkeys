@@ -332,7 +332,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
 
   if (endTime) {
     function handleRestart(): void {
-      throw new Error("Function not implemented.");
+      window.location.href = "/";
     }
 
     return (
