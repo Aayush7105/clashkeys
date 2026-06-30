@@ -145,47 +145,103 @@ export default function MultiplayerScorePage({
               </div>
             </section>
 
-            <section className="grid w-full grid-cols-2 gap-3 border-t border-[#44464a] pt-3 md:grid-cols-5 md:gap-4 md:pt-4">
-              <div>
-                <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
-                  characters
+            <section className="overflow-hidden rounded-lg border border-[#30343d] bg-[#14161a] font-mono">
+              <div className="flex flex-col gap-3 border-b border-[#30343d] bg-[#181b20] px-4 py-4 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-[#646669]">
+                    score breakdown
+                  </p>
+                  <h2 className="mt-1 text-2xl font-semibold leading-none text-[#d1d0c5] sm:text-3xl">
+                    Metrics
+                  </h2>
                 </div>
-                <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">
-                  {correctKeystrokes}
-                  <span className="mx-1 text-[#646669]">/</span>
-                  <span className="text-[#ca4754]">{incorrectChars}</span>
-                </div>
-              </div>
-              <div>
-                <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
-                  keystrokes
-                </div>
-                <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">
-                  {totalKeystrokes}
-                </div>
-              </div>
-              <div>
-                <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
-                  time
-                </div>
-                <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">
-                  {safeSeconds}s
+                <div className="text-left sm:text-right">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#646669]">
+                    duration
+                  </p>
+                  <p className="mt-0.5 text-lg font-semibold leading-none text-[#e2b714]">
+                    {safeSeconds}s
+                  </p>
                 </div>
               </div>
-              <div>
-                <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
-                  raw
-                </div>
-                <div className="mt-1 text-xl text-[#d1d0c5] md:mt-1.5 md:text-3xl">
-                  {Math.round(rawWpm)}
-                </div>
+
+              <div className="grid grid-cols-[minmax(0,1fr)_5rem_6rem] gap-2 border-b border-[#30343d] bg-[#111317] px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#646669] sm:grid-cols-[minmax(0,1fr)7rem_7rem]">
+                <div>metric</div>
+                <div className="text-right">value</div>
+                <div className="text-right">detail</div>
               </div>
-              <div>
-                <div className="text-xs uppercase tracking-[0.2em] text-[#646669]">
-                  errors
+
+              <div className="divide-y divide-[#242832]">
+                <div className="grid grid-cols-[minmax(0,1fr)_5rem_6rem] items-center gap-2 px-4 py-3.5 text-sm sm:grid-cols-[minmax(0,1fr)7rem_7rem]">
+                  <div>
+                    <div className="text-[15px] font-semibold leading-tight text-[#d1d0c5]">
+                      Characters
+                    </div>
+                    
+                  </div>
+                  <div className="text-right text-xl font-semibold leading-none text-[#d1d0c5] tabular-nums">
+                    {correctKeystrokes}
+                  </div>
+                  <div className="text-right text-sm font-semibold text-[#8f949e] tabular-nums">
+                    <span className="text-[#d1d0c5]">{correctKeystrokes}</span>
+                    <span className="mx-1 text-[#646669]">/</span>
+                    <span className="text-[#ca4754]">{incorrectChars}</span>
+                  </div>
+                  
                 </div>
-                <div className="mt-1 text-xl text-[#ca4754] md:mt-1.5 md:text-3xl">
-                  {incorrectChars}
+
+                <div className="grid grid-cols-[minmax(0,1fr)_5rem_6rem] items-center gap-2 px-4 py-3.5 text-sm sm:grid-cols-[minmax(0,1fr)7rem_7rem]">
+                  <div>
+                    <div className="text-[15px] font-semibold leading-tight text-[#d1d0c5]">
+                      Keystrokes
+                    </div>
+                    <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#646669]">
+                      total input
+                    </p>
+                  </div>
+                  <div className="text-right text-xl font-semibold leading-none text-[#d1d0c5] tabular-nums">
+                    {totalKeystrokes}
+                  </div>
+                  <div className=" uppercase text-right text-sm font-semibold text-[#8f949e] tabular-nums">
+                    {correctKeystrokes} CORRECT
+                  </div>
+                  
+                </div>
+
+                <div className="grid grid-cols-[minmax(0,1fr)_5rem_6rem] items-center gap-2 px-4 py-3.5 text-sm sm:grid-cols-[minmax(0,1fr)7rem_7rem]">
+                  <div>
+                    <div className="text-[15px] font-semibold leading-tight text-[#d1d0c5]">
+                      Raw speed
+                    </div>
+                    <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#646669]">
+                      before errors
+                    </p>
+                  </div>
+                  <div className="text-right text-xl font-semibold leading-none text-[#d1d0c5] tabular-nums">
+                    {Math.round(rawWpm)}
+                  </div>
+                  <div className="uppercase text-right text-sm font-semibold text-[#8f949e]">
+                    wpm
+                  </div>
+                 
+                </div>
+
+                <div className="grid grid-cols-[minmax(0,1fr)_5rem_6rem] items-center gap-2 px-4 py-3.5 text-sm sm:grid-cols-[minmax(0,1fr)7rem_7rem]">
+                  <div>
+                    <div className="text-[15px] font-semibold leading-tight text-[#d1d0c5]">
+                      Errors
+                    </div>
+                    <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#646669]">
+                      missed characters
+                    </p>
+                  </div>
+                  <div className="text-right text-xl font-semibold leading-none text-[#ca4754] tabular-nums">
+                    {incorrectChars}
+                  </div>
+                  <div className="uppercase text-right text-sm font-semibold text-[#8f949e] tabular-nums">
+                    {Math.round(accuracy)}% acc
+                  </div>
+                  
                 </div>
               </div>
             </section>
