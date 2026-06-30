@@ -202,8 +202,8 @@ export default function MultiplayerScorePage({
                   <div className="text-right text-xl font-semibold leading-none text-[#d1d0c5] tabular-nums">
                     {totalKeystrokes}
                   </div>
-                  <div className=" uppercase text-right text-sm font-semibold text-[#8f949e] tabular-nums">
-                    {correctKeystrokes} CORRECT
+                  <div className=" uppercase text-right text-sm font-semibold text-emerald-500 tabular-nums">
+                    {correctKeystrokes} 
                   </div>
                   
                 </div>
