@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import type { RoomUser } from "./multiplayer-types";
 
 type MultiplayerLeaderboardProps = {
@@ -79,9 +80,21 @@ export default function MultiplayerLeaderboard({
     : null;
   const gridCols =
     "grid-cols-[3rem_minmax(0,1fr)_4rem_4.5rem_4rem] sm:grid-cols-[3.5rem_minmax(0,1fr)_5rem_5rem_4.5rem]";
+  const rowDropVariants = {
+    hidden: {
+      opacity: 0,
+      y: -22,
+      scale: 0.98,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+    },
+  };
 
   return (
-    <div className="overflow-hidden rounded-lg border border-[#30343d] bg-[#14161a] font-mono">
+    <div className="overflow-hidden rounded-lg border-x border-t border-[#30343d] bg-[#14161a] font-mono">
       <div className="flex flex-col gap-3 border-b border-[#30343d] bg-[#181b20] px-4 py-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-[#646669]">
@@ -127,7 +140,20 @@ export default function MultiplayerLeaderboard({
             <div className="text-right">error</div>
           </div>
 
-          <div className="divide-y divide-[#242832]">
+          <motion.div
+            className="divide-y divide-[#242832]"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: {},
+              visible: {
+                transition: {
+                  staggerChildren: 0.08,
+                  delayChildren: 0.08,
+                },
+              },
+            }}
+          >
             {rows.map((row, index) => {
               const rank = index + 1;
               const isCurrentUser = Boolean(
@@ -144,8 +170,15 @@ export default function MultiplayerLeaderboard({
                       : "text-[#646669]";
 
               return (
-                <div
+                <motion.div
                   key={row.id}
+                  variants={rowDropVariants}
+                  transition={{
+                    type: "spring",
+                    stiffness: 520,
+                    damping: 34,
+                    mass: 0.8,
+                  }}
                   className={`grid ${gridCols} items-center gap-2 px-4 py-3.5 text-sm transition-colors ${
                     isCurrentUser
                       ? "bg-[#e2b714]/10"
@@ -227,10 +260,10 @@ export default function MultiplayerLeaderboard({
                       {row.errors}
                     </span>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </>
       )}
     </div>
