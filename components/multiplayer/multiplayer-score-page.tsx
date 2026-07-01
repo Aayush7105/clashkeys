@@ -95,7 +95,7 @@ export default function MultiplayerScorePage({
           </p>
           <button
             onClick={() => setShowLeaderboardOnly((value) => !value)}
-            className="rounded-lg border border-[#3a3f49] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#d1d0c5] transition-colors hover:border-[#e2b714] hover:text-[#e2b714]"
+            className="rounded-lg ring ring-[#3a3f49] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#d1d0c5] transition-colors hover:ring-[#e2b714] hover:text-[#e2b714]"
             type="button"
           >
             {showLeaderboardOnly ? "show score" : "see leaderboard"}
@@ -145,8 +145,8 @@ export default function MultiplayerScorePage({
               </div>
             </section>
 
-            <section className="overflow-hidden rounded-lg border border-[#30343d] bg-[#14161a] font-mono">
-              <div className="flex flex-col gap-3 border-b border-[#30343d] bg-[#181b20] px-4 py-4 sm:flex-row sm:items-end sm:justify-between">
+            <section className="overflow-hidden rounded-lg ring ring-neutral-900 bg-neutral-950 font-mono">
+              <div className="flex flex-col gap-3 ring-b ring-neutral-900 bg-neutral-950 px-4 py-4 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-[#646669]">
                     score breakdown
@@ -155,7 +155,7 @@ export default function MultiplayerScorePage({
                     Metrics
                   </h2>
                 </div>
-                <div className="text-left sm:text-right">
+                <div className="text-left sm:text-right ">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#646669]">
                     duration
                   </p>
@@ -165,13 +165,13 @@ export default function MultiplayerScorePage({
                 </div>
               </div>
 
-              <div className="grid grid-cols-[minmax(0,1fr)_5rem_6rem] gap-2 border-b border-[#30343d] bg-[#111317] px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#646669] sm:grid-cols-[minmax(0,1fr)7rem_7rem]">
-                <div>metric</div>
-                <div className="text-right">value</div>
-                <div className="text-right">detail</div>
+              <div className="grid grid-cols-[minmax(0,1fr)_5rem_6rem] gap-2 ring-b ring-neutral-900 bg-[#111317] px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#646669] sm:grid-cols-[minmax(0,1fr)7rem_7rem]">
+                <div className="text-sm">metric</div>
+                <div className="text-right text-sm">value</div>
+                <div className="text-right text-sm">detail</div>
               </div>
 
-              <div className="divide-y divide-[#242832]">
+              <div className="divide-y divide-neutral-800">
                 <div className="grid grid-cols-[minmax(0,1fr)_5rem_6rem] items-center gap-2 px-4 py-3.5 text-sm sm:grid-cols-[minmax(0,1fr)7rem_7rem]">
                   <div>
                     <div className="text-[15px] font-semibold leading-tight text-[#d1d0c5]">
@@ -247,7 +247,7 @@ export default function MultiplayerScorePage({
             </section>
           </>
         ) : (
-          <section className="w-full border-t border-[#44464a] pt-3 md:pt-4">
+          <section className="w-full ring-t ring-[#44464a] pt-3 md:pt-4">
             <MultiplayerLeaderboard
               users={users}
               elapsedMs={safeElapsedMs}
@@ -256,12 +256,12 @@ export default function MultiplayerScorePage({
           </section>
         )}
 
-        <section className="w-full border-t mt-3 border-[#44464a] pt-3 md:pt-4">
+        <section className="w-full ring-t mt-3 ring-[#44464a] pt-3 md:pt-4">
           <div className="flex flex-col justify-center items-center gap-2">
             {isHost ? (
               <button
                 onClick={onRestart}
-                className="cursor-pointer rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-[#e2b714] md:text-sm"
+                className="cursor-pointer rounded-xl px-4 py-2 text-xl font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-[#e2b714] md:text-sm"
                 type="button"
                 aria-label="restart test"
               >
@@ -275,7 +275,7 @@ export default function MultiplayerScorePage({
 
             <button
               onClick={onExit}
-              className="rounded-xl text-center text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:border-[#e2b714] hover:text-[#e2b714] md:text-sm"
+              className= "bg-amber-300 ring px-2 py-1 ring-amber-300 rounded-xl text-center text-xs font-semibold uppercase tracking-normal text-neutral-950 transition-colors hover:ring-[#e2b714]  md:text-sm cursor-pointer"
               type="button"
             >
               go back
