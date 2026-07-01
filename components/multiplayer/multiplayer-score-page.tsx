@@ -7,6 +7,12 @@ import MultiplayerLeaderboard, {
 } from "./multiplayer-leaderboard";
 import type { RoomUser } from "./multiplayer-types";
 import { RiResetRightFill } from "react-icons/ri";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type MultiplayerScorePageProps = {
   roomId: string;
@@ -165,7 +171,7 @@ export default function MultiplayerScorePage({
                 </div>
               </div>
 
-              <div className="grid grid-cols-[minmax(0,1fr)_5rem_6rem] gap-2 ring-b ring-neutral-900 bg-[#111317] px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#646669] sm:grid-cols-[minmax(0,1fr)7rem_7rem]">
+              <div className="grid grid-cols-[minmax(0,1fr)_5rem_6rem] gap-2 ring-b ring-neutral-900 bg-neutral-900 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-[#646669] sm:grid-cols-[minmax(0,1fr)7rem_7rem]">
                 <div className="text-sm">metric</div>
                 <div className="text-right text-sm">value</div>
                 <div className="text-right text-sm">detail</div>
@@ -259,14 +265,21 @@ export default function MultiplayerScorePage({
         <section className="w-full ring-t mt-3 ring-[#44464a] pt-3 md:pt-4">
           <div className="flex flex-col justify-center items-center gap-2">
             {isHost ? (
-              <button
-                onClick={onRestart}
-                className="cursor-pointer rounded-xl px-4 py-2 text-xl font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-[#e2b714] md:text-sm"
-                type="button"
-                aria-label="restart test"
-              >
-                <RiResetRightFill className="size-7" />
-              </button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={onRestart}
+                      className="cursor-pointer rounded-xl px-4 py-2 text-xl font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-[#e2b714] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e2b714] md:text-sm"
+                      type="button"
+                      aria-label="restart test"
+                    >
+                      <RiResetRightFill className="size-7" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">restart</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             ) : (
               <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-500 md:text-xs">
                 only host can restart
@@ -275,7 +288,7 @@ export default function MultiplayerScorePage({
 
             <button
               onClick={onExit}
-              className= "bg-amber-300 ring px-2 py-1 ring-amber-300 rounded-xl text-center text-xs font-semibold uppercase tracking-normal text-neutral-950 transition-colors hover:ring-[#e2b714]  md:text-sm cursor-pointer"
+              className= "bg-amber-300 ring px-2 py-1 ring-amber-300 rounded-xl text-center text-xs font-semibold uppercase tracking-normal text-neutral-950 transition-colors hover:bg-amber-300/95 md:text-sm cursor-pointer"
               type="button"
             >
               go back
