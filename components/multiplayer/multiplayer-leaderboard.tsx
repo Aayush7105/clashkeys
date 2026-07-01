@@ -94,19 +94,19 @@ export default function MultiplayerLeaderboard({
   };
 
   return (
-    <div className="overflow-hidden rounded-lg border-x border-t border-[#30343d] bg-[#14161a] font-mono">
-      <div className="flex flex-col gap-3 border-b border-[#30343d] bg-[#181b20] px-4 py-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className="overflow-hidden rounded-lg ring ring-neutral-900 bg-neutral-950 font-mono">
+      <div className="flex flex-col gap-3 ring-b ring-neutral-900 bg-neutral-950 px-4 py-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-[#646669]">
+          <p className="text-[13px] font-semibold uppercase tracking-normal text-[#646669]">
             final standings
           </p>
           <h2 className="mt-1 text-2xl font-semibold leading-none text-[#d1d0c5] sm:text-3xl">
             Leaderboard
           </h2>
         </div>
-        <div className="flex gap-4 text-left sm:text-right">
+        <div className="flex gap-7 text-left sm:text-right">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#646669]">
+            <p className="text-[12px] font-semibold uppercase tracking-noraml text-[#646669]">
               players
             </p>
             <p className="mt-0.5 text-lg font-semibold leading-none text-[#d1d0c5]">
@@ -114,7 +114,7 @@ export default function MultiplayerLeaderboard({
             </p>
           </div>
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#646669]">
+            <p className="text-[12px] font-semibold uppercase tracking-normal text-[#646669]">
               your rank
             </p>
             <p className="mt-0.5 text-lg font-semibold leading-none text-[#e2b714]">
@@ -131,17 +131,17 @@ export default function MultiplayerLeaderboard({
       ) : (
         <>
           <div
-            className={`grid ${gridCols} gap-2 border-b border-[#30343d] bg-[#111317] px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#646669]`}
+            className={`grid ${gridCols} gap-2 ring-b ring-neutral-900 bg-neutral-900 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-[#646669]`}
           >
-            <div>rank</div>
-            <div>player</div>
-            <div className="text-right">wpm</div>
-            <div className="text-right">acc</div>
-            <div className="text-right">error</div>
+            <div className="text-sm">rank</div>
+            <div className="text-sm">player</div>
+            <div className="text-right text-sm">wpm</div>
+            <div className="text-right text-sm">acc</div>
+            <div className="text-right text-sm">error</div>
           </div>
 
           <motion.div
-            className="divide-y divide-[#242832]"
+            className="divide-y divide-neutral-800"
             initial="hidden"
             animate="visible"
             variants={{
@@ -181,8 +181,8 @@ export default function MultiplayerLeaderboard({
                   }}
                   className={`grid ${gridCols} items-center gap-2 px-4 py-3.5 text-sm transition-colors ${
                     isCurrentUser
-                      ? "bg-[#e2b714]/10"
-                      : "hover:bg-[#191b20]"
+                      ? "bg-neutral-800"
+                      : "hover:bg-neutral-900"
                   }`}
                 >
                   <div>
@@ -200,10 +200,10 @@ export default function MultiplayerLeaderboard({
 
                   <div className="flex min-w-0 items-center gap-2.5">
                     <div
-                      className={`flex h-8 w-8 flex-none items-center justify-center rounded-md border text-[11px] font-semibold ${
+                      className={`flex h-8 w-8 flex-none items-center justify-center rounded-md ring text-[11px] font-semibold ${
                         isCurrentUser
-                          ? "border-[#e2b714]/50 bg-[#e2b714]/15 text-[#e2b714]"
-                          : "border-[#343943] bg-[#1f232b] text-[#8f949e]"
+                          ? "ring-neutral-800 bg-neutral-900 text-[#e2b714]"
+                          : "ring-neutral-800 bg-neutral-900 text-[#8f949e]"
                       }`}
                     >
                       {getInitials(row.name) || "P"}
@@ -214,19 +214,12 @@ export default function MultiplayerLeaderboard({
                           {row.name}
                         </span>
                         {isCurrentUser && (
-                          <span className="rounded-sm border border-[#e2b714]/40 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-[#e2b714]">
+                          <span className="rounded-sm ring ring-emerald-600 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-emerald-200">
                             you
                           </span>
                         )}
                       </div>
-                      <div className="mt-1 h-1.5 rounded-full bg-[#242832]">
-                        <div
-                          className={`h-1.5 rounded-full ${
-                            isCurrentUser ? "bg-[#e2b714]" : "bg-[#646669]"
-                          }`}
-                          style={{ width: `${row.progress}%` }}
-                        />
-                      </div>
+                      
                     </div>
                   </div>
 
@@ -234,19 +227,12 @@ export default function MultiplayerLeaderboard({
                     <span className="block text-xl font-semibold leading-none text-[#d1d0c5]">
                       {Math.round(row.wpm)}
                     </span>
-                    <span className="mt-0.5 block text-[9px] font-semibold uppercase tracking-[0.12em] text-[#646669]">
-                      wpm
-                    </span>
+                    
                   </div>
 
                   <div className="text-right">
-                    <div className="mb-1 ml-auto h-1 w-12 overflow-hidden rounded-full bg-[#242832]">
-                      <div
-                        className="h-1 rounded-full bg-[#e2b714]"
-                        style={{ width: `${row.accuracy}%` }}
-                      />
-                    </div>
-                    <span className="text-sm font-semibold text-[#d1d0c5]">
+                    
+                    <span className="text-lg font-semibold text-[#d1d0c5]">
                       {Math.round(row.accuracy)}%
                     </span>
                   </div>

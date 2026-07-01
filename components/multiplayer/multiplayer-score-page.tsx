@@ -93,15 +93,15 @@ export default function MultiplayerScorePage({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-neutral-950 text-[#d1d0c5]">
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col justify-start gap-3 px-3 py-6 font-mono md:gap-5 md:px-4 md:py-8">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-5xl uppercase tracking-normal text-neutral-400 font-semibold mt-">
+      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-3 px-3 py-6 font-mono md:gap-5 md:px-4 md:py-8">
+        <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 bg-neutral-950/95 py-2 backdrop-blur">
+          <p className="text-5xl uppercase tracking-normal text-neutral-400 font-semibold">
             Test completed
             <br/><span className="text-3xl tracking-normal">room {roomId}</span>
           </p>
           <button
             onClick={() => setShowLeaderboardOnly((value) => !value)}
-            className="rounded-lg ring ring-[#3a3f49] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#d1d0c5] transition-colors hover:ring-[#e2b714] hover:text-[#e2b714]"
+            className="w-44 rounded-lg ring ring-[#3a3f49] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#d1d0c5] transition-colors hover:ring-[#e2b714] hover:text-[#e2b714]"
             type="button"
           >
             {showLeaderboardOnly ? "show score" : "see leaderboard"}
@@ -277,7 +277,7 @@ export default function MultiplayerScorePage({
                       <RiResetRightFill className="size-7" />
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent side="top">restart</TooltipContent>
+                  <TooltipContent side="top">restart test</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             ) : (
@@ -288,7 +288,7 @@ export default function MultiplayerScorePage({
 
             <button
               onClick={onExit}
-              className= "bg-amber-300 ring px-2 py-1 ring-amber-300 rounded-xl text-center text-xs font-semibold uppercase tracking-normal text-neutral-950 transition-colors hover:bg-amber-300/95 md:text-sm cursor-pointer"
+              className= "bg-[#e2b714] ring px-2 py-1 rounded-xl text-center text-xs font-semibold uppercase tracking-normal text-neutral-950 transition-colors  hover:bg-amber-300/90 md:text-sm cursor-pointer"
               type="button"
             >
               go back
