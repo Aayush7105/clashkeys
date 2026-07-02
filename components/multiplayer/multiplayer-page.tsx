@@ -70,7 +70,7 @@ export default function MultiplayerPage() {
         <motion.div
           layout
           transition={{ duration: 0.3 }}
-          className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-neutral-400"
+          className="flex items-center justify-between text-sm tracking-tight uppercase text-neutral-400"
         >
           <div className="flex items-center gap-3">
             <button
@@ -79,10 +79,10 @@ export default function MultiplayerPage() {
             >
               <IoMdArrowRoundBack className="size-5" />
             </button>
-            <span className="font-mono text-lg font-semibold">Multiplayer</span>
+            <span className="font-mono text-lg font-medium">Multiplayer</span>
           </div>
 
-          <span className="text-[#e2b714] text-lg font-mono font-semibold">
+          <span className="text-[#e2b714] text-lg font-mono font-medium">
             clashkeys
           </span>
         </motion.div>
@@ -117,18 +117,16 @@ export default function MultiplayerPage() {
 
                 <button
                   onClick={() => setMode("create")}
-                  className={`relative z-10 px-4 py-1.5 text-sm font-semibold transition-colors duration-200 ${
-                    mode === "create" ? "text-black" : "text-neutral-400"
-                  }`}
+                  className={`relative z-10 px-4 py-1.5 text-sm font-semibold transition-colors duration-200 ${mode === "create" ? "text-black" : "text-neutral-400"
+                    }`}
                 >
                   Create Room
                 </button>
 
                 <button
                   onClick={() => setMode("join")}
-                  className={`relative z-10 px-4 py-1.5 text-sm font-semibold transition-colors duration-200 ${
-                    mode === "join" ? "text-black" : "text-neutral-400"
-                  }`}
+                  className={`relative z-10 px-4 py-1.5 text-sm font-semibold transition-colors duration-200 ${mode === "join" ? "text-black" : "text-neutral-400"
+                    }`}
                 >
                   Join Room
                 </button>
@@ -180,11 +178,10 @@ export default function MultiplayerPage() {
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={mode === "create" ? createRoom : joinRoom}
-                className={`w-full rounded-xl px-5 py-3 text-sm font-semibold mt-2 transition-all duration-200 ${
-                  mode === "create"
-                    ? "bg-[#e2b714] text-black hover:bg-[#d4a812]"
-                    : "border border-[#3a3f49] text-neutral-200 hover:border-[#e2b714]"
-                }`}
+                className={`w-full rounded-xl px-5 py-3 text-sm font-semibold mt-2 transition-all duration-200 ${mode === "create"
+                  ? "bg-[#e2b714] text-black hover:bg-[#d4a812]"
+                  : "border border-[#3a3f49] text-neutral-200 hover:border-[#e2b714]"
+                  }`}
               >
                 {mode === "create" ? "Create Room" : "Join Room"}
               </motion.button>

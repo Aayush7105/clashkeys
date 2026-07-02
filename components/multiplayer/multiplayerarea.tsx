@@ -172,12 +172,12 @@ function normalizeUser(user: Partial<RoomUser>): RoomUser {
         : 0,
     correctChars:
       typeof user.correctChars === "number" &&
-      Number.isFinite(user.correctChars)
+        Number.isFinite(user.correctChars)
         ? user.correctChars
         : 0,
     totalKeystrokes:
       typeof user.totalKeystrokes === "number" &&
-      Number.isFinite(user.totalKeystrokes)
+        Number.isFinite(user.totalKeystrokes)
         ? user.totalKeystrokes
         : 0,
   };
@@ -286,12 +286,12 @@ export default function MultiplayerArea({
     roundStartedAt === null
       ? 0
       : Math.max(
-          0,
-          Math.min(
-            (finishedAt ?? now) - roundStartedAt,
-            Math.max(1, roundDuration) * 1000,
-          ),
-        );
+        0,
+        Math.min(
+          (finishedAt ?? now) - roundStartedAt,
+          Math.max(1, roundDuration) * 1000,
+        ),
+      );
   const elapsedFloor = Math.floor(elapsedMs / 1000);
   const timeLeft =
     roundStartedAt === null
@@ -336,7 +336,7 @@ export default function MultiplayerArea({
         : selectedModeRef.current;
       const startedAt =
         typeof payload.startedAt === "number" &&
-        Number.isFinite(payload.startedAt)
+          Number.isFinite(payload.startedAt)
           ? payload.startedAt
           : Date.now();
 
@@ -542,9 +542,9 @@ export default function MultiplayerArea({
         roundStartedAt === null
           ? 0
           : Math.max(
-              0,
-              Math.min(eventTime - roundStartedAt, roundDuration * 1000),
-            );
+            0,
+            Math.min(eventTime - roundStartedAt, roundDuration * 1000),
+          );
       const pointSecond = elapsedForPointMs / 1000;
       const minutes = elapsedForPointMs / 60000;
       let projectedCorrect = countCorrectChars(typed, text);
@@ -655,8 +655,8 @@ export default function MultiplayerArea({
             disabledDurationTitle="Host controls duration"
           />
         </div>
-        <div className="mt-10 flex items-center justify-between text-sm uppercase tracking-[0.2em] text-[#6b6f7a] md:px-16 lg:px-32">
-          <span className="font-mono text-md">Multiplayer</span>
+        <div className="mt-10 flex items-center justify-between text-sm uppercase tracking-normal text-[#6b6f7a] md:px-16 lg:px-32">
+          <span className="font-mono font-semibold text-lg">Multiplayer</span>
         </div>
 
         {!isRunning ? (

@@ -109,18 +109,17 @@ export default function MultiplayerTypingArea({
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2 md:mb-8 md:gap-4">
         <div>
-          <h1 className="text-xl font-bold font-mono text-neutral-200 md:text-3xl">
+          <h1 className="text-xl font-semibold font-mono text-neutral-200 md:text-3xl">
             Room {roomId}
           </h1>
-          <p className="text-xs text-neutral-500 font-mono md:text-sm">Playing as {name}</p>
+          <p className="text-xs text-neutral-500 tracking-tight font-mono md:text-[16px]">Playing as {name}</p>
         </div>
-        <div className="text-2xl font-mono text-yellow-500">{timeLeft}s</div>
+        <div className="text-4xl font-mono text-yellow-500 font-medium">{timeLeft}s</div>
       </div>
 
       <div
-        className={`relative transition-all duration-500 ease-in-out ${
-          !isFocused ? "blur-[6px] opacity-20 scale-[0.98]" : "blur-0 opacity-100 scale-100"
-        }`}
+        className={`relative transition-all duration-500 ease-in-out ${!isFocused ? "blur-[6px] opacity-20 scale-[0.98]" : "blur-0 opacity-100 scale-100"
+          }`}
       >
         <div
           className="relative whitespace-pre-wrap text-2xl md:text-3xl lg:text-4xl font-mono leading-[1.6] tracking-tight text-left select-none"

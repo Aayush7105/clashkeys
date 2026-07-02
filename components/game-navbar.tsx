@@ -13,6 +13,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import Link from "next/link";
 
 type GameNavbarProps = {
   currentDuration: number;
@@ -61,11 +62,10 @@ export default function GameNavbar({
 
   const modeButtonClass = (mode: SoloMode) => {
     const isActive = canInteractModes && currentMode === mode;
-    return `relative isolate flex items-center gap-1 rounded-full px-2 py-1.5 transition ${
-      isActive
-        ? "text-neutral-900 font-bold hover:text-neutral-800"
-        : "text-neutral-400 hover:text-slate-300"
-    } ${!canInteractModes ? "cursor-not-allowed opacity-50 hover:text-neutral-400" : "cursor-pointer"}`;
+    return `relative isolate flex items-center gap-1 rounded-full px-2 py-1.5 transition ${isActive
+      ? "text-neutral-900 font-bold hover:text-neutral-800"
+      : "text-neutral-400 hover:text-slate-300"
+      } ${!canInteractModes ? "cursor-not-allowed opacity-50 hover:text-neutral-400" : "cursor-pointer"}`;
   };
 
   const modeItems = [
@@ -128,11 +128,10 @@ export default function GameNavbar({
           <span className="inline-flex">
             <button
               onClick={() => handleDurationChange(duration)}
-              className={`relative isolate rounded-full px-2 py-1.5 transition ${
-                currentDuration === duration
-                  ? "text-neutral-900 font-bold hover:text-neutral-800"
-                  : "text-neutral-300 hover:text-slate-300"
-              } ${!canChangeDuration ? "cursor-not-allowed opacity-50 hover:text-neutral-300" : "cursor-pointer"}`}
+              className={`relative isolate rounded-full px-2 py-1.5 transition ${currentDuration === duration
+                ? "text-neutral-900 font-bold hover:text-neutral-800"
+                : "text-neutral-300 hover:text-slate-300"
+                } ${!canChangeDuration ? "cursor-not-allowed opacity-50 hover:text-neutral-300" : "cursor-pointer"}`}
               disabled={!canChangeDuration}
               type="button"
             >
@@ -154,9 +153,9 @@ export default function GameNavbar({
     <TooltipProvider>
       <div className="w-full p-2 md:p-2 flex flex-col justify-center items-center gap-2 md:gap-3 font-mono">
         <div className="flex justify-between lg:px-32 md:px-12 py-2 md:py-4 w-full md:-mt-20">
-          <div className="font-mono font-semibold tracking-tight text-neutral-400 text-2xl">
+          <Link href="/landing" className="font-mono font-semibold tracking-tight text-neutral-400 text-2xl">
             CLASHKEYS
-          </div>
+          </Link>
           <div className="flex items-center gap-4 text-neutral-400">
             {navTooltip(
               isMobileMenuOpen ? "close menu" : "open menu",
