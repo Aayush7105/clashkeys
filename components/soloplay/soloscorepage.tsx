@@ -1,6 +1,12 @@
 import React, { useEffect } from "react";
 import WpmGraph from "./wpmgraph";
 import { RxReload } from "react-icons/rx";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Props {
   wpm: number;
@@ -99,8 +105,8 @@ const SoloScorePage: React.FC<Props> = ({
           </div>
         </section>
 
-        <section className="overflow-hidden rounded-lg border border-[#30343d] bg-[#14161a] font-mono">
-          <div className="flex flex-col gap-3 border-b border-[#30343d] bg-[#181b20] px-4 py-4 sm:flex-row sm:items-end sm:justify-between">
+        <section className="overflow-hidden rounded-lg ring ring-neutral-900 bg-neutral-950 font-mono">
+          <div className="flex flex-col gap-3 ring-b ring-neutral-900 bg-neutral-950 px-4 py-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-[#646669]">
                 score breakdown
@@ -119,13 +125,13 @@ const SoloScorePage: React.FC<Props> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-[minmax(0,1fr)_5rem_6rem] gap-2 border-b border-[#30343d] bg-[#111317] px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#646669] sm:grid-cols-[minmax(0,1fr)7rem_7rem]">
-            <div>metric</div>
-            <div className="text-right">value</div>
-            <div className="text-right">detail</div>
+          <div className="grid grid-cols-[minmax(0,1fr)_5rem_6rem] gap-2 ring-b ring-neutral-900 bg-neutral-900 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-[#646669] sm:grid-cols-[minmax(0,1fr)7rem_7rem]">
+            <div className="text-sm">metric</div>
+            <div className="text-right text-sm">value</div>
+            <div className="text-right text-sm">detail</div>
           </div>
 
-          <div className="divide-y divide-[#242832]">
+          <div className="divide-y divide-neutral-800">
             <div className="grid grid-cols-[minmax(0,1fr)_5rem_6rem] items-center gap-2 px-4 py-3.5 text-sm sm:grid-cols-[minmax(0,1fr)7rem_7rem]">
               <div>
                 <div className="text-[15px] font-semibold leading-tight text-[#d1d0c5]">
@@ -197,21 +203,28 @@ const SoloScorePage: React.FC<Props> = ({
 
         <section className="mt-3 w-full border-t border-[#44464a] pt-3 md:pt-4">
           <div className="flex flex-col items-center justify-center gap-2">
-          <button
-            onClick={() => window.location.reload()}
-            className="cursor-pointer rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-[#e2b714] md:text-sm"
-            type="button"
-            aria-label="restart test"
-          >
-            <RxReload className="size-7" />
-          </button>
-          <button
-            onClick={onRestart}
-            className="rounded-xl text-center text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:border-[#e2b714] hover:text-[#e2b714] md:text-sm"
-            type="button"
-          >
-            go back
-          </button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="cursor-pointer rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-[#e2b714] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e2b714] md:text-sm"
+                    type="button"
+                    aria-label="restart test"
+                  >
+                    <RxReload className="size-7" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top">restart test</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <button
+              onClick={onRestart}
+              className= "bg-[#e2b714] ring px-2 py-1 rounded-xl text-center text-xs font-semibold uppercase tracking-normal text-neutral-950 transition-colors  hover:bg-amber-300/90 md:text-sm cursor-pointer"
+              type="button"
+            >
+              go back
+            </button>
           </div>
         </section>
       </div>
