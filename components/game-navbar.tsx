@@ -55,7 +55,7 @@ export default function GameNavbar({
   const navTooltip = (content: string, children: ReactNode) => (
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent side="bottom">{content}</TooltipContent>
+      <TooltipContent side="top" sideOffset={8}>{content}</TooltipContent>
     </Tooltip>
   );
 
@@ -64,8 +64,8 @@ export default function GameNavbar({
     return `relative isolate flex items-center gap-1 rounded-full px-2 py-1.5 transition ${
       isActive
         ? "text-neutral-900 font-bold hover:text-neutral-800"
-        : "text-neutral-300 hover:text-slate-300"
-    } ${!canInteractModes ? "cursor-not-allowed opacity-50 hover:text-neutral-300" : "cursor-pointer"}`;
+        : "text-neutral-400 hover:text-slate-300"
+    } ${!canInteractModes ? "cursor-not-allowed opacity-50 hover:text-neutral-400" : "cursor-pointer"}`;
   };
 
   const modeItems = [
@@ -139,7 +139,7 @@ export default function GameNavbar({
               {currentDuration === duration && (
                 <motion.span
                   layoutId={`${layoutScope}-duration-selected-pill`}
-                  className="absolute inset-0 rounded-full border border-yellow-400 bg-yellow-400"
+                  className="absolute inset-0 rounded-full ring ring-yellow-400 bg-yellow-400"
                   transition={{ type: "spring", stiffness: 420, damping: 34 }}
                 />
               )}
@@ -154,10 +154,10 @@ export default function GameNavbar({
     <TooltipProvider>
       <div className="w-full p-2 md:p-2 flex flex-col justify-center items-center gap-2 md:gap-3 font-mono">
         <div className="flex justify-between lg:px-32 md:px-12 py-2 md:py-4 w-full md:-mt-20">
-          <div className="font-mono tracking-widest text-neutral-200">
+          <div className="font-mono font-semibold tracking-tight text-neutral-400 text-2xl">
             CLASHKEYS
           </div>
-          <div className="flex items-center gap-4 text-neutral-300">
+          <div className="flex items-center gap-4 text-neutral-400">
             {navTooltip(
               isMobileMenuOpen ? "close menu" : "open menu",
               <button
@@ -185,7 +185,7 @@ export default function GameNavbar({
           </div>
         </div>
 
-        <div className="hidden md:flex items-center gap-6 px-6 py-3 text-sm md:text-neutral-300 border-2 border-neutral-900 rounded-2xl bg-neutral-900 w-fit">
+        <div className="hidden md:flex items-center gap-6 px-6 py-3 text-sm md:text-neutral-400 ring-2 ring-neutral-900 rounded-2xl bg-neutral-900 w-fit">
           <LayoutGroup id="desktop-mode">
             <div className="flex items-center gap-6">
               {renderModeItems("desktop")}
@@ -193,7 +193,7 @@ export default function GameNavbar({
           </LayoutGroup>
 
           <LayoutGroup id="desktop-duration">
-            <div className="flex items-center gap-4 text-neutral-300">
+            <div className="flex items-center gap-4 text-neutral-400">
               {renderDurationButtons("desktop")}
             </div>
           </LayoutGroup>
@@ -201,7 +201,7 @@ export default function GameNavbar({
 
         {isMobileMenuOpen && (
           <div className="w-full px-6 md:hidden">
-            <div className="flex flex-col gap-4 px-4 py-3 text-sm text-neutral-300 border border-neutral-700 rounded-2xl bg-neutral-900">
+            <div className="flex flex-col gap-4 px-4 py-3 text-sm text-neutral-400 ring ring-neutral-700 rounded-2xl bg-neutral-900">
               <LayoutGroup id="mobile-mode">
                 <div className="grid grid-cols-2 gap-3">
                   {renderModeItems("mobile")}
