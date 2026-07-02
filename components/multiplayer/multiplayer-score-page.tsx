@@ -92,9 +92,14 @@ export default function MultiplayerScorePage({
         : "text-[#ca4754]";
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-neutral-950 text-[#d1d0c5]">
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-3 px-3 py-6 font-mono md:gap-5 md:px-4 md:py-8">
-        <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 bg-neutral-950/95 py-2 backdrop-blur">
+    <div className="fixed inset-0 z-50 isolate overflow-y-auto bg-neutral-950 text-[#d1d0c5]">
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div className="absolute -top-36 right-0 h-112 w-md rounded-full bg-[radial-gradient(circle_at_center,rgba(226,183,20,0.22)_0%,rgba(226,183,20,0.1)_42%,rgba(10,10,10,0)_74%)] blur-3xl sm:h-128 sm:w-lg" />
+        <div className="absolute -bottom-32 left-0 h-136 w-xl rounded-full bg-[radial-gradient(circle_at_center,rgba(64,64,64,0.34)_0%,rgba(64,64,64,0.16)_44%,rgba(10,10,10,0)_76%)] blur-3xl sm:h-152 sm:w-2xl" />
+      </div>
+
+      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-3 px-3 py-6 font-mono md:gap-5 md:px-4 md:py-8">
+        <div className="z-10 flex flex-wrap items-center justify-between gap-3 bg-transparent py-2 backdrop-blur">
           <p className="text-5xl uppercase tracking-normal text-neutral-400 font-semibold">
             Test completed
             <br/><span className="text-3xl tracking-normal">room {roomId}</span>

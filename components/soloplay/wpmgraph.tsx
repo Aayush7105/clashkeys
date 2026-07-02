@@ -236,7 +236,7 @@ export default function WpmGraph({
   ]);
 
   return (
-    <Card className="w-full overflow-hidden gap-2 border-neutral-900 bg-neutral-900 py-2.5 shadow-none">
+    <Card className="w-full overflow-hidden gap-2 border-neutral-900 bg-neutral-950 py-2.5 shadow-none">
       <CardHeader className="px-3 pb-1 md:px-4">
         <CardTitle className="flex items-center gap-2 text-neutral-200 font-mono mx-5 mt-3">
           Typing speed
