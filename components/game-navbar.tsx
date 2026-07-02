@@ -47,9 +47,9 @@ export default function GameNavbar({
 
   const modeButtonClass = (mode: SoloMode) => {
     const isActive = canInteractModes && currentMode === mode;
-    return `flex items-center gap-2 transition px-1 py-0.5 rounded-md ${
+    return `flex items-center gap-1 transition px-2 py-1.5 rounded-full ${
       isActive
-        ? "text-yellow-500 font-semibold hover:text-yellow-400"
+        ? "text-neutral-900 bg-yellow-400 font-bold hover:text-neutral-800"
         : "text-neutral-600 hover:text-slate-300"
     } ${!canInteractModes ? "opacity-50 cursor-not-allowed hover:text-neutral-600" : "cursor-pointer"}`;
   };
@@ -118,9 +118,9 @@ export default function GameNavbar({
     <button
       key={duration}
       onClick={() => handleDurationChange(duration)}
-      className={`transition px-2 py-0.5 rounded-md cursor-pointer ${
+      className={`transition px-2 py-1.5 rounded-full cursor-pointer ${
         currentDuration === duration
-          ? "text-yellow-500 font-semibold hover:text-yellow-400"
+          ? "text-neutral-900 font-bold border border-yellow-400 bg-yellow-400 hover:text-neutral-800"
           : "hover:text-slate-300"
       } ${!canChangeDuration ? "opacity-50 cursor-not-allowed hover:text-slate-500" : ""}`}
       disabled={!canChangeDuration}
@@ -141,7 +141,7 @@ export default function GameNavbar({
         <div className="font-mono tracking-widest text-neutral-200">
           CLASHKEYS
         </div>
-        <div className="flex items-center gap-4 text-slate-400">
+        <div className="flex items-center gap-4 text-neutral-300">
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen((open) => !open)}
@@ -162,13 +162,13 @@ export default function GameNavbar({
         </div>
       </div>
 
-      <div className="hidden md:flex items-center gap-6 px-6 py-3 text-sm text-neutral-300 border-2 border-neutral-800 rounded-2xl bg-neutral-900 w-fit">
+      <div className="hidden md:flex items-center gap-6 px-6 py-3 text-sm md:text-neutral-300 border-2 border-neutral-900 rounded-2xl bg-neutral-900 w-fit">
         <div className="flex items-center gap-6">
           {modeItems}
-          <div className="h-full w-0.5 bg-white" />
+          
         </div>
 
-        <div className="flex items-center gap-4 text-slate-500">
+        <div className="flex items-center gap-4 text-neutral-300">
           {durationButtons}
         </div>
       </div>

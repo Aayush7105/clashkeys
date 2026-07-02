@@ -59,7 +59,7 @@ const SoloPlayPage: React.FC<SoloPlayPageProps> = ({
           />
         </div>
         <div className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a] mt-10 md:px-16 lg:px-32">
-          <span className="font-mono text-md ">Solo Play</span>
+          <span className="font-mono text-xl ">Solo Play</span>
         </div>
         {/* Reset component completely when duration changes */}
         <SoloTypingArea
