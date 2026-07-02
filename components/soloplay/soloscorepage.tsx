@@ -63,7 +63,10 @@ const SoloScorePage: React.FC<Props> = ({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-neutral-950 text-[#d1d0c5]">
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col justify-center gap-3 px-3 py-6 font-mono md:gap-5 md:px-4 md:py-8">
+      <div className="pointer-events-none absolute -top-36 right-0 h-112 w-112 rounded-full bg-[radial-gradient(circle_at_center,rgba(226,183,20,0.22)_0%,rgba(226,183,20,0.1)_42%,rgba(10,10,10,0)_74%)] blur-3xl sm:h-128 sm:w-128" />
+      <div className="pointer-events-none absolute -bottom-32 left-0 h-136 w-xl rounded-full bg-[radial-gradient(circle_at_center,rgba(64,64,64,0.34)_0%,rgba(64,64,64,0.16)_44%,rgba(10,10,10,0)_76%)] blur-3xl sm:h-152 sm:w-2xl" />
+
+      <div className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col justify-center gap-3 px-3 py-6 font-mono md:gap-5 md:px-4 md:py-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-5xl font-semibold uppercase tracking-normal text-neutral-400">
             Test completed
