@@ -702,13 +702,8 @@ export default function MultiplayerArea({
         </div>
         {/* Reset component completely when duration changes */}
         <div className={`transition-all duration-500 ease-in-out w-full transform ${
-          showUI ? "mt-16 md:mt-24 translate-y-0" : "mt-0 md:mt-0 -translate-y-2 md:-translate-y-4"
+          showUI ? "mt-16 md:mt-24 translate-y-0" : "mt-0 md:mt-0 -translate-y-6 md:-translate-y-10"
         }`}>
-          {isRunning && (
-            <div className={`text-left md:px-16 lg:px-32 w-full transition-all duration-500 ${showUI ? "mb-2" : "mb-1"}`}>
-              <span className="text-5xl font-mono text-yellow-500 font-medium">{timeLeft}s</span>
-            </div>
-          )}
           <div className="flex items-center justify-between text-sm uppercase tracking-normal text-[#6b6f7a] md:px-16 lg:px-32 mb-1 w-full">
             <span className={`font-mono font-semibold text-lg transition-all duration-500 ease-in-out ${
               showUI
@@ -717,6 +712,9 @@ export default function MultiplayerArea({
             }`}>
               Multiplayer
             </span>
+            {isRunning && (
+              <span className="text-4xl font-mono text-yellow-500 font-medium">{timeLeft}s</span>
+            )}
           </div>
 
           {!isRunning ? (
