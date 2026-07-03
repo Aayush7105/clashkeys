@@ -106,13 +106,13 @@ export default function MultiplayerTypingArea({
 
   return (
     <div
-      className="relative w-full max-w-5xl mx-auto mt-2"
+      className={`relative w-full max-w-5xl mx-auto transition-all duration-500 ${showUI ? "mt-2" : "mt-0"}`}
       onClick={focusInput}
     >
-      <div className={`mb-4 flex flex-wrap items-center justify-between gap-2 md:mb-8 md:gap-4 transition-all duration-500 ease-in-out ${
+      <div className={`flex flex-wrap items-center justify-between gap-2 transition-all duration-500 ease-in-out overflow-hidden ${
         showUI
-          ? "opacity-100 translate-y-0 pointer-events-auto"
-          : "opacity-0 -translate-y-2 pointer-events-none"
+          ? "opacity-100 translate-y-0 pointer-events-auto max-h-24 mb-4 md:mb-8"
+          : "opacity-0 -translate-y-2 pointer-events-none max-h-0 mb-0"
       }`}>
         <div>
           <h1 className="text-xl font-semibold font-mono text-neutral-200 md:text-3xl">

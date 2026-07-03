@@ -22,6 +22,7 @@ interface SoloTypingAreaProps {
   initialText: string;
   mode: SoloMode;
   onTypingStateChange?: (isActive: boolean) => void;
+  showUI?: boolean;
 }
 
 type ErrorPoint = {
@@ -115,6 +116,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
   initialText,
   mode,
   onTypingStateChange,
+  showUI = true,
 }) => {
   const targetText = sanitizeTextByMode(
     initialText || getFallbackTextByMode(mode),
@@ -362,8 +364,8 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
   }
 
   return (
-    <div className="relative w-full max-w-5xl mx-auto mt-2 ">
-      <div className="mb-4 text-2xl font-mono text-yellow-500"><span className="text-5xl font-medium">{timeLeft}s</span></div>
+    <div className={`relative w-full max-w-5xl mx-auto transition-all duration-500 ${showUI ? "mt-2" : "mt-0"}`}>
+      <div className={`transition-all duration-500 ${showUI ? "mb-4" : "mb-1"} text-2xl font-mono text-yellow-500`}><span className="text-5xl font-medium">{timeLeft}s</span></div>
 
       <div
         className={`relative transition-all duration-500 ease-in-out

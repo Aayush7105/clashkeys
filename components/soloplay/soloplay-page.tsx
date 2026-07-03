@@ -105,13 +105,13 @@ const SoloPlayPage: React.FC<SoloPlayPageProps> = ({
           />
         </div>
         {/* Reset component completely when duration changes */}
-        <div className={`transition-all duration-500 ease-in-out w-full ${
-          showUI ? "mt-16 md:mt-24" : "mt-0 md:mt-0"
+        <div className={`transition-all duration-500 ease-in-out w-full transform ${
+          showUI ? "mt-16 md:mt-24 translate-y-0" : "mt-0 md:mt-0 -translate-y-6 md:-translate-y-10"
         }`}>
-          <div className={`transition-all duration-500 ease-in-out flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a] md:px-16 lg:px-32 mb-1 ${
+          <div className={`transition-all duration-500 ease-in-out flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a] md:px-16 lg:px-32 overflow-hidden ${
             showUI
-              ? "opacity-100 translate-y-0 pointer-events-auto"
-              : "opacity-0 -translate-y-2 pointer-events-none"
+              ? "opacity-100 translate-y-0 pointer-events-auto max-h-10 mb-1"
+              : "opacity-0 -translate-y-2 pointer-events-none max-h-0 mb-0"
           }`}>
             <span className="font-mono text-xl">Solo Play</span>
           </div>
@@ -121,6 +121,7 @@ const SoloPlayPage: React.FC<SoloPlayPageProps> = ({
             initialText={initialText}
             mode={mode}
             onTypingStateChange={setHasStartedTyping}
+            showUI={showUI}
           />
         </div>
       </div>
