@@ -362,7 +362,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
   }
 
   return (
-    <div className="relative w-full max-w-5xl mx-auto mt-5 ">
+    <div className="relative w-full max-w-5xl mx-auto mt-2 ">
       <div className="mb-4 text-2xl font-mono text-yellow-500"><span className="text-5xl font-medium">{timeLeft}s</span></div>
 
       <div

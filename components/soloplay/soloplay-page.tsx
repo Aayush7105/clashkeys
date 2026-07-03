@@ -89,9 +89,9 @@ const SoloPlayPage: React.FC<SoloPlayPageProps> = ({
   };
 
   return (
-    <main className={`min-h-screen bg-neutral-900 text-neutral-300 flex items-start justify-center px-3 pt-3 md:items-center md:px-2 md:py-16 transition-all duration-300 ${!showUI ? "cursor-none" : ""}`}>
-      <div className="w-full max-w-7xl min-h-screen py-0 md:h-screen md:py-20">
-        <div className={`transition-all duration-500 ease-in-out sticky top-0 z-50 bg-neutral-900/95 backdrop-blur md:relative md:top-auto md:bg-transparent md:backdrop-blur-none ${
+    <main className={`min-h-screen bg-neutral-900 text-neutral-300 flex items-center justify-center px-3 md:px-2 transition-all duration-300 ${!showUI ? "cursor-none" : ""}`}>
+      <div className="w-full max-w-7xl min-h-screen relative flex flex-col justify-center py-20">
+        <div className={`transition-all duration-500 ease-in-out absolute top-4 md:top-26 left-0 right-0 z-50 bg-neutral-900/95 backdrop-blur md:bg-transparent md:backdrop-blur-none ${
           showUI
             ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
             : "opacity-0 -translate-y-4 scale-95 pointer-events-none"
@@ -104,21 +104,25 @@ const SoloPlayPage: React.FC<SoloPlayPageProps> = ({
             onModeChange={handleModeChange}
           />
         </div>
-        <div className={`transition-all duration-500 ease-in-out flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a] mt-10 md:px-16 lg:px-32 ${
-          showUI
-            ? "opacity-100 translate-y-0 pointer-events-auto"
-            : "opacity-0 -translate-y-2 pointer-events-none"
-        }`}>
-          <span className="font-mono text-xl ">Solo Play</span>
-        </div>
         {/* Reset component completely when duration changes */}
-        <SoloTypingArea
-          key={`${duration}-${mode}`}
-          duration={duration}
-          initialText={initialText}
-          mode={mode}
-          onTypingStateChange={setHasStartedTyping}
-        />
+        <div className={`transition-all duration-500 ease-in-out w-full ${
+          showUI ? "mt-16 md:mt-24" : "mt-0 md:mt-0"
+        }`}>
+          <div className={`transition-all duration-500 ease-in-out flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a] md:px-16 lg:px-32 mb-1 ${
+            showUI
+              ? "opacity-100 translate-y-0 pointer-events-auto"
+              : "opacity-0 -translate-y-2 pointer-events-none"
+          }`}>
+            <span className="font-mono text-xl">Solo Play</span>
+          </div>
+          <SoloTypingArea
+            key={`${duration}-${mode}`}
+            duration={duration}
+            initialText={initialText}
+            mode={mode}
+            onTypingStateChange={setHasStartedTyping}
+          />
+        </div>
       </div>
     </main>
   );
