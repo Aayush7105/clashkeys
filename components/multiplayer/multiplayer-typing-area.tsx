@@ -15,6 +15,7 @@ type MultiplayerTypingAreaProps = {
   onKeyDown: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onPaste: (event: React.ClipboardEvent<HTMLTextAreaElement>) => void;
   onFocusChange: (focused: boolean) => void;
+  showUI?: boolean;
 };
 
 export default function MultiplayerTypingArea({
@@ -29,6 +30,7 @@ export default function MultiplayerTypingArea({
   onKeyDown,
   onPaste,
   onFocusChange,
+  showUI = true,
 }: MultiplayerTypingAreaProps) {
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const caretRef = useRef<HTMLDivElement>(null);
@@ -107,14 +109,17 @@ export default function MultiplayerTypingArea({
       className="relative w-full max-w-5xl mx-auto mt-2"
       onClick={focusInput}
     >
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-2 md:mb-8 md:gap-4">
+      <div className={`mb-4 flex flex-wrap items-center justify-between gap-2 md:mb-8 md:gap-4 transition-all duration-500 ease-in-out ${
+        showUI
+          ? "opacity-100 translate-y-0 pointer-events-auto"
+          : "opacity-0 -translate-y-2 pointer-events-none"
+      }`}>
         <div>
           <h1 className="text-xl font-semibold font-mono text-neutral-200 md:text-3xl">
             Room {roomId}
           </h1>
           <p className="text-xs text-neutral-500 tracking-tight font-mono md:text-[16px]">Playing as {name}</p>
         </div>
-        <div className="text-4xl font-mono text-yellow-500 font-medium">{timeLeft}s</div>
       </div>
 
       <div
