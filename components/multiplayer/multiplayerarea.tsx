@@ -235,6 +235,47 @@ export default function MultiplayerArea({
   const correctKeystrokesRef = useRef(0);
 
   const ready = roomId.trim().length > 0 && name.trim().length > 0;
+
+  const [showUI, setShowUI] = useState(true);
+  const hasStartedTyping = isRunning && typed.length > 0 && isFocused;
+
+  useEffect(() => {
+    setShowUI(true);
+  }, [selectedDuration, selectedMode, isRunning]);
+
+  useEffect(() => {
+    if (!hasStartedTyping) {
+      setShowUI(true);
+      return;
+    }
+
+    setShowUI(false);
+
+    let timeoutId: NodeJS.Timeout;
+
+    const handleMouseMove = () => {
+      setShowUI(true);
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setShowUI(false);
+      }, 2500);
+    };
+
+    const handleKeyDown = () => {
+      setShowUI(false);
+      clearTimeout(timeoutId);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("keydown", handleKeyDown);
+      clearTimeout(timeoutId);
+    };
+  }, [hasStartedTyping]);
+
   const optimisticUserId = useMemo(
     () => `local:${roomId}:${name}`,
     [roomId, name],
@@ -640,9 +681,13 @@ export default function MultiplayerArea({
   }
 
   return (
-    <main className="min-h-screen bg-neutral-900 text-neutral-300 flex items-start justify-center px-3 pt-3 md:items-center md:px-2 md:py-16">
-      <div className="w-full max-w-7xl min-h-screen py-0 md:py-20">
-        <div className="sticky top-0 z-50 bg-neutral-900/95 backdrop-blur md:relative md:top-auto md:bg-transparent md:backdrop-blur-none">
+    <main className={`min-h-screen bg-neutral-900 text-neutral-300 flex items-center justify-center px-3 md:px-2 transition-all duration-300 ${!showUI ? "cursor-none" : ""}`}>
+      <div className="w-full max-w-7xl min-h-screen relative flex flex-col justify-center py-20">
+        <div className={`transition-all duration-500 ease-in-out absolute top-4 md:top-26 left-0 right-0 z-50 bg-neutral-900/95 backdrop-blur md:bg-transparent md:backdrop-blur-none ${
+          showUI
+            ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+            : "opacity-0 -translate-y-4 scale-95 pointer-events-none"
+        }`}>
           <GameNavbar
             currentDuration={selectedDuration}
             durations={MULTIPLAYER_DURATIONS}
@@ -655,37 +700,46 @@ export default function MultiplayerArea({
             disabledDurationTitle="Host controls duration"
           />
         </div>
-        <div className="mt-10 flex items-center justify-between text-sm uppercase tracking-normal text-[#6b6f7a] md:px-16 lg:px-32">
-          <span className="font-mono font-semibold text-lg">Multiplayer</span>
-        </div>
+        {/* Reset component completely when duration changes */}
+        <div className={`transition-all duration-500 ease-in-out w-full ${
+          showUI ? "mt-16 md:mt-24" : "mt-0 md:mt-0"
+        }`}>
+          <div className={`transition-all duration-500 ease-in-out flex items-center justify-between text-sm uppercase tracking-normal text-[#6b6f7a] md:px-16 lg:px-32 mb-1 ${
+            showUI
+              ? "opacity-100 translate-y-0 pointer-events-auto"
+              : "opacity-0 -translate-y-2 pointer-events-none"
+          }`}>
+            <span className="font-mono font-semibold text-lg">Multiplayer</span>
+          </div>
 
-        {!isRunning ? (
-          <MultiplayerWaitingRoom
-            roomId={roomId}
-            name={name}
-            users={visibleUsers}
-            hostId={hostId}
-            isHost={isHost}
-            selectedDuration={selectedDuration}
-            selectedMode={selectedMode}
-            onStart={startTest}
-            onExit={() => router.push("/multiplayer")}
-          />
-        ) : (
-          <MultiplayerTypingArea
-            roomId={roomId}
-            name={name}
-            text={text}
-            typed={typed}
-            timeLeft={timeLeft}
-            isFocused={isFocused}
-            inputRef={inputRef}
-            onTypedChange={handleTypedChange}
-            onKeyDown={handleKeyDown}
-            onPaste={handlePaste}
-            onFocusChange={setIsFocused}
-          />
-        )}
+          {!isRunning ? (
+            <MultiplayerWaitingRoom
+              roomId={roomId}
+              name={name}
+              users={visibleUsers}
+              hostId={hostId}
+              isHost={isHost}
+              selectedDuration={selectedDuration}
+              selectedMode={selectedMode}
+              onStart={startTest}
+              onExit={() => router.push("/multiplayer")}
+            />
+          ) : (
+            <MultiplayerTypingArea
+              roomId={roomId}
+              name={name}
+              text={text}
+              typed={typed}
+              timeLeft={timeLeft}
+              isFocused={isFocused}
+              inputRef={inputRef}
+              onTypedChange={handleTypedChange}
+              onKeyDown={handleKeyDown}
+              onPaste={handlePaste}
+              onFocusChange={setIsFocused}
+            />
+          )}
+        </div>
       </div>
     </main>
   );

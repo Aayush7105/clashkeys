@@ -104,7 +104,7 @@ export default function MultiplayerTypingArea({
 
   return (
     <div
-      className="relative w-full max-w-5xl mx-auto mt-10"
+      className="relative w-full max-w-5xl mx-auto mt-2"
       onClick={focusInput}
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2 md:mb-8 md:gap-4">
