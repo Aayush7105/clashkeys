@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import GameNavbar from "@/components/game-navbar";
 import SoloTypingArea from "./solotypingarea";
@@ -32,6 +32,48 @@ const SoloPlayPage: React.FC<SoloPlayPageProps> = ({
     : initialDuration || DEFAULT_SOLO_DURATION;
   const mode: SoloMode = isValidSoloMode(rawMode) ? rawMode : DEFAULT_SOLO_MODE;
 
+  const [hasStartedTyping, setHasStartedTyping] = useState(false);
+  const [showUI, setShowUI] = useState(true);
+
+  useEffect(() => {
+    setHasStartedTyping(false);
+    setShowUI(true);
+  }, [duration, mode]);
+
+  useEffect(() => {
+    if (!hasStartedTyping) {
+      setShowUI(true);
+      return;
+    }
+
+    setShowUI(false);
+
+    let timeoutId: NodeJS.Timeout;
+
+    const handleMouseMove = () => {
+      setShowUI(true);
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setShowUI(false);
+      }, 2500);
+    };
+
+    const handleKeyDown = () => {
+      setShowUI(false);
+      clearTimeout(timeoutId);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("keydown", handleKeyDown);
+      clearTimeout(timeoutId);
+    };
+  }, [hasStartedTyping]);
+
+
   const handleDurationChange = (next: number) => {
     if (next === duration) return;
     const params = new URLSearchParams(searchParams.toString());
@@ -47,9 +89,13 @@ const SoloPlayPage: React.FC<SoloPlayPageProps> = ({
   };
 
   return (
-    <main className="min-h-screen bg-neutral-900 text-neutral-300 flex items-start justify-center px-3 pt-3 md:items-center md:px-2 md:py-16">
+    <main className={`min-h-screen bg-neutral-900 text-neutral-300 flex items-start justify-center px-3 pt-3 md:items-center md:px-2 md:py-16 transition-all duration-300 ${!showUI ? "cursor-none" : ""}`}>
       <div className="w-full max-w-7xl min-h-screen py-0 md:h-screen md:py-20">
-        <div className="sticky top-0 z-50 bg-neutral-900/95 backdrop-blur md:relative md:top-auto md:bg-transparent md:backdrop-blur-none">
+        <div className={`transition-all duration-500 ease-in-out sticky top-0 z-50 bg-neutral-900/95 backdrop-blur md:relative md:top-auto md:bg-transparent md:backdrop-blur-none ${
+          showUI
+            ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+            : "opacity-0 -translate-y-4 scale-95 pointer-events-none"
+        }`}>
           <GameNavbar
             currentDuration={duration}
             durations={SOLO_DURATIONS}
@@ -58,7 +104,11 @@ const SoloPlayPage: React.FC<SoloPlayPageProps> = ({
             onModeChange={handleModeChange}
           />
         </div>
-        <div className="flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a] mt-10 md:px-16 lg:px-32">
+        <div className={`transition-all duration-500 ease-in-out flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a] mt-10 md:px-16 lg:px-32 ${
+          showUI
+            ? "opacity-100 translate-y-0 pointer-events-auto"
+            : "opacity-0 -translate-y-2 pointer-events-none"
+        }`}>
           <span className="font-mono text-xl ">Solo Play</span>
         </div>
         {/* Reset component completely when duration changes */}
@@ -67,6 +117,7 @@ const SoloPlayPage: React.FC<SoloPlayPageProps> = ({
           duration={duration}
           initialText={initialText}
           mode={mode}
+          onTypingStateChange={setHasStartedTyping}
         />
       </div>
     </main>

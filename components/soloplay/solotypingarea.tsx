@@ -21,6 +21,7 @@ interface SoloTypingAreaProps {
   duration: number;
   initialText: string;
   mode: SoloMode;
+  onTypingStateChange?: (isActive: boolean) => void;
 }
 
 type ErrorPoint = {
@@ -113,6 +114,7 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
   duration,
   initialText,
   mode,
+  onTypingStateChange,
 }) => {
   const targetText = sanitizeTextByMode(
     initialText || getFallbackTextByMode(mode),
@@ -242,6 +244,11 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
     return () =>
       document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, []);
+
+  useEffect(() => {
+    const isActive = startTime !== null && endTime === null && isFocused;
+    onTypingStateChange?.(isActive);
+  }, [startTime, endTime, isFocused, onTypingStateChange]);
 
   useLayoutEffect(() => {
     const el = charRefs.current[typed.length];
