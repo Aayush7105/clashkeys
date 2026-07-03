@@ -702,7 +702,7 @@ export default function MultiplayerArea({
         </div>
         {/* Reset component completely when duration changes */}
         <div className={`transition-all duration-500 ease-in-out w-full transform ${
-          showUI ? "mt-16 md:mt-24 translate-y-0" : "mt-0 md:mt-0 -translate-y-6 md:-translate-y-10"
+          showUI ? "mt-16 md:mt-24 translate-y-0" : "mt-0 md:mt-0 -translate-y-2 md:-translate-y-4"
         }`}>
           {isRunning && (
             <div className={`text-left md:px-16 lg:px-32 w-full transition-all duration-500 ${showUI ? "mb-2" : "mb-1"}`}>

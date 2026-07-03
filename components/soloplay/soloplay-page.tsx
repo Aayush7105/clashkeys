@@ -106,7 +106,7 @@ const SoloPlayPage: React.FC<SoloPlayPageProps> = ({
         </div>
         {/* Reset component completely when duration changes */}
         <div className={`transition-all duration-500 ease-in-out w-full transform ${
-          showUI ? "mt-16 md:mt-24 translate-y-0" : "mt-0 md:mt-0 -translate-y-6 md:-translate-y-10"
+          showUI ? "mt-16 md:mt-24 translate-y-0" : "mt-0 md:mt-0 -translate-y-2 md:-translate-y-4"
         }`}>
           <div className={`transition-all duration-500 ease-in-out flex items-center justify-between text-sm tracking-[0.2em] uppercase text-[#6b6f7a] md:px-16 lg:px-32 overflow-hidden ${
             showUI
