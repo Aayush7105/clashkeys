@@ -61,13 +61,13 @@ const Landing = () => {
             <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-row sm:flex-wrap sm:gap-4">
               <Link
                 href="/multiplayer"
-                className="w-full rounded-lg bg-[#e2b714] px-3 py-3 text-center text-[14px] font-semibold text-[#1a1b1f] tracking-wide hover:brightness-110 sm:w-auto sm:px-6 font-mono "
+                className="w-full rounded-lg bg-[#e2b714] px-3 py-3 text-center text-xl font-bold text-[#1a1b1f] tracking-normal hover:brightness-110 sm:w-auto sm:px-6 font-mono hover:-translate-y-1 transition-all ease-in-out "
               >
                 Start a Room
               </Link>
               <Link
                 href="/soloplay"
-                className="w-full rounded-lg border border-neutral-700 px-3 py-3 text-center text-[14px] font-semibold tracking-wide text-neutral-200 hover:border-[#e2b714] sm:w-auto sm:px-6 font-mono"
+                className="w-full rounded-lg ring ring-neutral-800 px-3 py-3 text-center text-xl font-semibold tracking-wide text-neutral-200 hover:bg-neutral-400/50 sm:w-auto sm:px-6 font-mono hover:-translate-y-1 transition-all ease-in-out"
               >
                 Practice Solo
               </Link>
@@ -94,7 +94,7 @@ const Landing = () => {
           ].map((card) => (
             <div
               key={card.title}
-              className="rounded-xl border border-neutral-800 bg-neutral-900 p-5 font-mono tracking-tighter sm:p-6"
+              className="rounded-xl ring ring-neutral-800 bg-neutral-900 p-5 font-mono tracking-tighter sm:p-6"
             >
               <h3 className="text-[16px] font-semibold text-neutral-200">
                 {card.title}
