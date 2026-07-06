@@ -7,6 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { RiLoopLeftLine } from "react-icons/ri";
 
 interface Props {
   wpm: number;
@@ -96,7 +97,6 @@ const SoloScorePage: React.FC<Props> = ({
               </div>
             </div>
           </div>
-
           <div className="w-full lg:w-[85%]">
             <WpmGraph
               wpmData={wpmHistory}
@@ -107,6 +107,27 @@ const SoloScorePage: React.FC<Props> = ({
             />
           </div>
         </section>
+        <section className="mt-3 w-full pt-3 md:pt-4">
+          <div className="flex flex-col items-center justify-center gap-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="cursor-pointer rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-[#e2b714] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e2b714] md:text-sm"
+                    type="button"
+                    aria-label="restart test"
+                  >
+                    <RiLoopLeftLine className="size-7" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top">restart test</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            
+          </div>
+        </section>
+
 
         <section className="overflow-hidden rounded-lg ring ring-neutral-900 bg-neutral-950 font-mono">
           <div className="flex flex-col gap-3 ring-b ring-neutral-900 bg-neutral-950 px-4 py-4 sm:flex-row sm:items-end sm:justify-between">
@@ -203,33 +224,20 @@ const SoloScorePage: React.FC<Props> = ({
             </div>
           </div>
         </section>
-
         <section className="mt-3 w-full border-t border-[#44464a] pt-3 md:pt-4">
-          <div className="flex flex-col items-center justify-center gap-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => window.location.reload()}
-                    className="cursor-pointer rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-[#e2b714] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e2b714] md:text-sm"
-                    type="button"
-                    aria-label="restart test"
-                  >
-                    <RxReload className="size-7" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top">restart test</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <button
+          <div className="flex flex-col items-center justify-center gap-2"><button
               onClick={onRestart}
               className= "bg-[#e2b714] ring px-2 py-1 rounded-xl text-center text-xs font-semibold uppercase tracking-normal text-neutral-950 transition-colors  hover:bg-amber-300/90 md:text-sm cursor-pointer"
               type="button"
             >
               go back
             </button>
-          </div>
-        </section>
+            </div>
+              </section>
+
+        
+
+        
       </div>
     </div>
   );
