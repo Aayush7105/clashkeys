@@ -41,27 +41,6 @@ The socket-based architecture ensures that every participant receives
 updates as soon as they occur, making multiplayer typing battles
 responsive and interactive.
 
-## Local Development
-
-Multiplayer needs the Next.js app and the Socket.IO server running at the
-same time.
-
-In one terminal, start the app:
-
-```bash
-npm run dev
-```
-
-In another terminal, start the socket server:
-
-```bash
-npm run dev:socket
-```
-
-The local client defaults to `http://localhost:4000` for sockets. If you
-run the socket server somewhere else, set `NEXT_PUBLIC_SOCKET_URL` to that
-origin before starting the Next.js dev server.
-
 ## Technology Stack
 
 ### Frontend
