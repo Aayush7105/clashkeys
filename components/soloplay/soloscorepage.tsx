@@ -73,6 +73,31 @@ const SoloScorePage: React.FC<Props> = ({
             <br />
             <span className="text-lg tracking-normal md:text-xl">solo play</span>
           </p>
+          <div className="flex items-center gap-3">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="cursor-pointer rounded-xl px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-[#e2b714] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e2b714]"
+                    type="button"
+                    aria-label="restart test"
+                  >
+                    <RiLoopLeftLine className="size-5 md:size-6" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top">restart test</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <button
+              onClick={onRestart}
+              className="bg-[#e2b714] ring px-2.5 py-1 rounded-xl text-center text-xs font-semibold uppercase tracking-normal text-neutral-950 transition-colors hover:bg-amber-300/90 cursor-pointer"
+              type="button"
+            >
+              go back
+            </button>
+          </div>
         </div>
 
         <section className="flex w-full flex-col gap-2 md:gap-4 lg:flex-row lg:items-start">
@@ -115,34 +140,6 @@ const SoloScorePage: React.FC<Props> = ({
               durationSeconds={selectedDuration}
               heightClass="h-[clamp(8rem,18vh,12rem)] w-full md:h-[clamp(10rem,22vh,15rem)]"
             />
-          </div>
-        </section>
-
-        <section className="mt-1 w-full pt-1">
-          <div className="flex items-center justify-center gap-4">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => window.location.reload()}
-                    className="cursor-pointer rounded-xl px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-[#e2b714] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e2b714]"
-                    type="button"
-                    aria-label="restart test"
-                  >
-                    <RiLoopLeftLine className="size-5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top">restart test</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <button
-              onClick={onRestart}
-              className="bg-[#e2b714] ring px-2.5 py-1 rounded-xl text-center text-xs font-semibold uppercase tracking-normal text-neutral-950 transition-colors hover:bg-amber-300/90 cursor-pointer"
-              type="button"
-            >
-              go back
-            </button>
           </div>
         </section>
 
