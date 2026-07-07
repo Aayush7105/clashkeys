@@ -47,6 +47,7 @@ type WpmGraphProps = {
   durationSeconds?: number;
   forceOneSecondXTicks?: boolean;
   shiftPlotLeft?: boolean;
+  heightClass?: string;
 };
 
 const chartConfig = {
@@ -122,6 +123,7 @@ export default function WpmGraph({
   durationSeconds,
   forceOneSecondXTicks = false,
   shiftPlotLeft = false,
+  heightClass,
 }: WpmGraphProps) {
   const hasFixedDuration = typeof durationSeconds === "number";
   const maxErrorSecond = errorPoints.reduce(
@@ -238,13 +240,13 @@ export default function WpmGraph({
   return (
     <Card className="w-full overflow-hidden gap-2 border-neutral-900 bg-neutral-950 py-2.5 shadow-none">
       <CardHeader className="px-3 pb-1 md:px-4">
-        <CardTitle className="flex items-center gap-2 text-neutral-200 font-mono mx-5 mt-3">
+        <CardTitle className="flex items-center gap-2 text-neutral-200 font-mono mx-5 mt-1 text-sm md:text-base">
           Typing speed
         </CardTitle>
-        <CardDescription className="font-mono text-neutral-500 mx-5 mb-3 mt-2">
+        <CardDescription className="font-mono text-neutral-500 mx-5 mb-1.5 mt-0.5 text-xs">
           0s to {axisMaxSeconds}s
         </CardDescription>
-        <div className="mx-5 flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.18em] text-neutral-500 font-mono">
+        <div className="mx-5 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-[0.18em] text-neutral-500 font-mono">
           <span className="flex items-center gap-1.5">
             <span
               className="h-2 w-2 rounded-full"
@@ -279,7 +281,7 @@ export default function WpmGraph({
       <CardContent className="px-2 pt-1 md:px-3">
         <div className={shiftPlotLeft ? "-ml-1 w-[calc(100%+0.25rem)]" : "w-full"}>
           <ChartContainer
-            className="h-[clamp(10rem,30vh,22rem)] w-full md:h-[clamp(14rem,34vh,24rem)]"
+            className={heightClass || "h-[clamp(10rem,30vh,22rem)] w-full md:h-[clamp(14rem,34vh,24rem)]"}
             config={chartConfig}
           >
             <LineChart
