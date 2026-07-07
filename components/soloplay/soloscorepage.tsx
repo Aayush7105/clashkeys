@@ -76,7 +76,7 @@ const SoloScorePage: React.FC<Props> = ({
         </div>
 
         <section className="flex w-full flex-col gap-2 md:gap-4 lg:flex-row lg:items-start">
-          <div className="flex gap-4 md:gap-6 lg:w-[15%] lg:flex-col lg:gap-3">
+          <div className="flex gap-8 md:gap-12 lg:w-[15%] lg:flex-col lg:gap-6">
             <div>
               <div className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-neutral-500">
                 wpm
