@@ -73,31 +73,7 @@ const SoloScorePage: React.FC<Props> = ({
             <br />
             <span className="text-lg tracking-normal md:text-xl">solo play</span>
           </p>
-          <div className="flex items-center gap-3">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => window.location.reload()}
-                    className="cursor-pointer rounded-xl px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-[#e2b714] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e2b714]"
-                    type="button"
-                    aria-label="restart test"
-                  >
-                    <RiLoopLeftLine className="size-5 md:size-6" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top">restart test</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
 
-            <button
-              onClick={onRestart}
-              className="bg-[#e2b714] ring px-2.5 py-1 rounded-xl text-center text-xs font-semibold uppercase tracking-normal text-neutral-950 transition-colors hover:bg-amber-300/90 cursor-pointer"
-              type="button"
-            >
-              go back
-            </button>
-          </div>
         </div>
 
         <section className="flex w-full flex-col gap-2 md:gap-4 lg:flex-row lg:items-start">
@@ -146,11 +122,9 @@ const SoloScorePage: React.FC<Props> = ({
         <section className="overflow-hidden rounded-lg bg-neutral-950 ring ring-neutral-900 font-mono">
           <div className="flex flex-col gap-1.5 border-b border-neutral-900 bg-neutral-950 px-5 py-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-[#646669]">
-                score breakdown
-              </p>
-              <h2 className="mt-0.5 text-2xl font-semibold leading-none text-[#d1d0c5] sm:text-3xl">
-                Metrics
+
+              <h2 className="mt-0.5 text-2xl font-semibold leading-none text-neutral-300 sm:text-2xl">
+                Score Breakdown
               </h2>
             </div>
 
@@ -182,7 +156,7 @@ const SoloScorePage: React.FC<Props> = ({
             </div>
 
             <div className="flex flex-col items-center justify-center px-5 py-4 text-center">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#646669]">
+              <p className="text-[12px] font-semibold uppercase tracking-wide text-[#646669]">
                 Keystrokes
               </p>
 
@@ -196,7 +170,7 @@ const SoloScorePage: React.FC<Props> = ({
             </div>
 
             <div className="flex flex-col items-center justify-center px-5 py-4 text-center">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#646669]">
+              <p className="text-[12px] font-semibold uppercase tracking-wide text-[#646669]">
                 Raw Speed
               </p>
 
@@ -224,11 +198,33 @@ const SoloScorePage: React.FC<Props> = ({
             </div>
           </div>
         </section>
+        <section className="flex justify-center items-center">
+          <div className="flex items-center gap-3">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="cursor-pointer rounded-xl px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-[#e2b714] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e2b714]"
+                    type="button"
+                    aria-label="restart test"
+                  >
+                    <RiLoopLeftLine className="size-5 md:size-6" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top">restart test</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
 
-
-
-
-
+            <button
+              onClick={onRestart}
+              className="bg-[#e2b714] ring px-2.5 py-1 rounded-xl text-center text-xs font-semibold uppercase tracking-normal text-neutral-950 transition-colors hover:bg-amber-300/90 cursor-pointer"
+              type="button"
+            >
+              go back
+            </button>
+          </div>
+        </section>
       </div>
     </div>
   );
