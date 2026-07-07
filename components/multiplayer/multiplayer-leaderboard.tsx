@@ -141,7 +141,7 @@ export default function MultiplayerLeaderboard({
           </div>
 
           <motion.div
-            className="divide-y divide-neutral-800"
+            className="divide-y divide-neutral-800 max-h-[300px] sm:max-h-[400px] overflow-y-auto pr-1"
             initial="hidden"
             animate="visible"
             variants={{
