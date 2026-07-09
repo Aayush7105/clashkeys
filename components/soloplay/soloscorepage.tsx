@@ -7,6 +7,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { RiLoopLeftLine } from "react-icons/ri";
+import Shortcuts from "../shortcuts";
 
 interface Props {
   wpm: number;
@@ -225,6 +226,7 @@ const SoloScorePage: React.FC<Props> = ({
             </button>
           </div>
         </section>
+        <section><Shortcuts/></section>
       </div>
     </div>
   );
