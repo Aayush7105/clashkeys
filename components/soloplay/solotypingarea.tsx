@@ -188,7 +188,17 @@ const SoloTypingArea: React.FC<SoloTypingAreaProps> = ({
     focusInput();
   }, [focusInput]);
 
-  useEffect(() => {
+  useEffect(()=>{
+    const handleKeyDown = (e:KeyboardEvent) =>{
+      if (e.ctrlKey && e.key === "r") {
+      e.preventDefault();
+      window.location.reload()
+    }
+    }
+  }) 
+  
+  
+  useEffect(() => { 
     if (startTime === null || endTime !== null) return;
 
     const id = setInterval(() => {
